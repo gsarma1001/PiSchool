@@ -11,3 +11,13 @@
 - Follow the architecture and design decisions in the project plan. For a new website, use Next.js App Router, TypeScript, and Tailwind CSS, and document the actual compatible dependency versions.
 - Do not implement future phases until requested. In particular, do not add AI features or student accounts as part of the initial foundation.
 - Validate changes with the smallest relevant existing checks, and report what works, what was verified, and what remains incomplete.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

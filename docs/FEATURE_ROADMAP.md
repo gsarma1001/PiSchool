@@ -1,6 +1,6 @@
 # The Pi School — Feature Roadmap and Requirements
 
-Updated: October 30, 2026
+Updated: November 5, 2026
 Suggested repository location: `docs/FEATURE_ROADMAP.md`
 Status: Planning baseline. Proposed features are not authorization to implement every phase at once.
 
@@ -128,13 +128,29 @@ Store question ID/version, prompt, topic, intended level, hint, solution, public
 
 **Done when:** a reviewed problem renders correctly on mobile; hints and solutions are keyboard accessible; publication dates behave correctly; no unreviewed question is published.
 
-### F07 — Opportunities and beginner guides
+### F07 — Worldwide math events and beginner guides
 
-Cover competitions, Olympiads, conferences and workshops. Fields: title, organizer, category, audience, eligibility, location/online format, start/end date, timezone, separate registration deadline, official URL, registration status, last verified date, and editorial status. Unknown dates/status must remain explicitly unknown.
+Cover math conferences, competitions, Olympiads, tournaments, and workshops worldwide. Include local through international events and clearly distinguish the venue's location from where entrants are eligible to participate.
 
-Provide filters by grade/level, category, format and date; archive past events. Add beginner guides explaining how to choose an event, preparation expectations and official registration steps. Link to official organizers for authoritative requirements. A future event does not imply open registration.
+**Timing.** Add the requirements now. Build the directory in M2 after the content preservation and site foundation milestones. Launch with a small set of verified events across several regions and online formats, then expand country by country and through verified organizer submissions. Treat worldwide coverage as the long-term scope and track which regions and organizers are covered.
 
-**Done when:** each real listing has an official source and verification date; filters work; deadlines are separate from event dates; stale events are handled honestly. Automated collection, if later added, creates drafts for review.
+| Listing field | What to capture |
+| --- | --- |
+| Event and organizer | Name, organizer, category, edition, and official event URL |
+| Event schedule | Start/end dates and organizer time zone |
+| Mode and location | Online, in person, or hybrid. Include city and country for in-person participation |
+| Eligibility | Eligible grades, original local year labels, age cutoffs, divisions, and geographic restrictions where applicable. Use equivalent grade filters only where the mapping is verified. Label conferences for educators, researchers, or other audiences when school grades do not apply |
+| Registration route | Direct official registration link when available. Label school or test-center registration, team entry, qualification, invitation, or other requirements when applicable |
+| Registration deadline | Last date to register, with the cutoff time and time zone if published. Show distinct deadlines by division, participation mode, or registration route when they differ |
+| Registration status | Open, not yet open, closed, waitlist, or unknown, based on the organizer's information |
+| Preparation materials | Optional links to official sample questions, past papers, answer keys, or worked solutions. Label which division or year the material covers when known. Link to organizer materials and reproduce them only when permission allows |
+| Verification | Source URL for each key detail as needed, last verified date, and editorial status |
+
+Provide search and filters by grade/level, event type, mode, country/region, event dates, and registration status. Let families sort by upcoming registration deadline and distinguish event dates from deadlines on cards and detail pages. Show explicit states such as “Deadline not announced,” “Registration link not published,” or “Sample questions not published” when appropriate. Preserve date-only deadlines without inventing cutoff times. Keep organizer time zones visible when converting a timed deadline for the visitor.
+
+Start with manual verification and publish only reviewed entries. Recheck active listings before deadlines, flag broken links and date changes for review, archive past editions, and keep separate editions or rounds where eligibility or deadlines differ. Future automated discovery should create drafts for editorial review. Beginner guides should explain how to choose an event, prepare, and register through the official route.
+
+**Done when:** published listings are traceable to official sources and show verified dates, participation mode, eligibility, registration details, and sample resources when available. Filters and deadline sorting work across regions, and the directory handles unknown details, closed registration, and archived events clearly.
 
 ### F08 — Math Discoveries
 
@@ -272,7 +288,7 @@ Do not enable new AI processing or publish unreviewed content.
 - Which tutors and availability are current?
 - What are the actual homework-help hours and registration method?
 - Is help free, paid, or included with tutoring?
-- Which grade bands and geography should opportunity listings prioritize?
+- Which countries, organizers, and grade bands should the first worldwide directory listings prioritize?
 - Who reviews math questions and publishes weekly content?
 - What exactly should Calculus IV cover?
 - When is persistent progress valuable enough to introduce accounts?
@@ -288,7 +304,7 @@ These do not block preserving content or applying the visual theme.
 - [ ] F04 verified feedback and current team published
 - [ ] F05 real contact delivery verified
 - [ ] F06 first original weekly challenge reviewed
-- [ ] F07 opportunities sourced and verified
+- [ ] F07 worldwide math events directory launched with verified listings and preparation links where available
 - [ ] F08 discovery content reviewed and attributed
 - [ ] F09 real help schedule and registration verified
 - [ ] F10 admin access and publication workflow verified
