@@ -56,7 +56,7 @@ All statuses below are **proposed / not verified as implemented**, unless explic
 | F04 | Testimonials and current tutor profiles | Near term | F01; owner content review |
 | F05 | Tutoring pages and contact flow | Near term | Verified services; delivery configuration |
 | F06 | Weekly Math Challenge | Near term | Reviewed original questions |
-| F07 | Competition/Olympiad/conference directory and guides | Near term | Official-source verification |
+| F07 | Worldwide math events and beginner guides | Near term | Official-source verification |
 | F08 | Math Discoveries: research, news, facts | Near term | Editorial review |
 | F09 | Weekly homework-help calendar | Near term | Confirmed schedule and registration method |
 | F10 | Editorial/admin dashboard | Near term | Database, admin authentication and authorization |
