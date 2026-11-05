@@ -1,0 +1,88 @@
+{
+  "sourceUrl": "https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/",
+  "captureDate": "2026-11-05",
+  "sourcePage": "Homepage testimonial carousel",
+  "uniqueTestimonialsObserved": 6,
+  "ownerProvidedTestimonials": 1,
+  "totalTestimonialsForPublication": 7,
+  "carouselCopiesPerTestimonialObserved": 4,
+  "duplicateCarouselCopiesRemoved": 18,
+  "testimonials": [
+    {
+      "id": "saket-l-ap-calculus-ab",
+      "quote": "The Pi Schools tutoring program helped me grow a lot in calculus as a whole and allowed me to get an A in AP calculus AB. The school has very friendly tutors who make learning easy, and make math feel a lot easier than it should be.",
+      "displayedAttribution": "Saket L",
+      "displayedSubject": "AP Calculus AB",
+      "sourceUrl": "https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/",
+      "captureDate": "2026-11-05",
+      "carouselCopiesObserved": 4,
+      "duplicateCopiesRemoved": 3,
+      "publicationReview": "Owner-approved for publication 2026-11-05"
+    },
+    {
+      "id": "ishan-d-algebra-2",
+      "quote": "The Pi School's tutoring has helped me grasp new concepts and improve my knowledge on known concepts. With the tutoring I was able to work ahead of my school and understand what each formula meant and where it derived from. Before tutoring my math grade was around 88-92 but now after I started tutoring it is 97+ consistently.",
+      "displayedAttribution": "Ishan D",
+      "displayedSubject": "Algebra 2",
+      "sourceUrl": "https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/",
+      "captureDate": "2026-11-05",
+      "carouselCopiesObserved": 4,
+      "duplicateCopiesRemoved": 3,
+      "publicationReview": "Owner-approved for publication 2026-11-05"
+    },
+    {
+      "id": "tanisha-r-calculus-1-math-151",
+      "quote": "Tutoring with Abhay has helped me get good grades in my calculus 1 class through Bellevue College. He teaches concepts well and shows you how to apply them to different questions. I enjoyed how he takes the topics you are learning and relates them to real life situations. This makes his sessions engaging and interesting!",
+      "displayedAttribution": "Tanisha R",
+      "displayedSubject": "Calculus 1 | Math 151",
+      "sourceUrl": "https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/",
+      "captureDate": "2026-11-05",
+      "carouselCopiesObserved": 4,
+      "duplicateCopiesRemoved": 3,
+      "publicationReview": "Owner-approved for publication 2026-11-05"
+    },
+    {
+      "id": "ashwin-m-algebra-2",
+      "quote": "PI’s school’s tutoring was fabulous in working with me to understand and grasp concepts I was having a hard time to before. The tutors are super friendly and patient and will keep working with you to ensure you properly understand the concepts and problems and always ready to answer questions or help.",
+      "displayedAttribution": "Ashwin M",
+      "displayedSubject": "Algebra 2",
+      "sourceUrl": "https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/",
+      "captureDate": "2026-11-05",
+      "carouselCopiesObserved": 4,
+      "duplicateCopiesRemoved": 3,
+      "publicationReview": "Owner-approved for publication 2026-11-05"
+    },
+    {
+      "id": "vidhu-algebra-1",
+      "quote": "I liked Abhay’s class because while he’s very casual, it’s his casual approach I found helpful. He is very laid back and doesn’t pressure you to solve anything or express any kind of disappointment when you get something wrong, he just patiently corrects you. His teaching style is also pretty interactive and engaging.",
+      "displayedAttribution": "Vidhu",
+      "displayedSubject": "Algebra 1",
+      "sourceUrl": "https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/",
+      "captureDate": "2026-11-05",
+      "carouselCopiesObserved": 4,
+      "duplicateCopiesRemoved": 3,
+      "publicationReview": "Owner-approved for publication 2026-11-05"
+    },
+    {
+      "id": "anonymous-algebra-1",
+      "quote": "Thank you for helping me with Algebra 1. I was struggling with the subject and you helped me understand it better. I was a D in Math before I started tutoring with you and now I am an A-. Thank you for your help.",
+      "displayedAttribution": "Anonymous",
+      "displayedSubject": "Algebra 1",
+      "sourceUrl": null,
+      "captureDate": null,
+      "sourceType": "Owner-provided",
+      "publicationReview": "Owner-approved for publication 2026-11-05"
+    },
+    {
+      "id": "bhai-at-bhai",
+      "quote": "School made easy with these tutors . Great work.",
+      "displayedAttribution": "Bhai",
+      "displayedSubject": "@Bhai",
+      "sourceUrl": "https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/",
+      "captureDate": "2026-11-05",
+      "carouselCopiesObserved": 4,
+      "duplicateCopiesRemoved": 3,
+      "publicationReview": "Owner-approved for publication 2026-11-05"
+    }
+  ]
+}
