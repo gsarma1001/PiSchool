@@ -4,19 +4,32 @@ I reviewed your homepage, team page, and FAQ page. Your domain currently display
 
 I’m assuming you mean **Visual Studio Code with an AI coding assistant**, such as GitHub Copilot or Codex. The prompts below can be used sequentially in its coding chat.
 
-## Implementation status — 2026-11-05
+## Implementation status — 2026-11-07
 
-Prompt 1 is complete: the App Router, TypeScript, and Tailwind CSS foundation; responsive shared site shell and minimal homepage; project brief, implementation plan, curriculum scope, environment example, and local setup instructions are in place. Lint, TypeScript, production build, and local production HTTP checks passed. Phase 0 public-source capture includes the accessible pages and assets, six unique homepage testimonials, and seven expanded FAQs. The owner supplied and approved an additional testimonial; all seven are displayed in the local application. Remaining content review and private-record reconciliation are tracked separately; the live site/domain were not changed.
+Prompt 1 is complete: the App Router, TypeScript, and Tailwind CSS foundation; responsive shared site shell and minimal homepage; project brief, implementation plan, curriculum scope, environment example, and local setup instructions are in place. Lint, TypeScript, production build, and local production HTTP checks passed. Phase 0 public-source capture includes the accessible pages and assets, six unique homepage testimonials, and seven expanded FAQs. The owner supplied and approved an additional testimonial; all seven are displayed in the local application. The owner has reviewed the flagged preservation content and confirmed no private records were collected or kept; specific corrections or republication decisions for flagged claims/contact/team content are still unrecorded. The live site/domain were not changed.
+
+F05 has since added local tutoring/contact routes and a short, server-validated inquiry form with Resend delivery code. Local credentials are configured, but Resend has not verified the sender domain and rejected the test email; inbox receipt and Reply-To behavior remain unverified. See `docs/FEATURE_ROADMAP.md` for the current F05 status.
 
 | Prompt or phase | Status | Notes |
 |---|---|---|
 | Prompt 1 — Establish the project and working rules | Complete | The local application foundation and minimal homepage are implemented. Lint, TypeScript, production build, and production-server homepage checks pass. |
-| Phase 0 — Preserve | In progress — next required phase | Public pages, assets, six unique testimonials, and seven expanded FAQs are archived and reconciled. Owner review and any private-record exports remain outstanding; see `docs/CONTENT_MIGRATION.md`. |
-| Phase 1 — Redesign | Foundation only | The minimal local homepage exists; full public pages and contact flow await owner review, remaining preservation work, and future scope approval. |
-| Phase 2 — Math hub | Not started | Future phase; not implemented. |
+| Phase 0 — Preserve | Complete | Public pages, assets, six unique testimonials, and seven expanded FAQs are archived and reconciled. The owner completed the flagged-content review and confirmed there are no private records to export. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
+| Phase 1 — Redesign | Foundation plus partial F05 | Tutoring/contact routes and the validated inquiry form are implemented locally. Resend DNS verification and inbox/Reply-To verification remain outstanding; current tutor details also need review. |
+| Phase 2 — Math hub | Partial — F06 implemented locally | The Daily Math Challenge now has a typed service/repository boundary, versioned reviewed bank content, deterministic integer/fraction/linear-equation templates, reproducible challenge snapshots, and device-local progress. Its 14-course, 154-topic catalog and readiness summary remain bank-derived; ten Arithmetic topics have authored five-level coverage. Other Phase 2 features and incomplete topic banks remain unimplemented; see `docs/FEATURE_ROADMAP.md` and `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md`. |
 | Phase 3 — Daily Quick Mind pilot | Not started | Future phase; not implemented. |
 | Phase 4 — Expand learning | Not started | Future phase; not implemented. |
 | Phase 5 — Launch and operate | Not started | Future phase; production website and domain have not been changed. |
+
+F06 is a local pilot, not a complete curriculum or a production publishing
+workflow. Its file-backed question service combines authored content with
+deterministic templates for integer arithmetic, adding/subtracting fractions,
+and linear equations. Arithmetic and Number Sense has five authored questions
+per topic for all ten requested topics; other listed topics remain “Coming
+soon” unless an existing complete bank applies. Trigonometry and Precalculus
+share the same trigonometry bank. Mathematical answer rules and solutions stay
+server-side; challenge snapshots and student progress are saved on the
+visitor’s device only. Owner/educator review and wider topic coverage remain
+open before production use.
 
 ## 1. What to preserve before rebuilding
 
@@ -80,12 +93,12 @@ Keep **Get Tutoring Help** as the primary action.
 
 The current proposed Pi School theme uses **pale aqua `#E6F3F4`** as the dominant page background, **blue-gray `#F0F4F8`** for alternating sections, and **soft white `#FAFCFD`** for cards and form surfaces. Use **navy `#1D385C`** for headings, primary buttons, and the footer; **teal `#087F8C`** for selected controls and interaction accents; **slate `#293746`** for body text; occasional **purple `#86239B`** for challenge-related accents; **gold `#F2BE48`** for restrained decoration; and **`#D8DDD4`** for borders. For normal-size text links, use the accessible deeper teal `#076F79`: the specified teal has only 4.18:1 contrast against pale aqua, while the deeper shade exceeds 4.5:1 on both proposed light backgrounds. These are proposed Pi School theme values, not claimed AoPS brand colors. The general academic color direction is inspired by the requested reference; do not copy its logos, photography, text, or page design. Keep the existing layout, readable typography, subtle mathematical illustrations, and minimal motion.
 
-### Proposed learning features — not implemented
+### Learning features — planned scope and current status
 
-Near-term concepts for future review:
+Future concepts:
 
 - Learning-pathway cards that could help visitors explore suitable math topics.
-- An original Weekly Math Challenge with hints and worked solutions, published only after its content is reviewed.
+- F06 Daily Math Challenge is implemented locally with a typed question service, file repository, deterministic parameterized templates, server-side grading/help, versioned snapshots, and device-local progress. Its 14-course, 154-topic catalog has bank-derived readiness; Arithmetic and Number Sense is fully banked for its ten requested topics. Independent content review and broader curriculum coverage remain open before production use.
 
 Future backlog concepts, with no implementation commitment or launch date:
 

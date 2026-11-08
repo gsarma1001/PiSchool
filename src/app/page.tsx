@@ -40,6 +40,16 @@ const plannedFeatures = [
     symbol: "□",
     style: "feature-card-cream",
   },
+  {
+    number: "05",
+    title: "Daily Math Challenge",
+    description:
+      "A new original problem with progressive hints and a worked solution will be published each day after review.",
+    label: "Preparing",
+    symbol: "?",
+    style: "feature-card-blue",
+    href: "/daily-challenge",
+  },
 ];
 
 export default function Home() {
@@ -64,7 +74,7 @@ export default function Home() {
               of ways to explore mathematics.
             </p>
             <div className="hero-actions">
-              <Link className="button button-primary" href="#tutoring">
+              <Link className="button button-primary" href="/tutoring">
                 Explore tutoring <span aria-hidden="true">↗</span>
               </Link>
               <Link className="button button-text" href="#explore">
@@ -195,9 +205,19 @@ export default function Home() {
                 </span>
                 <h3>{feature.title}</h3>
                 <p>{feature.description}</p>
-                <span aria-hidden="true" className="feature-arrow">
-                  ↗
-                </span>
+                {feature.href ? (
+                  <Link
+                    aria-label={`Visit ${feature.title}`}
+                    className="feature-arrow feature-card-link"
+                    href={feature.href}
+                  >
+                    Explore <span aria-hidden="true">↗</span>
+                  </Link>
+                ) : (
+                  <span aria-hidden="true" className="feature-arrow">
+                    ↗
+                  </span>
+                )}
               </article>
             ))}
           </div>
@@ -247,8 +267,8 @@ export default function Home() {
             Tutoring details and contact options will be added after the
             existing content has been reviewed.
           </p>
-          <Link className="button button-light" href="#tutoring">
-            Learn about tutoring <span aria-hidden="true">↑</span>
+          <Link className="button button-light" href="/contact">
+            Request tutoring <span aria-hidden="true">↑</span>
           </Link>
         </div>
         <span aria-hidden="true" className="closing-decoration closing-left">

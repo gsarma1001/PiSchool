@@ -1,6 +1,6 @@
 # The Pi School — Feature Roadmap and Requirements
 
-Updated: November 5, 2026
+Updated: November 7, 2026
 Suggested repository location: `docs/FEATURE_ROADMAP.md`
 Status: Planning baseline. Proposed features are not authorization to implement every phase at once.
 
@@ -12,11 +12,13 @@ This document supplements `docs/PROJECT_PLAN.md`; it does not replace its origin
 
 AoPS is a reference for academic presentation and learning patterns. Keep The Pi School's branding, wording, imagery, teaching approach, and implementation original.
 
-## 2. Current state — reported, not independently audited
+## 2. Current state — checked November 7, 2026
 
-The owner shared a development report confirming a Next.js App Router, TypeScript, and Tailwind foundation; responsive homepage; shared header/navigation/footer; and passing lint, typecheck, and build checks.
+The local application has a Next.js App Router, TypeScript, Tailwind styling, a responsive shared site shell, a homepage, tutoring and contact pages, and seven owner-approved testimonials published locally. F05 includes a short inquiry form with server-side validation, a honeypot, a best-effort in-process rate limit, and Resend email delivery code. Local email environment variables are populated, but a test request was rejected by Resend with HTTP 403 because `thepischools.com` is not verified. No email was accepted or sent; F05 delivery is not complete.
 
-The current repository has not been inspected for this document. Content migration, exact testimonial preservation, contact delivery, accounts, booking, and AI were reported outstanding. Completion of the proposed palette change has not been confirmed.
+The public source archive and F01 reconciliation are complete. On 2026-11-07, the owner confirmed reviewing the flagged team/contact/outcome-claim content and confirmed no private records were collected or kept for this website. The review did not record specific corrections or republication approvals, so flagged details remain unverified and must not be presented as current facts. The testimonial portion of F04 is complete locally; current tutor profiles remain unverified and unpublished. Booking, accounts, database-backed storage, and AI are not implemented.
+
+F06 has a working local daily challenge route with a typed question-service and repository boundary, a server-only file bank, and deterministic templates for integer arithmetic, fraction addition/subtraction, and linear equations. Its 14-course, 154-topic typed curriculum catalog still derives readiness from complete coverage. Ten Arithmetic and Number Sense topics each have five authored questions (one at every difficulty), as well as a retained complete mixed-review topic. Other catalog topics remain marked “Coming soon” unless an existing complete bank or supported template supplies all five difficulties. The five-question daily set is selected by local date, timezone, course/level, topic, and generation version, then cached as a versioned public snapshot separately from attempts in device-local storage. Answer checking, hints, and solutions stay server-side. No account, cross-device sync, database, AI, or production publishing workflow is included. The authored content has not received separate owner/educator review for production. See `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md` for the service, content lifecycle, and authoring rules.
 
 Do not mark a feature complete solely because its navigation, mockup, or placeholder exists.
 
@@ -35,27 +37,27 @@ Do not mark a feature complete solely because its navigation, mockup, or placeho
 
 | Milestone | Scope | Exit condition |
 | --- | --- | --- |
-| M0 — Preserve | F01 | Source archive and content reconciliation complete |
+| M0 — Preserve | F01 | Complete — source archive and content reconciliation complete |
 | M1 — Design and trust | F02–F05 | Consistent theme, honest learning paths, verified testimonials/team, working inquiries |
-| M2 — Resource hub | F06–F10 | Weekly challenge, reviewed opportunities/news, real help schedule, editorial workflow |
+| M2 — Resource hub | F06–F10 | Daily challenge, reviewed opportunities/news, real help schedule, editorial workflow |
 | M3 — Practice pilot | F11 | Guest 5/10-question sessions with reliable server-side grading |
 | M4 — Assisted learning | F12–F15 | Evaluated AI feedback, reviewed curriculum expansion, optional accounts and targeted review |
 | M5 — Advanced experiences | F16–F20 | Selected contest, live-learning, and community features justified by demand and staffing |
 
-M0 remains the next required project phase. The visual theme may be refined independently without publishing unverified content. No calendar dates or delivery estimates are committed here.
+M0 / F01 is complete. The next feature candidate is F07 — Worldwide math events and beginner guides, subject to official-source verification. The visual theme may be refined independently without publishing unverified content. No calendar dates or delivery estimates are committed here.
 
 ## 5. Feature inventory
 
-All statuses below are **proposed / not verified as implemented**, unless explicitly noted.
+The inventory defines scope and dependencies. Current verified completion is recorded in Section 2 and each feature specification below.
 
 | ID | Feature | Priority | Dependencies |
 | --- | --- | --- | --- |
-| F01 | Original-content and testimonial preservation | Required next | Access to public site and private exports where available |
+| F01 | Original-content and testimonial preservation | Complete | Archive and owner reconciliation complete; no private records were collected or kept |
 | F02 | Aqua/navy visual theme | Near term | Existing app foundation |
 | F03 | Learning-pathway cards | Near term | Reviewed service scope |
 | F04 | Testimonials and current tutor profiles | Near term | F01; owner content review |
 | F05 | Tutoring pages and contact flow | Near term | Verified services; delivery configuration |
-| F06 | Weekly Math Challenge | Near term | Reviewed original questions |
+| F06 | Daily Math Challenge | Near term | Reviewed original questions |
 | F07 | Worldwide math events and beginner guides | Near term | Official-source verification |
 | F08 | Math Discoveries: research, news, facts | Near term | Editorial review |
 | F09 | Weekly homework-help calendar | Near term | Confirmed schedule and registration method |
@@ -75,13 +77,15 @@ All statuses below are **proposed / not verified as implemented**, unless explic
 
 ### F01 — Preserve original content
 
-Archive homepage, team, FAQs with expanded answers, contact details, images, logos, and existing URLs. The earlier browser review found six distinct homepage testimonial attributions: Saket L, Ishan D, Tanisha R, Ashwin M, Vidhu, and Bhai. Treat this as a reconciliation checkpoint, not an exhaustive source archive or substitute for exact quote capture.
+Archive homepage, team, FAQs with expanded answers, contact details, images, logos, and existing URLs. Six distinct homepage testimonials were captured from the public carousel (Saket L, Ishan D, Tanisha R, Ashwin M, Vidhu, and Bhai); the owner supplied one additional testimonial. All seven are preserved and approved for local publication.
 
 Store stable ID, original wording, displayed name, subject, source URL, capture date, and review status. Preserve an immutable source copy separately from edited marketing content. Deduplicate repeated carousel copies only. Import must be repeatable without creating duplicates.
 
 Private inquiries, unpublished feedback, scheduling records, and client contact information require separate exports. Do not infer their recovery from a public crawl.
 
-**Done when:** every discovered source item is accounted for; exact testimonial comparison passes; missing/private records are listed; outdated tutor information and outcome claims are flagged for owner review.
+**Done when:** every discovered source item is accounted for; exact testimonial comparison passes; missing/private records are listed or confirmed not applicable; outdated tutor information and outcome claims are flagged and reviewed by the owner. Specific corrections and publication approval remain prerequisites before reuse of flagged content.
+
+**Status:** Complete for archive and reconciliation. The owner completed the flagged-content review and confirmed that no private records were collected or kept (2026-11-07). Tutor, contact, and outcome-claim details remain flagged because the review did not record specific corrections or approval to republish them.
 
 ### F02 — Visual theme
 
@@ -110,23 +114,33 @@ Add three clear entry cards: **Build Foundations**, **Get Homework Help**, and *
 
 ### F04 — Testimonials and tutor profiles
 
-Display verified testimonials in readable cards and a full feedback page. Avoid requiring motion to read quotes. Review current tutor participation, biographies, photographs, subjects and availability. Keep original quotes intact; editorial excerpts must be separately identified and traceable to the complete quote.
+Seven owner-approved testimonials are published in readable cards on the local homepage, with original wording and attributions. Avoid requiring motion to read quotes. Current tutor participation, biographies, photographs, subjects and availability still need review; no tutor profiles are being represented as current.
+
+**Status:** testimonial publication is complete locally; tutor-profile review and publication remain incomplete.
 
 **Done when:** published quotes match their archive; no invented stars or outcomes appear; tutor information is reviewed; original attributions remain intact.
 
 ### F05 — Tutoring and contact
 
-Explain subjects, session formats, how tutoring works, and actual next steps. Contact fields should collect only necessary information. Use server-side validation, spam controls, and a configured delivery or storage destination. Do not display success if delivery/storage fails. Do not invent pricing.
+Explain the source-confirmed broad math scope and tutoring formats, and provide a request path without implying current availability. The contact form collects only parent/guardian name, reply email, student grade or course, and requested help. It validates on the server, includes a hidden honeypot and best-effort in-process rate limit, and sends through Resend using server-only `RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`, and `INQUIRY_TO_EMAIL`. The intended recipient is `thepischooltutoring@gmail.com`; the sender must be an address on a domain verified with Resend. The owner still needs to configure these values and production edge rate limiting.
 
-**Done when:** a real inquiry reaches its intended destination; failure and validation states work; private inquiries are protected; expected response arrangements are accurately described.
+**Status:** routes, form, validation, spam controls, and delivery code are implemented locally. The test inquiry was rejected with HTTP 403: Resend reports that `thepischools.com` is not verified. Verify the domain in Resend, then repeat the inbox/Reply-To test. No test inquiry has been delivered.
 
-### F06 — Weekly Math Challenge
+**Done when:** a real inquiry reaches its intended destination; failure and validation states work; private inquiries are protected; expected response arrangements are accurately described. A provider acceptance is not proof of final inbox receipt.
 
-Start with one original reviewed problem per week, labeled by learning level/topic, with a progressive hint and expandable worked solution. Browse without login. Add archived challenges and printable versions later. A challenge may initially be self-checking; do not imply automatic grading unless implemented.
+### F06 — Daily Math Challenge
 
-Store question ID/version, prompt, topic, intended level, hint, solution, publication date and review status. Support clear equations and accessible diagrams where needed.
+A daily set contains five problems for one selected course/level and topic, in ascending difficulty. Each item has a progressive hint and worked solution. Visitors can practice without login. The current question bank is authored and version-controlled in server-side code; archived challenges, printable versions, and a content publishing workflow remain future work.
 
-**Done when:** a reviewed problem renders correctly on mobile; hints and solutions are keyboard accessible; publication dates behave correctly; no unreviewed question is published.
+Each bank item has a unique ID, eligible course/levels, topic/subtopic, difficulty, prompt, structured answer rule, hint, worked-solution steps, and optional answer-format instructions. Keep answer keys and grading logic out of client code. Use clear notation and accessible diagrams if later content requires them.
+
+**Status:** the responsive daily challenge is implemented locally at `/daily-challenge`; the former `/weekly-challenge` path redirects there. Students choose a course/level, search its topics, and start only topics with verified question coverage for all five difficulty levels. The catalog contains 14 courses and 154 distinct topics, including the complete requested Arithmetic and Number Sense topic set. Each of its ten requested topics has five authored questions; the retained whole-number mixed-review bank is also complete. Other existing complete banks remain playable, while incomplete catalog topics are marked “Coming soon.” The same trigonometric-ratio questions are shared under Trigonometry and Precalculus without duplication. The coverage table is derived from the bank, not manually maintained.
+
+Answer keys and deterministic answer checking remain server-side. The initial rules handle integers, equivalent fractions, explicitly permitted exact decimal equivalents, fixed-place decimals with a per-question tolerance, and unordered integer solution sets. Blank/unreadable submissions do not count as attempts. Hints and worked solutions unlock help-completion credit. Versioned local storage restores the current session, results, and local-calendar streak history; replaying a completed same-day challenge returns its original result. This is a starter collection, not a complete curriculum or production editorial system. Independent owner/educator review remains open before production use.
+
+Focused checks cover question-bank completeness and canonical answers, stable daily selection, answer formats, corrupted/outdated local progress, and streak rules across duplicates, gaps, and calendar boundaries. Local browser checks cover wrong/blank answers, progression, help, refresh recovery, same-day replay, multiple topics on one day, and the mobile results layout.
+
+**Done when:** the local pilot remains reliable and accessible; wider curriculum coverage and independent content review are complete before a production publishing process is introduced.
 
 ### F07 — Worldwide math events and beginner guides
 
@@ -301,9 +315,10 @@ These do not block preserving content or applying the visual theme.
 - [ ] F01 archived and reconciled
 - [ ] F02 theme reviewed on desktop/mobile
 - [ ] F03 pathways link to honest destinations
-- [ ] F04 verified feedback and current team published
+- [x] F04 owner-approved testimonials published in the local rebuild
+- [ ] F04 current tutor profiles reviewed and published
 - [ ] F05 real contact delivery verified
-- [ ] F06 first original weekly challenge reviewed
+- [ ] F06 first original daily challenge reviewed and daily publishing process confirmed
 - [ ] F07 worldwide math events directory launched with verified listings and preparation links where available
 - [ ] F08 discovery content reviewed and attributed
 - [ ] F09 real help schedule and registration verified

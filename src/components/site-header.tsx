@@ -17,7 +17,7 @@ export function SiteHeader() {
       </a>
       <header className="site-header">
         <div className="header-inner">
-          <Link aria-label="The Pi School home" className="brand" href="#home">
+          <Link aria-label="The Pi School home" className="brand" href="/">
             <span aria-hidden="true" className="brand-mark">
               π
             </span>
@@ -41,16 +41,19 @@ export function SiteHeader() {
             className={`main-nav${menuOpen ? " is-open" : ""}`}
             id="main-navigation"
           >
-            <Link href="/#tutoring" onClick={closeMenu}>
+            <Link href="/tutoring" onClick={closeMenu}>
               Tutoring
             </Link>
             <Link href="/#explore" onClick={closeMenu}>
               Explore
             </Link>
+            <Link href="/daily-challenge" onClick={closeMenu}>
+              Daily challenge
+            </Link>
             <Link href="/#testimonials" onClick={closeMenu}>
               Testimonials
             </Link>
-            <Link className="nav-cta" href="/#tutoring" onClick={closeMenu}>
+            <Link className="nav-cta" href="/contact" onClick={closeMenu}>
               Get started <span aria-hidden="true">↗</span>
             </Link>
           </nav>

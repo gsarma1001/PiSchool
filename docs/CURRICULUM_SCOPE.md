@@ -24,8 +24,40 @@ with the relevant course sequence. Do not assume a standard topic list.
 
 ## Current status
 
-- No curriculum taxonomy has been implemented in the application.
-- No exercises, answer keys, grading logic, or student records are
-  included in the initial homepage.
-- Topic selection and grade/course boundaries remain open decisions for
-  a future curriculum phase.
+- The typed curriculum catalog now defines 14 stable course IDs and 154
+  distinct topic IDs, including every topic in the requested course list.
+  Course and topic display names, descriptions, and display order are stored
+  separately from question content. The existing whole-number mixed-review
+  topic remains available to preserve its prior challenge bank.
+- Arithmetic and Number Sense has five authored questions at each of five
+  difficulty levels for every listed topic: place value; comparing and
+  ordering numbers; addition; subtraction; multiplication; division; order
+  of operations; rounding and estimation; factors and multiples; and prime
+  numbers. Its existing whole-number mixed-review bank is also complete.
+- Other existing complete banks remain available where their topic and course
+  mapping match: adding and subtracting fractions; proportions; one-step and
+  two-step equations; function notation; the Pythagorean theorem; quadratic
+  equations; trigonometric ratios; differentiation rules; definite integrals;
+  partial derivatives; separable equations; and determinants. Shared
+  trigonometric ratios use one topic and question bank under Trigonometry and
+  Precalculus; linear equations are shared by Pre-Algebra and Algebra 1.
+- Topic readiness and the course coverage summary are derived from actual
+  question-bank entries. A topic is ready only when it has a verifiable answer,
+  hint, and worked solution at each of the five difficulty levels. Incomplete
+  topics are marked “Coming soon” and cannot be started.
+- The catalog is broader than authored question coverage: future topics are
+  intentionally listed but remain unavailable until their complete sets are
+  written and checked. Learning objectives, prerequisites, grade-by-grade
+  boundaries, and broader subtopic maps remain future work.
+- The bank and answer-checking rules are server-side. The challenge saves
+  versioned progress in browser local storage; there are no accounts or
+  cross-device records.
+- The challenge now uses a typed question-service and repository boundary.
+  File-backed authored questions and deterministic integer-arithmetic,
+  fraction-add/subtract, and linear-equation templates are selected into
+  reproducible five-level snapshots. Attempts and cached public snapshots are
+  separate fields in device-only progress. See
+  `DAILY_CHALLENGE_QUESTION_SYSTEM.md` for the interface, lifecycle, versioning,
+  template format, and content authoring instructions.
+- Canonical answer rules and required solution fields are checked in tests.
+  Independent owner/educator review remains open before production use.

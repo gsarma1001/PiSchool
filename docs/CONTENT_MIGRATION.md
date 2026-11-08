@@ -1,13 +1,15 @@
 # Content migration tracker
 
-This tracker distinguishes captured public source material from private records and content that still needs owner review. The archive is a preservation copy, not approved publication copy.
+This tracker distinguishes captured public source material from private records and the owner's publication decisions. The archive is a preservation copy, not approved publication copy.
 
 ## Capture status
 
 - **Capture date:** 2026-11-05
 - **Public capture:** Complete for the accessible pages and assets listed below.
-- **Reconciliation:** Six unique homepage testimonials captured from the public carousel, plus one additional testimonial supplied by the owner. Seven testimonial cards are approved for the local rebuild. Seven expanded FAQ entries were captured.
-- **Next required project phase:** Content preservation remains active until the owner reviews flagged items and locates any private records worth retaining.
+- **Reconciliation:** Complete. Six unique homepage testimonials captured from the public carousel, plus one additional testimonial supplied by the owner. Seven testimonial cards are approved for the local rebuild. Seven expanded FAQ entries were captured.
+- **Owner review:** Completed 2026-11-07. The owner reviewed the flagged team, contact, and outcome-claim content. Specific corrections or publication approvals were not provided in this tracker; those items remain flagged and must not be treated as verified current information.
+- **Private records:** The owner confirmed no private records were collected or kept for this website; no export is applicable.
+- **Next required project phase:** F01 / Phase 0 content preservation is complete. Future private records, if discovered later, must be stored outside the repository.
 - **Live site:** No live website, domain, DNS, or content was changed.
 
 The requested site is `https://thepischools.com/`. It serves an outer frameset that embeds `https://purple-wave-0b8d2aa1e.6.azurestaticapps.net/`. `picampus-school.com` is unrelated and is not part of this archive. A separate research agent mistakenly opened that site during investigation; its content was not included or used as source material.
@@ -43,7 +45,9 @@ All five page requests returned HTTP 200. The accessible navigation routes are `
 
 The rendered scrolling carousel displayed **24 cards: six unique source testimonials, each shown four times**. The structured archive retains one copy of each and omits the **18 repeated display copies**. The owner added and reviewed one additional testimonial, bringing the local publication set to seven. All seven have owner approval for publication in the local rebuild; this does not change the live site.
 
-## Content captured but requiring owner review
+## Owner-reviewed content with publication decisions still pending
+
+The owner reviewed the following flagged items on 2026-11-07. This review completion closes the F01 archive/reconciliation task; it does not by itself verify that the details are current or approve republication. Keep these items unpublished or qualified until the specific corrections and approvals are recorded.
 
 - **Tutor profiles:** Abhay, Aanya, Samya, and Chandan C. are shown as “NCHS Junior.” Confirm current bios, school/year references, consent, and availability before reuse.
 - **Public contact details conflict:** the contact page links to `tel:+1234567890` and `mailto:info@thepischool.com`; the FAQ links to `thepischool@gmail.com`. Confirm the correct public phone and email. The phone number appears placeholder-like and must not be published without verification.
@@ -73,8 +77,8 @@ The public pages do not establish which services hold these records. Check the o
 - [x] Record accessible routes, unavailable routes, and the canonical-domain discrepancy.
 - [x] List private-record categories separately without copying private data.
 - [x] Flag claims, tutor details, contact details, and testimonials for owner review.
-- [ ] Owner review of current team information, contact details, and outcome claims.
-- [ ] Owner locates and exports any private records that should be retained.
+- [x] Owner reviewed current team information, contact details, and outcome claims (2026-11-07); specific corrections and publication decisions remain to be recorded before reuse.
+- [x] Owner confirmed no private records were collected or kept for this website; no export is applicable.
 
 ## Archive index
 

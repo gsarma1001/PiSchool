@@ -9,7 +9,7 @@ production changes.
 | Prompt or phase | Status | Exit criteria |
 |---|---|---|
 | Prompt 1 — Foundation and homepage | Complete | App Router, TypeScript, Tailwind, responsive shared shell and homepage; required docs and setup instructions; ESLint, TypeScript, production build, and HTTP 200 homepage content checks passed. |
-| Phase 0 — Preserve | In progress — public archive captured | Accessible public pages, assets, six unique source testimonials, seven expanded FAQs, and one owner-provided testimonial are archived. Seven testimonials are approved for the local site. Owner review of tutor/contact/claims and any private-record exports remain open. |
+| Phase 0 — Preserve | Complete | Accessible public pages, assets, six unique source testimonials, seven expanded FAQs, and one owner-provided testimonial are archived. The owner completed the flagged-content review and confirmed no private records were collected or kept. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
 | Phase 1 — Redesign | Foundation only | Responsive homepage, shared header/footer, and testimonials are implemented. Reviewed tutoring/team/FAQ/contact pages and a configured contact flow remain future work. |
 | Phase 2 — Math hub | Not started | Protected publishing workflow and source-verified opportunity/discovery content. |
 | Phase 3 — Daily Quick Mind pilot | Not started | Reviewed topics and validated server-side grading for a small pilot. |
