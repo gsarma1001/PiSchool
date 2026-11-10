@@ -26,6 +26,10 @@ template questions. The seed includes the local challenge date, timezone,
 course, topic, and generation version. Question candidates are identified by
 stable ID and version, preventing two versions of one item from being confused.
 Incomplete topics are unavailable rather than filled from another topic.
+Topic availability requires eligible question coverage at all five difficulty
+levels. Only available topics appear in the main selector; incomplete topics
+remain visible in the optional upcoming-topics disclosure. This readiness gate
+does not imply complete curriculum coverage or student mastery.
 
 ## Question record and lifecycle
 
@@ -62,6 +66,10 @@ Parameterized templates live in
 `src/app/daily-challenge/question-service/templates.ts`. The current templates
 are:
 
+- `elementary-math-foundations`, with deterministic, grade-scoped
+  multiple-choice questions for the 19 Kindergarten–Grade 5 topics listed in
+  `docs/CURRICULUM_SCOPE.md`. Public choices and visual metadata are exposed,
+  while answer rules, hints, and solutions stay server-side.
 - `integer-arithmetic`, with topic-specific structures for whole-number
   arithmetic, addition, subtraction, multiplication, division, and order of
   operations.

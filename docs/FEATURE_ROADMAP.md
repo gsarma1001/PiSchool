@@ -1,6 +1,6 @@
 # The Pi School — Feature Roadmap and Requirements
 
-Updated: November 7, 2026
+Updated: November 8, 2026
 Suggested repository location: `docs/FEATURE_ROADMAP.md`
 Status: Planning baseline. Proposed features are not authorization to implement every phase at once.
 
@@ -18,7 +18,19 @@ The local application has a Next.js App Router, TypeScript, Tailwind styling, a 
 
 The public source archive and F01 reconciliation are complete. On 2026-11-07, the owner confirmed reviewing the flagged team/contact/outcome-claim content and confirmed no private records were collected or kept for this website. The review did not record specific corrections or republication approvals, so flagged details remain unverified and must not be presented as current facts. The testimonial portion of F04 is complete locally; current tutor profiles remain unverified and unpublished. Booking, accounts, database-backed storage, and AI are not implemented.
 
-F06 has a working local daily challenge route with a typed question-service and repository boundary, a server-only file bank, and deterministic templates for integer arithmetic, fraction addition/subtraction, and linear equations. Its 14-course, 154-topic typed curriculum catalog still derives readiness from complete coverage. Ten Arithmetic and Number Sense topics each have five authored questions (one at every difficulty), as well as a retained complete mixed-review topic. Other catalog topics remain marked “Coming soon” unless an existing complete bank or supported template supplies all five difficulties. The five-question daily set is selected by local date, timezone, course/level, topic, and generation version, then cached as a versioned public snapshot separately from attempts in device-local storage. Answer checking, hints, and solutions stay server-side. No account, cross-device sync, database, AI, or production publishing workflow is included. The authored content has not received separate owner/educator review for production. See `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md` for the service, content lifecycle, and authoring rules.
+F06 has a working local daily challenge route with a typed question-service and repository boundary, a server-only file bank, and deterministic templates for integer arithmetic, fraction addition/subtraction, linear equations, and 19 elementary topics. The shared catalog defines 14 advanced course IDs and 173 topics: 154 advanced-course topics plus Kindergarten–Grade 5 topics. Each elementary topic has a grade-scoped five-question generated set with selectable answers and optional accessible visuals. Ten Arithmetic and Number Sense topics each have five authored questions (one at every difficulty), as well as a retained complete mixed-review topic. Readiness is derived from complete coverage. Other topics remain “Coming soon” unless an existing complete bank or supported template supplies all five difficulties. The five-question daily set is selected by local date, timezone, grade/course level, topic, and generation version, then cached as a versioned public snapshot separately from attempts in device-local storage. Answer checking, hints, and solutions stay server-side. No account, cross-device sync, database, AI, or production publishing workflow is included. Elementary and authored content have not received separate owner/educator review for production. See `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md` and `docs/CURRICULUM_SCOPE.md`.
+
+The shared curriculum labels Kindergarten, US Grades 1–12, and college/advanced math while keeping grade separate from course and topic. K–5 challenge coverage is a starter set, not a complete grade-by-grade curriculum; topic gaps and further review are tracked in `docs/CURRICULUM_SCOPE.md`.
+
+F07's local directory redesign is complete: seven published editions across
+seven event families, one archived edition, and one non-public draft. Families
+and annual editions are separately modeled; the public view has purpose tabs,
+URL-backed filters, compact cards, separate uncertain-eligibility results,
+and student-only deadline handling. Thirty-two source leads remain research
+starting points, not verified event listings. No verified upcoming conference,
+student workshop, or university tournament is published; the global
+30–40-family expansion remains open. See
+`docs/EVENT_DIRECTORY_EDITORIAL.md` for exact sources and limitations.
 
 Do not mark a feature complete solely because its navigation, mockup, or placeholder exists.
 
@@ -44,7 +56,7 @@ Do not mark a feature complete solely because its navigation, mockup, or placeho
 | M4 — Assisted learning | F12–F15 | Evaluated AI feedback, reviewed curriculum expansion, optional accounts and targeted review |
 | M5 — Advanced experiences | F16–F20 | Selected contest, live-learning, and community features justified by demand and staffing |
 
-M0 / F01 is complete. The next feature candidate is F07 — Worldwide math events and beginner guides, subject to official-source verification. The visual theme may be refined independently without publishing unverified content. No calendar dates or delivery estimates are committed here.
+M0 / F01 is complete. F07 — Worldwide math events and beginner guides has been implemented locally in M2; see the verified-coverage and editorial-gap notes below. The Kindergarten–Grade 5 expansion updates F06 and F07 without completing the broader curriculum. The visual theme may be refined independently without publishing unverified content. No calendar dates or delivery estimates are committed here.
 
 ## 5. Feature inventory
 
@@ -166,9 +178,112 @@ Start with manual verification and publish only reviewed entries. Recheck active
 
 **Done when:** published listings are traceable to official sources and show verified dates, participation mode, eligibility, registration details, and sample resources when available. Filters and deadline sorting work across regions, and the directory handles unknown details, closed registration, and archived events clearly.
 
+#### F07 implementation contract and M2 status
+
+The site foundation and content-preservation dependencies are complete, so
+implementation proceeds in M2. The directory is a curated first release, not
+comprehensive worldwide coverage. Preserve the existing site shell, palette,
+typography, and navigation across `/events`, `/events/[slug]`, and
+`/events/guides`. The implemented directory groups events by purpose, uses
+responsive event cards, keeps primary filters brief and additional filters
+collapsed, shows removable filter chips, and keeps archived editions hidden
+by default. Confirmed matches and uncertain eligibility are separate groups.
+Details include the event family and edition, schedule, mode and venue,
+distinct eligibility, divisions, registration routes and purpose-labeled
+deadlines/statuses, official preparation resources, source links,
+last-verified date, next review, and editorial state.
+
+The validated version-controlled model stores event families separately from
+annual editions and derives a flattened public read model. Families have stable
+IDs, names/aliases, organizer, intended purpose and audience, detailed type,
+official homepage, and preparation links. Editions have stable IDs/slugs,
+family ID, year/season, date-only or timed schedules, organizer timezone,
+online/in-person/hybrid mode, multiple venues and local sessions, original
+school-year labels, age/cutoff rules, divisions, entry pathway, participation
+format, verified fee when available, geographic eligibility independent from
+venue, and sourced grade mappings. Registration deadlines have explicit
+purposes for student, school/team, host, or organizer purchasing. Schema
+validation never substitutes for content review.
+Only official organizers, authorized national bodies, or designated official
+providers support published facts. Unknown details remain explicitly unknown;
+do not infer a new edition's dates, an open status from a future deadline,
+universal eligibility from a host country, or worldwide eligibility from
+online mode. Do not copy protected preparation content.
+
+Search event/family names, aliases, organizer, and description. Keep purpose,
+grade/level, audience, detailed type, participation format, mode, venue
+country/region, entrant-eligibility country/region, event date range,
+registration status, entry pathway, division, route, verified fee, archive,
+online inclusion, uncertainty inclusion, and sort in shareable URL state.
+Unknown eligibility is excluded from confirmed results and, only when
+requested, shown separately as “Eligibility to check.” Online does not mean
+worldwide. Deadline sorting uses only student-registration deadlines and
+excludes host/organizer purchasing deadlines; it compares timed cutoffs across
+IANA timezones including daylight saving, and leaves date-only deadlines as calendar dates rather than midnight.
+For timed and date-only deadlines on the same date, timed entries sort first;
+unknown deadlines follow known upcoming deadlines. Reliably passed timed
+deadlines cannot remain open and must be flagged for source recheck. Do not
+calculate a precise closure instant from date-only deadlines. Visitor-local
+conversion is optional; the organizer's published time and timezone remain
+visible.
+
+Include five concise beginner guides: choosing by level/interests/format/
+eligibility/experience; understanding event types; preparing with official
+samples and past papers; using direct, school, test-center, team,
+qualification, or invitation routes; and interpreting deadlines, timezones,
+divisions, and local school-year labels. Explain national selection for
+international finals and link to event-specific official rules.
+
+Start with manual editorial review and no custom admin. Record how to add a
+draft, verify official sources, review and publish, recheck near deadlines,
+flag broken links/date changes/stale conflicts, and archive editions without
+overwriting their history. There is no scheduled automation unless separately
+implemented. Future discovery or organizer submissions create drafts; changed
+facts are never auto-published. Treat submitted descriptions and URLs as
+untrusted. Use server rendering/static public content where practical; do not
+scrape sites or call AI on visitor loads. Keep client code limited to public
+content and filtering. Controls must be labeled and keyboard accessible,
+tables semantic, focus visible, status understandable without color, and
+mobile cards must retain dates, eligibility, and routes.
+
+Focused tests cover combined filters/URL state, venue versus entrant
+eligibility, grade mappings and non-school audiences, unknown/date-only/timed
+deadline ordering, timezone/DST handling, route/division/mode-specific
+deadlines, passed/closed routes, archived entries, and unpublished records.
+Run lint, type, tests, and production build. Launch target: about 8–12 verified
+listings across at least three regions and online formats, but accuracy takes
+priority over quota.
+
+The F07 directory redesign is complete locally: directory/detail/guide routes,
+responsive cards, purpose views, normalized family/edition records,
+URL-backed filters, confirmed/uncertain eligibility groups, student-purpose
+deadline handling, runtime validation, an editorial report, and 20 focused
+event tests are in place. The reviewed collection has seven published editions
+across seven families, one archived COMC edition, and one Australian Maths
+Competition draft excluded from public results. Current geographic coverage
+includes US/Canada, Europe, and online international opportunities. There is
+not yet a verified upcoming conference, student workshop, or university
+tournament. Thirty-two source leads remain research starting points, and the
+30–40-family expansion remains open; accuracy takes priority over a numeric
+target. AMC student deadlines depend on each local host; organizer/site
+deadlines are purpose-labeled and kept separate from student entry. No live
+website/domain changes were made. See `docs/EVENT_DIRECTORY_EDITORIAL.md` for
+checked sources, coverage, and the remaining research backlog.
+
+Elementary support extends the shared US-grade filters and beginner guidance
+through Kindergarten–Grade 5. Math Kangaroo USA's 2027 edition has verified
+US K–12 eligibility. Other elementary filters return a listing only when the
+edition's official rules and a verified mapping support it; host country,
+online mode, broad student audience, and age appearance do not imply grade
+eligibility. Preserve original organizer school-year labels; add a US-grade
+mapping only with an official, reviewed equivalency source. Beginner guides
+include parent/guardian guidance for younger participants.
+
 ### F08 — Math Discoveries
 
 Separate **Research Explained**, **Math News**, and **Interesting Facts**. Include learning-level/topic tags, original summaries, sources, publication date, review date and optional diagrams. Explain research uncertainty and distinguish established facts from new claims. Avoid confusing source publication date with your summary's publication date.
+
+**Progress:** A small, manually reviewed Math News page is now available at `/math-news`, linked from Explore. It contains two source-linked stories and is an initial slice of F08 only; research explainers, interesting facts, topic/level filters, and an editorial publishing workflow remain future work. Stories are static, curated records—not a live feed.
 
 **Done when:** every published item is reviewed and attributed; summaries are original; links work; research claims reflect the source; no unsupported feed content appears.
 

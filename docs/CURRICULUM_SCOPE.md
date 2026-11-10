@@ -24,8 +24,36 @@ with the relevant course sequence. Do not assume a standard topic list.
 
 ## Current status
 
+- The shared curriculum definitions in `src/lib/curriculum.ts` provide
+  US Kindergarten and Grades 1–12 filter options, broader school-level labels,
+  and the six elementary Daily Challenge levels. Grade level is separate from
+  math course/topic; elementary challenges map internally to the existing
+  Arithmetic and Number Sense course without changing its stable course ID.
+- Daily Challenge currently has five generated questions at each difficulty
+  for all 19 elementary topics: Kindergarten counting, comparing quantities,
+  patterns, and shapes/sorting; Grade 1 addition/subtraction within 20,
+  place value, and time/shapes; Grade 2 place value, equal groups, and
+  money/data; Grade 3 multiplication/division, fractions, and area/perimeter;
+  Grade 4 multidigit arithmetic, fractions, and angles/measurement; and
+  Grade 5 decimal/fraction operations, volume, and expressions/coordinates.
+  Selection is grade-scoped. Elementary answer choices, answer rules, hints,
+  and worked solutions are generated on the server; progress follows the
+  existing device-local persistence model.
+- Elementary challenge coverage is not comprehensive. Kindergarten positional
+  language and adding/subtracting with objects, Grade 1 measurement and
+  broader word problems, Grade 2 time/measurement, Grade 3 time/graphs and
+  multistep problems, Grade 4 factors/multiples and broader conversions, and
+  Grade 5 several requested strands need further content. Existing generated
+  templates also need independent educator review before production use.
+- F07 includes US grade filter choices, but published event records have no
+  verified US-grade equivalency mappings for Kindergarten–Grade 5. The
+  directory must therefore show no elementary matches until an editor adds
+  official, source-backed eligibility and any grade mapping; original
+  international school-year labels remain unchanged.
 - The typed curriculum catalog now defines 14 stable course IDs and 154
-  distinct topic IDs, including every topic in the requested course list.
+  distinct advanced-course topic IDs plus 19 elementary topic IDs (173
+  distinct topic IDs total), including every topic in the requested advanced
+  course list.
   Course and topic display names, descriptions, and display order are stored
   separately from question content. The existing whole-number mixed-review
   topic remains available to preserve its prior challenge bank.

@@ -2,7 +2,8 @@
 
 A responsive Next.js tutoring website with a shared site shell, tutoring
 information, approved student testimonials, a server-side tutoring inquiry
-form, and a local Daily Math Challenge pilot.
+form, a local Daily Math Challenge pilot, a curated math events directory,
+and an initial Math News page.
 
 ## Requirements
 
@@ -65,14 +66,42 @@ The form reports success only after Resend accepts the request. Provider
 acceptance does not itself guarantee final inbox delivery, so verify delivery
 and Reply-To behavior in the recipient inbox during the launch test.
 
+## Final validation and hardening status
+
+The site has been checked end-to-end on the local build: the main pages respond
+successfully, the app's internal links resolve without broken routes, and the
+daily-challenge and event validation suites pass. The production build also
+completes successfully. The remaining live-delivery dependency is the email
+provider configuration (Resend sender verification and recipient inbox
+validation), not the app logic itself.
+
 ## Daily Math Challenge
 
-Open `/daily-challenge` and choose a course/level followed by a specific
-topic using the searchable catalog. The catalog defines 14 courses and 154
-distinct topics. A topic can start only after its question bank has at least
-one verified problem at each difficulty from 1 through 5, with a hint and
-worked solution. Other listed topics appear as “Coming soon.” The live
-coverage summary is derived from the question bank.
+Open `/daily-challenge` and choose a US grade/level followed by a topic.
+The shared curriculum currently defines Kindergarten, Grades 1–12, and
+college/advanced math labels, along with 14 course IDs and 173 topics. The
+Daily Challenge has 19 elementary topics across Kindergarten–Grade 5, with
+five generated, progressively difficult multiple-choice questions for each
+topic. It also retains existing middle-school, high-school, college, and
+advanced math topics. Grade level remains distinct from course and topic.
+Elementary challenge content is a starter set, not complete grade coverage,
+and still needs independent educator review before production use.
+
+The 19 currently playable elementary topics are:
+
+- Kindergarten: counting collections, comparing quantities, patterns, shapes.
+- Grade 1: addition/subtraction within 20, tens and ones, time and shapes.
+- Grade 2: place value to 1,000, equal groups, money and simple data.
+- Grade 3: multiplication/division, fractions, area and perimeter.
+- Grade 4: multidigit arithmetic, fractions, angles and measurement.
+- Grade 5: decimal/fraction operations, volume, expressions and coordinate
+  grids.
+
+More requested strands remain gaps; see
+[docs/CURRICULUM_SCOPE.md](docs/CURRICULUM_SCOPE.md). The shared grade
+configuration lives in `src/lib/curriculum.ts`; add a grade/topic there and in
+the challenge catalog, then add reviewed question-bank or versioned template
+content and tests before marking it ready.
 
 Arithmetic and Number Sense is fully banked for this pass: all 10 requested
 topics have five authored problems each, plus the retained whole-number
@@ -81,7 +110,7 @@ course curricula. Shared topic/question sets, such as trigonometric ratios
 under Trigonometry and Precalculus, are not duplicated.
 
 Daily questions are selected deterministically for the local calendar date,
-course/level, and topic. Answer checking and answer keys stay server-side;
+grade/course level, and topic. Answer checking and answer keys stay server-side;
 progress and streaks are saved in versioned local storage on the current
 device only. This is not an adaptive system, account, or cross-device sync.
 Review question content before any production publication.
@@ -89,12 +118,30 @@ See [docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md](docs/DAILY_CHALLENGE_QUESTION_SYST
 for the question-service interface, repository contract, content lifecycle,
 templates, and content authoring rules.
 
+The curated event directory preserves organizer eligibility language. US
+grade filters match only explicit source-backed grade mappings. Math Kangaroo
+USA's verified 2027 rules include US Grades K–12; other events appear for
+elementary grades only when their own official rules and mappings support it.
+
+The Math Events directory groups opportunities by purpose and presents
+mobile-friendly cards. Event families are stored separately from annual
+editions; organizers, entry pathways, locations, and eligibility remain
+source-backed fields. Unconfirmed eligibility is shown separately and is never
+treated as a confirmed match. AMC host/organizer purchasing deadlines are not
+displayed as student deadlines. Run `npm run report:events` to see missing
+edition information and records whose next editorial review date has passed.
+See [docs/EVENT_DIRECTORY_EDITORIAL.md](docs/EVENT_DIRECTORY_EDITORIAL.md) for
+the editorial workflow, source registry, verified listings, and research
+backlog. This is a curated starting collection, not a complete worldwide
+calendar.
+
 ## Checks
 
 ```powershell
 npm run lint
 npm run typecheck
 npm run test:daily-challenge
+npm run test:events
 npm run build
 ```
 
