@@ -1,7 +1,12 @@
 import "server-only";
 import { createExtendedQuestionBank } from "./extended-question-bank";
 import type { AnswerRule } from "./domain";
-import { getCourseByName, type CourseId, type GradeCourse } from "./catalog";
+import {
+  getCourseByName,
+  type CourseId,
+  type GradeCourse,
+  type QuestionVisual,
+} from "./catalog";
 
 export type BankQuestion = {
   id: string;
@@ -19,6 +24,7 @@ export type BankQuestion = {
   hint: string;
   solutionSteps: string[];
   instructions?: string;
+  visual?: QuestionVisual;
 };
 
 export function question(
@@ -34,6 +40,7 @@ export function question(
   solutionSteps: string[],
   instructions?: string,
   version = 1,
+  visual?: QuestionVisual,
 ): BankQuestion {
   const courseIds = gradeCourses.map((gradeCourse) => {
     const course = getCourseByName(gradeCourse);
@@ -56,6 +63,7 @@ export function question(
     hint,
     solutionSteps,
     instructions,
+    visual,
   };
 }
 

@@ -49,10 +49,22 @@ function validateInquiry(formData: FormData) {
 }
 
 async function isRateLimited(): Promise<boolean> {
-  const requestHeaders = await headers();
-  const forwardedAddress = requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const clientAddress =
-    forwardedAddress || requestHeaders.get("x-real-ip") || "unknown";
+  let clientAddress = "unknown";
+
+  try {
+    const requestHeaders = await headers();
+    const forwardedAddress = requestHeaders
+      .get("x-forwarded-for")
+      ?.split(",")[0]
+      ?.trim();
+    clientAddress = forwardedAddress || requestHeaders.get("x-real-ip") || "unknown";
+  } catch (error) {
+    console.error(
+      "Inquiry rate-limit headers could not be read. Falling back to a single shared client bucket.",
+      error instanceof Error ? error.message : "Unknown header read error",
+    );
+  }
+
   const clientKey = createHash("sha256").update(clientAddress).digest("hex");
   const now = Date.now();
 

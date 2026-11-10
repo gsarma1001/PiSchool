@@ -1,6 +1,12 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import type { CourseId, GradeCourse } from "../catalog";
+import {
+  challengeTopics,
+  type CourseId,
+  type GradeCourse,
+  type QuestionVisual,
+} from "../catalog";
+import { checkAnswer, type AnswerRule } from "../domain";
 import { question, type BankQuestion, type QuestionFactory } from "../question-bank";
 import type { ChallengeDifficulty } from "./types";
 import type { QuestionRecord } from "./repository";
@@ -55,6 +61,34 @@ const templates = [
     topicIds: ["linear-equations"],
     generators: [{ version: 1, generate: linearEquationQuestion }],
   },
+  {
+    id: "elementary-math-foundations",
+    version: 1,
+    publicationStatus: "published",
+    reviewStatus: "mathematically-reviewed",
+    topicIds: [
+      "kindergarten-counting",
+      "kindergarten-comparing",
+      "kindergarten-patterns",
+      "kindergarten-shapes",
+      "grade-1-add-subtract",
+      "grade-1-place-value",
+      "grade-1-time-shapes",
+      "grade-2-place-value",
+      "grade-2-equal-groups",
+      "grade-2-money-data",
+      "grade-3-multiplication-division",
+      "grade-3-fractions",
+      "grade-3-area-perimeter",
+      "grade-4-multidigit-operations",
+      "grade-4-fractions",
+      "grade-4-angles-measure",
+      "grade-5-decimals-fractions",
+      "grade-5-volume",
+      "grade-5-expressions-coordinates",
+    ],
+    generators: [{ version: 1, generate: elementaryQuestion }],
+  },
 ] as const;
 
 function hashSeed(value: string): number {
@@ -104,12 +138,13 @@ function makeGenerated(
   parameters: TemplateParameters,
   subtopic: string,
   prompt: string,
-  canonical: string,
+  answer: string | AnswerRule,
   hint: string,
   solutionSteps: string[],
   answerType: "integer" | "fraction" = "integer",
   instructions?: string,
   templateVersion: number = templates.find((item) => item.id === templateId)?.version ?? 1,
+  visual?: QuestionVisual,
 ): GeneratedQuestion {
   const template = templates.find((item) => item.id === templateId);
   if (
@@ -138,13 +173,16 @@ function makeGenerated(
     difficulty,
     subtopic,
     prompt,
-    answerType === "fraction"
-      ? { type: "fraction", canonical }
-      : { type: "integer", canonical },
+    typeof answer === "string"
+      ? answerType === "fraction"
+        ? { type: "fraction", canonical: answer }
+        : { type: "integer", canonical: answer }
+      : answer,
     hint,
     solutionSteps,
     instructions,
     templateVersion,
+    visual,
   );
   return {
     ...item,
@@ -168,7 +206,9 @@ function topicLabel(topicId: string): string {
     "fraction-operations": "Adding and subtracting fractions",
     "linear-equations": "Solving linear equations in one variable",
   };
-  return labels[topicId] ?? topicId;
+  return labels[topicId] ??
+    challengeTopics.find((topic) => topic.id === topicId)?.label ??
+    topicId;
 }
 
 function integerQuestion(
@@ -642,6 +682,562 @@ function linearEquationQuestion(
     "integer",
     undefined,
     templateVersion,
+  );
+}
+
+function choiceAnswer(
+  correct: string,
+  distractors: string[],
+  valueType: "integer" | "fraction" | "text",
+  seed: number,
+): AnswerRule {
+  const ruleFor = (): AnswerRule =>
+    valueType === "fraction"
+        ? { type: "fraction", canonical: correct }
+        : { type: "integer", canonical: correct };
+  const isEquivalentToCorrect = (value: string) =>
+    valueType === "text"
+      ? value === correct
+      : checkAnswer(ruleFor(), value).status === "correct";
+  const optionCount =
+    ["Group A", "Group B", "Same", "Acute", "Right", "Obtuse"].includes(correct)
+      ? 3
+      : 4;
+  const values = [...new Set([correct, ...distractors])]
+    .filter((value) => value === correct || !isEquivalentToCorrect(value))
+    .slice(0, optionCount);
+  const denominator = Number(correct.split("/")[1]) || 1;
+  for (let fallback = 1; values.length < optionCount; fallback += 1) {
+    const candidate =
+      valueType === "integer"
+        ? String(Number(correct) + fallback)
+        : valueType === "fraction"
+          ? `${fallback}/${denominator}`
+          : `Other choice ${fallback}`;
+    if (!values.includes(candidate) && !isEquivalentToCorrect(candidate)) {
+      values.push(candidate);
+    }
+  }
+  for (let index = values.length - 1; index > 0; index -= 1) {
+    const swap = nextRandom(seed + index) % (index + 1);
+    [values[index], values[swap]] = [values[swap], values[index]];
+  }
+  return {
+    type: "choice",
+    canonical: correct,
+    valueType,
+    options: values.map((value, index) => ({
+      id: `choice-${String.fromCharCode(65 + index)}`,
+      label: value,
+      value,
+    })),
+  };
+}
+
+function elementaryQuestion(
+  makeQuestion: QuestionFactory,
+  context: GenerationContext,
+  difficulty: ChallengeDifficulty,
+  seed: number,
+  templateVersion: number = 1,
+): GeneratedQuestion {
+  let prompt: string;
+  let subtopic: string;
+  let answer = "";
+  let distractors: string[] = [];
+  let valueType: "integer" | "fraction" | "text" = "integer";
+  let hint: string;
+  let steps: string[];
+  let visual: QuestionVisual | undefined;
+  const parameters: TemplateParameters = { difficulty };
+  const a = randomInt(seed, 2, 9);
+  const b = randomInt(nextRandom(seed), 2, 9);
+  const c = randomInt(nextRandom(seed + 13), 1, 8);
+
+  switch (context.topicId) {
+    case "kindergarten-counting": {
+      const count = difficulty === 4
+        ? c + randomInt(seed, 1, 6)
+        : difficulty < 3
+          ? randomInt(seed, 1, 5 + difficulty)
+          : randomInt(seed, 6, 10 + difficulty);
+      answer = String(count);
+      distractors = [String(Math.max(0, count - 1)), String(count + 1), String(count + 2)];
+      subtopic = difficulty < 3 ? "Count the objects" : "Count and reason";
+      prompt = difficulty < 3
+        ? "How many stars do you see?"
+        : difficulty < 5
+          ? `There are ${count - c} blocks. How many more make ${count}?`
+          : `You have ${count} counters and add ${c}. How many counters are there now?`;
+      if (difficulty === 4) answer = String(c);
+      if (difficulty === 5) answer = String(count + c);
+      if (difficulty === 4) distractors = [String(c - 1), String(c + 1), String(count)];
+      if (difficulty === 5) distractors = [String(count + c - 1), String(count + c + 1), String(count + c + 2)];
+      visual = difficulty <= 3
+        ? { kind: "counters", label: "Stars", count }
+        : undefined;
+      hint = "Touch or count each object once. For a missing part, count on to the total.";
+      steps = [`Count the objects or identify the missing part.`, `The answer is ${answer}.`];
+      parameters.count = count;
+      parameters.extra = c;
+      break;
+    }
+    case "kindergarten-comparing": {
+      let left = randomInt(seed, 1, 5 + difficulty);
+      let right = randomInt(nextRandom(seed), 1, 5 + difficulty);
+      if (difficulty === 4 && right > left) [left, right] = [right, left];
+      const difference = Math.abs(left - right);
+      if (difficulty <= 2) {
+        answer = left > right ? "Group A" : left < right ? "Group B" : "Same";
+        distractors = ["Group A", "Group B", "Same"].filter((item) => item !== answer);
+        valueType = "text";
+        prompt = "Which group has more counters, or are they the same?";
+        visual = {
+          kind: "comparison",
+          label: "Compare the two groups",
+          count: left + right,
+          groups: [
+            { label: "Group A", count: left },
+            { label: "Group B", count: right },
+          ],
+        };
+      } else {
+        answer = String(difference);
+        distractors = [String(difference + 1), String(Math.max(0, difference - 1)), String(difference + 2)];
+        prompt = `Group A has ${left} counters and Group B has ${right}. How many more counters are in the larger group?`;
+      }
+      if (difficulty === 1) {
+        visual = {
+          kind: "comparison",
+          label: "Compare the two groups",
+          count: left + right,
+          groups: [
+            { label: "Group A", count: left },
+            { label: "Group B", count: right },
+          ],
+        };
+      } else if (difficulty === 2) {
+        prompt = `Group A has ${left}. Group B has ${right}. Which group has more, or are they the same?`;
+      } else if (difficulty === 4) {
+        prompt = `Mia has ${left} shells. Leo has ${right}. How many shells must Leo find to have as many as Mia?`;
+        answer = String(Math.max(0, left - right));
+        distractors = [String(Math.max(0, left - right) + 1), String(Math.abs(left - right)), String(left + right)];
+      } else if (difficulty === 5) {
+        prompt = `There are ${left} red blocks and ${right} blue blocks. How many blocks are there altogether?`;
+        answer = String(left + right);
+        distractors = [String(left + right - 1), String(left + right + 1), String(Math.abs(left - right))];
+      }
+      subtopic = difficulty <= 2 ? "Compare two groups" : "Find the difference";
+      hint = "Line up the groups or count on from the smaller group.";
+      steps = [`Compare or count on between the two groups.`, `The answer is ${answer}.`];
+      parameters.left = left;
+      parameters.right = right;
+      break;
+    }
+    case "kindergarten-patterns": {
+      const symbol = difficulty % 2 === 0 ? "● ▲ ● ▲" : "★ ○ ★ ○";
+      const answerText = difficulty < 3
+        ? (difficulty % 2 === 0 ? "Circle" : "Star")
+        : String(a + (difficulty === 3 ? 3 : 2));
+      answer = answerText;
+      valueType = difficulty < 3 ? "text" : "integer";
+      prompt = difficulty < 3
+        ? `What comes next in this pattern? ${symbol} …`
+        : `The pattern starts ${a}, ${a + 1}, ${a + 2}. What is the next number?`;
+      distractors = valueType === "text"
+        ? ["Triangle", "Square", answerText === "Star" ? "Circle" : "Star"]
+        : [String(Number(answerText) - 1), String(Number(answerText) + 1), String(Number(answerText) + 2)];
+      if (difficulty === 4) {
+        prompt = `The pattern goes ${a}, ${a + 2}, ${a + 4}. What comes next?`;
+        answer = String(a + 6);
+      }
+      if (difficulty === 5) {
+        prompt = `The pattern goes ${a}, ${a + 2}, ${a + 4}, __, ${a + 8}. What number is missing?`;
+        answer = String(a + 6);
+      }
+      subtopic = "Continue a pattern";
+      hint = "Look at what repeats or how much the numbers change each time.";
+      steps = [`Find the repeating part or count the same jump each time.`, `The next or missing part is ${answer}.`];
+      parameters.start = a;
+      parameters.difficulty = difficulty;
+      break;
+    }
+    case "kindergarten-shapes": {
+      const shape = difficulty % 2 === 0 ? "Square" : "Triangle";
+      answer = shape;
+      valueType = "text";
+      if (difficulty === 1) {
+        prompt = "Which shape has three straight sides?";
+      } else if (difficulty === 2) {
+        prompt = "Which shape has four equal sides and four corners?";
+        answer = "Square";
+      } else if (difficulty === 3) {
+        prompt = "Which shape has no straight sides and no corners?";
+        answer = "Circle";
+      } else if (difficulty === 4) {
+        prompt = "Which shape has four corners and opposite sides equal?";
+        answer = "Rectangle";
+      } else {
+        prompt = "A shape has three corners. What is its name?";
+        answer = "Triangle";
+      }
+      distractors = ["Circle", "Square", "Triangle", "Rectangle"].filter((item) => item !== answer);
+      subtopic = "Name a shape";
+      hint = "Count straight sides and corners, or notice whether the sides are curved.";
+      steps = [`Check the number of sides and corners in the description.`, `${answer} matches the description.`];
+      break;
+    }
+    case "grade-1-add-subtract": {
+      const first =
+        difficulty < 3
+          ? randomInt(seed, 3, 10)
+          : randomInt(seed, 3, 19);
+      const second =
+        difficulty < 3
+          ? randomInt(nextRandom(seed), 1, 9)
+          : randomInt(nextRandom(seed), 1, 20 - first);
+      if (difficulty === 1) {
+        prompt = `Find ${first} + ${second}.`;
+        answer = String(first + second);
+      } else if (difficulty === 2) {
+        const total = Math.min(20, first + second);
+        prompt = `Find ${total} − ${second}.`;
+        answer = String(total - second);
+      } else if (difficulty === 3) {
+        prompt = `${first} + __ = ${first + second}. What number is missing?`;
+        answer = String(second);
+      } else if (difficulty === 4) {
+        prompt = `There are ${first} birds. ${second} more arrive. How many birds are there now?`;
+        answer = String(first + second);
+      } else {
+        const total = first + second;
+        prompt = `There are ${total} apples. ${second} are eaten. How many are left?`;
+        answer = String(first);
+      }
+      const n = Number(answer);
+      distractors = [String(n - 1), String(n + 1), String(n + 2)];
+      subtopic = difficulty < 3 ? "Add and subtract within 20" : "Find a missing part";
+      hint = "Use a number line or count on. For subtraction, count back or find the missing part.";
+      steps = [`Write the numbers in the story or equation.`, `Add or subtract: ${answer}.`];
+      parameters.first = first;
+      parameters.second = second;
+      break;
+    }
+    case "grade-1-place-value":
+    case "grade-2-place-value":
+    case "grade-4-multidigit-operations": {
+      const grade2 = context.topicId === "grade-2-place-value";
+      const grade4 = context.topicId === "grade-4-multidigit-operations";
+      const base = grade4
+        ? randomInt(seed, 120, 640)
+        : grade2
+          ? randomInt(seed, 120, 850)
+          : randomInt(seed, 21, 89);
+      if (!grade4 && difficulty <= 2) {
+        const tens = Math.floor(base / 10) * 10;
+        const ones = base % 10;
+        prompt = difficulty === 1
+          ? `In ${base}, what is the value of the ${ones} in the ones place?`
+          : `What number is made from ${tens} and ${ones} ones?`;
+        answer = difficulty === 1 ? String(ones) : String(base);
+      } else if (!grade4 && difficulty === 3) {
+        prompt = `Write ${Math.floor(base / 100) ? `${Math.floor(base / 100)} hundreds, ` : ""}${Math.floor((base % 100) / 10)} tens, and ${base % 10} ones as a number.`;
+        answer = String(base);
+      } else if (grade4 && difficulty === 1) {
+        prompt = `Find ${base} + ${b * 10}.`;
+        answer = String(base + b * 10);
+      } else if (grade4 && difficulty === 2) {
+        prompt = `Find ${base * 2} − ${base}.`;
+        answer = String(base);
+      } else if (grade4 && difficulty === 3) {
+        prompt = `Find ${a * 123} × ${a}.`;
+        answer = String(a * 123 * a);
+      } else if (grade4 && difficulty === 4) {
+        prompt = `A school orders ${a} boxes with ${b * 10} pencils in each box. How many pencils is that?`;
+        answer = String(a * b * 10);
+      } else if (!grade2 && !grade4 && difficulty === 4) {
+        prompt = `What is 10 less than ${base}?`;
+        answer = String(base - 10);
+      } else if (!grade2 && !grade4) {
+        prompt = `What is 10 more than ${base}?`;
+        answer = String(base + 10);
+      } else if (difficulty === 4) {
+        prompt = `Round ${base} to the nearest ten.`;
+        answer = String(Math.round(base / 10) * 10);
+      } else {
+        prompt = `Round ${base} to the nearest hundred.`;
+        answer = String(Math.round(base / 100) * 100);
+      }
+      const result = Number(answer);
+      distractors = [String(result + 10), String(Math.max(0, result - 10)), String(result + 1)];
+      subtopic = grade4 ? "Use place value with larger numbers" : "Tens, hundreds, and ones";
+      hint = "Break the number into place-value parts before calculating or rounding.";
+      steps = [`Identify the place-value parts shown.`, `Combine them to get ${answer}.`];
+      parameters.base = base;
+      break;
+    }
+    case "grade-1-time-shapes": {
+      answer = difficulty % 2 === 0 ? "2:30" : "4:00";
+      valueType = "text";
+      if (difficulty === 1) prompt = "The short hand points to 4 and the long hand points to 12. What time is it?";
+      if (difficulty === 2) prompt = "The short hand is between 2 and 3. The long hand points to 6. What time is it?";
+      if (difficulty === 3) { prompt = "Thirty minutes after 5:00 is what time?"; answer = "5:30"; }
+      if (difficulty === 4) { prompt = "One hour after 6:30 is what time?"; answer = "7:30"; }
+      if (difficulty === 5) { prompt = "It is 3:30. What time will it be in one hour?"; answer = "4:30"; }
+      distractors = ["2:00", "3:30", "4:30", "5:00"].filter((item) => item !== answer);
+      subtopic = "Read and use time";
+      hint = "The long hand at 12 means :00. At 6, it means :30.";
+      steps = [`Read the hour and minute hands or count forward by one hour.`, `The time is ${answer}.`];
+      break;
+    }
+    case "grade-2-equal-groups":
+    case "grade-3-multiplication-division": {
+      const groups = randomInt(seed, 2, difficulty + 3);
+      const each = randomInt(nextRandom(seed), 2, 5 + Math.min(difficulty, 3));
+      if (difficulty === 1) {
+        prompt = `There are ${groups} groups with ${each} in each group. How many are there altogether?`;
+        answer = String(groups * each);
+        visual = { kind: "array", label: `${groups} rows of ${each}`, rows: groups, columns: each, count: groups * each };
+      } else if (difficulty === 2) {
+        prompt = `Find ${groups} × ${each}.`;
+        answer = String(groups * each);
+      } else if (difficulty === 3) {
+        prompt = `${groups * each} objects are shared equally among ${groups} children. How many does each child get?`;
+        answer = String(each);
+      } else if (difficulty === 4) {
+        prompt = `There are ${groups} bags with ${each} marbles in each. How many marbles are there?`;
+        answer = String(groups * each);
+      } else {
+        prompt = `${groups} × __ = ${groups * each}. What number is missing?`;
+        answer = String(each);
+      }
+      const result = Number(answer);
+      distractors = [String(result + 1), String(Math.max(0, result - 1)), String(result + groups)];
+      subtopic = difficulty <= 2 ? "Equal groups and arrays" : "Multiply and divide";
+      hint = "Draw equal groups or an array. Multiplication counts all the equal groups.";
+      steps = [`There are ${groups} equal groups of ${each}.`, `Multiply or divide to find ${answer}.`];
+      parameters.groups = groups;
+      parameters.each = each;
+      break;
+    }
+    case "grade-2-money-data": {
+      const centsA = randomInt(seed, 10, 90);
+      const centsB = randomInt(nextRandom(seed), 10, 90);
+      const cents = difficulty <= 3 ? centsA + centsB : Math.max(centsA, centsB) - Math.min(centsA, centsB);
+      valueType = "text";
+      prompt = difficulty <= 3
+        ? `A pencil costs $${(centsA / 100).toFixed(2)} and an eraser costs $${(centsB / 100).toFixed(2)}. What is the total cost?`
+        : `Cats got ${centsA} votes and dogs got ${centsB} votes. How many more votes did the larger group get?`;
+      if (difficulty <= 3) {
+        answer = `$${(cents / 100).toFixed(2)}`;
+        distractors = [
+          `$${((cents + 1) / 100).toFixed(2)}`,
+          `$${(Math.max(0, cents - 1) / 100).toFixed(2)}`,
+          `$${((cents + 2) / 100).toFixed(2)}`,
+        ];
+      } else {
+        answer = String(Math.abs(centsA - centsB));
+        distractors = [
+          String(Number(answer) + 1),
+          String(Math.max(0, Number(answer) - 1)),
+          String(Number(answer) + 2),
+        ];
+      }
+      subtopic = difficulty <= 3 ? "Add money amounts" : "Compare simple data";
+      hint = "Line up dollars and cents, or compare the two counts and find the difference.";
+      steps = [`Combine or compare the two amounts.`, `The answer is ${answer}.`];
+      parameters.amountA = centsA;
+      parameters.amountB = centsB;
+      break;
+    }
+    case "grade-3-fractions":
+    case "grade-4-fractions":
+    case "grade-5-decimals-fractions": {
+      const numeratorA = randomInt(seed, 1, 3);
+      const denominator = difficulty < 3 ? 4 : 8;
+      const numeratorB = randomInt(nextRandom(seed), 1, denominator - numeratorA);
+      let numerator = numeratorA + numeratorB;
+      let answerValue = fraction(numerator, denominator);
+      if (context.topicId === "grade-3-fractions") {
+        numerator = difficulty <= 2 ? numeratorA : Math.min(denominator, numeratorA + numeratorB);
+        answerValue = fraction(numerator, denominator);
+        prompt = difficulty <= 2
+          ? `A shape is split into ${denominator} equal parts. ${numeratorA} parts are shaded. Which fraction is shaded?`
+          : `Which is greater: ${numeratorA}/${denominator} or ${numeratorB}/${denominator}?`;
+        if (difficulty >= 3) {
+          answerValue = numeratorA >= numeratorB ? `${numeratorA}/${denominator}` : `${numeratorB}/${denominator}`;
+          valueType = "fraction";
+        } else {
+          valueType = "fraction";
+        }
+      } else if (context.topicId === "grade-4-fractions") {
+        if (difficulty <= 2) {
+          prompt = `Which fraction is equivalent to ${numeratorA}/${denominator}?`;
+          answerValue = `${numeratorA * 2}/${denominator * 2}`;
+          valueType = "fraction";
+        } else {
+          prompt = `Find ${numeratorA}/${denominator} + ${numeratorB}/${denominator}. Give a fraction.`;
+          answerValue = fraction(numeratorA + numeratorB, denominator);
+          valueType = "fraction";
+        }
+      } else {
+        const decimalA = randomInt(seed, 11, 45) / 10;
+        const decimalB = randomInt(nextRandom(seed), 11, 35) / 10;
+        if (difficulty <= 3) {
+          prompt = `Find ${decimalA.toFixed(1)} + ${decimalB.toFixed(1)}.`;
+          answerValue = (decimalA + decimalB).toFixed(1);
+          valueType = "text";
+        } else {
+          prompt = `Find ${numeratorA}/${denominator} + ${numeratorB}/${denominator}. Give a fraction.`;
+          answerValue = fraction(numeratorA + numeratorB, denominator);
+          valueType = "fraction";
+        }
+        parameters.decimalA = decimalA;
+        parameters.decimalB = decimalB;
+      }
+      answer = answerValue;
+      distractors = valueType === "fraction"
+        ? [`${numeratorA}/${denominator}`, `${numeratorA + 1}/${denominator}`, "1/2"]
+        : valueType === "text"
+          ? ["1/2", "2/3", "3/4"].filter((item) => item !== answerValue)
+          : [];
+      subtopic = context.topicId === "grade-3-fractions" ? "Fractions as equal parts" : context.topicId === "grade-4-fractions" ? "Equivalent fractions and like denominators" : "Decimal and fraction operations";
+      hint = "Use equal-sized parts. For fractions, keep a common denominator; for decimals, line up the decimal points.";
+      steps = [`Represent each amount in equal parts.`, `Combine or compare the parts to get ${answerValue}.`];
+      parameters.numeratorA = numeratorA;
+      parameters.numeratorB = numeratorB;
+      parameters.denominator = denominator;
+      break;
+    }
+    case "grade-3-area-perimeter": {
+      const length = randomInt(seed, 2, 5 + difficulty);
+      const width = randomInt(nextRandom(seed), 2, 5);
+      const area = length * width;
+      if (difficulty <= 2) {
+        prompt = `A rectangle is ${length} units long and ${width} units wide. What is its area in square units?`;
+        answer = String(area);
+        visual = { kind: "array", label: `${length} rows of ${width} square units`, rows: length, columns: width, count: area };
+      } else if (difficulty === 3) {
+        prompt = `A rectangle has length ${length} and width ${width}. What is its perimeter?`;
+        answer = String(2 * (length + width));
+      } else if (difficulty === 4) {
+        prompt = `A rectangle has area ${area} square units and width ${width}. What is its length?`;
+        answer = String(length);
+      } else {
+        prompt = `A garden is ${length} meters by ${width} meters. How many meters of fencing go around it?`;
+        answer = String(2 * (length + width));
+      }
+      const result = Number(answer);
+      distractors = [String(result + 1), String(Math.max(1, result - 1)), String(length + width)];
+      subtopic = difficulty <= 2 ? "Find area with an array" : "Area and perimeter";
+      hint = "Area counts square units inside. Perimeter adds all the side lengths around the outside.";
+      steps = [`Use ${difficulty <= 2 || difficulty === 4 ? "length × width" : "2 × (length + width)"}.`, `The answer is ${answer}.`];
+      parameters.length = length;
+      parameters.width = width;
+      break;
+    }
+    case "grade-4-angles-measure": {
+      const angle = randomInt(seed, 2, 16) * 10;
+      answer = String(difficulty < 3 ? (difficulty === 1 ? 90 : angle) : (180 - angle));
+      prompt = difficulty === 1
+        ? "How many degrees are in a right angle?"
+        : difficulty === 2
+          ? `An angle is ${angle}°. Is it acute, right, or obtuse?`
+          : difficulty === 3
+            ? `A straight angle is 180°. One part is ${angle}°. How many degrees are in the other part?`
+            : difficulty === 4
+              ? `Convert ${a} meters to centimeters.`
+              : `A ribbon is 2 meters long. How many centimeters long is it?`;
+      if (difficulty === 2) {
+        answer = angle < 90 ? "Acute" : angle === 90 ? "Right" : "Obtuse";
+        valueType = "text";
+      }
+      if (difficulty === 4) answer = String(a * 100);
+      if (difficulty === 5) answer = "200";
+      distractors = valueType === "text"
+        ? ["Acute", "Right", "Obtuse"].filter((item) => item !== answer)
+        : [String(Number(answer) + 10), String(Math.max(0, Number(answer) - 10)), String(Number(answer) + 20)];
+      subtopic = difficulty <= 3 ? "Angle measures" : "Metric conversions";
+      hint = "A right angle is 90°. One meter is 100 centimeters.";
+      steps = [`Use the angle fact or conversion: 1 meter = 100 centimeters.`, `The answer is ${answer}${valueType === "text" ? "" : "° or units"}.`];
+      parameters.angle = angle;
+      break;
+    }
+    case "grade-5-volume": {
+      const length = randomInt(seed, 2, 6);
+      const width = randomInt(nextRandom(seed), 2, 5);
+      const height = randomInt(nextRandom(seed + 17), 2, 4);
+      const volume = length * width * height;
+      prompt = difficulty <= 2
+        ? `A box is ${length} cubes long, ${width} cubes wide, and ${height} cubes tall. How many unit cubes fill it?`
+        : difficulty <= 4
+          ? `Find the volume of a rectangular prism with length ${length}, width ${width}, and height ${height}.`
+          : `A box has a base with area ${length * width} square units and height ${height}. What is its volume?`;
+      answer = String(volume);
+      const result = Number(answer);
+      distractors = [String(result + length), String(result - width), String(length * width)];
+      subtopic = "Volume of rectangular prisms";
+      hint = "Find how many cubes cover one layer, then multiply by the number of layers.";
+      steps = [`Find the base layer: ${length} × ${width} = ${length * width}.`, `Multiply by height: ${length * width} × ${height} = ${answer} cubic units.`];
+      visual = difficulty === 1
+        ? { kind: "array", label: "Unit cubes in one layer", rows: length, columns: width, count: length * width }
+        : undefined;
+      parameters.length = length;
+      parameters.width = width;
+      parameters.height = height;
+      break;
+    }
+    case "grade-5-expressions-coordinates": {
+      if (difficulty <= 3) {
+        const start = randomInt(seed, 2, 8);
+        const multiplier = randomInt(nextRandom(seed), 2, 5);
+        prompt = difficulty === 1
+          ? `Evaluate ${start} + ${multiplier}.`
+          : difficulty === 2
+            ? `Evaluate ${start} × ${multiplier} + 2.`
+            : `Evaluate (${start} + 2) × ${multiplier}.`;
+        answer = String(difficulty === 1 ? start + multiplier : difficulty === 2 ? start * multiplier + 2 : (start + 2) * multiplier);
+        parameters.start = start;
+        parameters.multiplier = multiplier;
+      } else {
+        const x = randomInt(seed, 1, 8);
+        const y = randomInt(nextRandom(seed), 1, 8);
+        prompt = difficulty === 4
+          ? `On a coordinate grid, move ${x} spaces right and ${y} spaces up from (0, 0). Which point do you reach?`
+          : `Point A is at (${x}, ${y}). How many units right is it from the y-axis?`;
+        answer = difficulty === 4 ? `(${x}, ${y})` : String(x);
+        valueType = difficulty === 4 ? "text" : "integer";
+        parameters.x = x;
+        parameters.y = y;
+      }
+      distractors = valueType === "text"
+        ? ["(1, 2)", "(2, 1)", "(3, 3)"].filter((item) => item !== answer)
+        : [String(Number(answer) + 1), String(Math.max(0, Number(answer) - 1)), String(Number(answer) + 2)];
+      subtopic = difficulty <= 3 ? "Evaluate numerical expressions" : "Read coordinate points";
+      hint = "Follow the operation order, or read the horizontal coordinate first.";
+      steps = [`Apply the operations in order or identify the x-coordinate.`, `The answer is ${answer}.`];
+      break;
+    }
+    default:
+      throw new Error(`No elementary generator exists for ${context.topicId}.`);
+  }
+
+  const rule = choiceAnswer(answer, distractors, valueType, seed);
+  return makeGenerated(
+    makeQuestion,
+    context,
+    difficulty,
+    "elementary-math-foundations",
+    parameters,
+    subtopic,
+    prompt!,
+    rule,
+    hint!,
+    steps!,
+    "integer",
+    "Choose one answer. A parent or teacher can help read the question if needed.",
+    templateVersion,
+    visual,
   );
 }
 

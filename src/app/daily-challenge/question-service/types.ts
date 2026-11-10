@@ -1,4 +1,4 @@
-import type { CourseId, GradeCourse } from "../catalog";
+import type { CourseId, GradeCourse, QuestionVisual } from "../catalog";
 import type { AnswerCheck, AnswerRule } from "../domain";
 
 export type ChallengeDifficulty = 1 | 2 | 3 | 4 | 5;
@@ -15,6 +15,7 @@ export type PublicTopic = {
   label: string;
   description: string;
   courseId: CourseId;
+  gradeCourse: GradeCourse;
   order: number;
   ready: boolean;
 };
@@ -30,6 +31,8 @@ export type PublicQuestion = {
   difficulty: ChallengeDifficulty;
   prompt: string;
   instructions?: string;
+  choices?: { id: string; label: string }[];
+  visual?: QuestionVisual;
   source: "bank" | "template";
   templateId?: string;
   templateVersion?: number;
@@ -65,7 +68,7 @@ export type QuestionLocator = Pick<
 
 export type QuestionService = {
   listCourses(): PublicCourse[];
-  listTopics(courseId: CourseId): PublicTopic[];
+  listTopics(courseId: CourseId, gradeCourse?: GradeCourse): PublicTopic[];
   getCoverage(): CourseCoverage[];
   createDailyChallenge(
     date: string,

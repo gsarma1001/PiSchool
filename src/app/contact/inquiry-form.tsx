@@ -1,6 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
+import { curriculumLevelLabels } from "@/lib/curriculum";
+import { courseCatalog } from "../daily-challenge/catalog";
 import { submitInquiry } from "./actions";
 import type { InquiryField, InquiryState } from "./inquiry-types";
 
@@ -73,7 +75,9 @@ export function InquiryForm() {
         </div>
 
         <div className="form-field form-field-wide">
-          <label htmlFor="inquiry-grade-course">Student grade or course</label>
+          <label htmlFor="inquiry-grade-course">
+            Student grade, level, or course
+          </label>
           <input
             aria-describedby={
               fieldError(state, "gradeOrCourse")
@@ -84,10 +88,23 @@ export function InquiryForm() {
             defaultValue={state.values?.gradeOrCourse ?? ""}
             id="inquiry-grade-course"
             maxLength={120}
+            list="inquiry-curriculum-options"
             name="gradeOrCourse"
-            placeholder="For example, Grade 8 or AP Calculus AB"
+            placeholder="For example, Kindergarten, US Grade 3, or AP Calculus AB"
             required
           />
+          <datalist id="inquiry-curriculum-options">
+            {curriculumLevelLabels.map((level) => (
+              <option key={level} value={level} />
+            ))}
+            {courseCatalog.map((course) => (
+              <option key={course.id} value={course.name} />
+            ))}
+          </datalist>
+          <span className="field-hint">
+            Suggestions use US grade labels. If the student is outside the US,
+            enter their local school-year label or course.
+          </span>
           {fieldError(state, "gradeOrCourse") && (
             <span className="field-error" id="inquiry-grade-course-error">
               {fieldError(state, "gradeOrCourse")}

@@ -1,3 +1,9 @@
+import {
+  elementaryChallengeLevels,
+  type ElementaryLevelId,
+  type ElementaryLevelLabel,
+} from "../../lib/curriculum";
+
 export const courseCatalog = [
   { id: "arithmetic-number-sense", name: "Arithmetic and Number Sense", description: "Build fluency with whole numbers and the place-value system.", order: 1 },
   { id: "fractions-decimals-percentages", name: "Fractions, Decimals, and Percentages", description: "Represent and calculate with fractional and equivalent quantities.", order: 2 },
@@ -16,13 +22,25 @@ export const courseCatalog = [
 ] as const;
 
 export type CourseId = (typeof courseCatalog)[number]["id"];
-export type GradeCourse = (typeof courseCatalog)[number]["name"];
+export type GradeCourse =
+  | (typeof courseCatalog)[number]["name"]
+  | ElementaryLevelLabel;
+
+export type QuestionVisual = {
+  kind: "counters" | "array" | "comparison";
+  label: string;
+  count: number;
+  rows?: number;
+  columns?: number;
+  groups?: { label: string; count: number }[];
+};
 
 export type ChallengeTopic = {
   id: string;
   label: string;
   description: string;
   courseIds: CourseId[];
+  levelIds?: ElementaryLevelId[];
   courseLabels?: Partial<Record<CourseId, string>>;
   order: number;
 };
@@ -43,6 +61,31 @@ const differentialEquations: CourseId = "differential-equations";
 const linearAlgebra: CourseId = "linear-algebra";
 
 export const challengeTopics: ChallengeTopic[] = [
+  { id: "kindergarten-counting", label: "Counting collections", description: "Count small groups of familiar objects and connect each object to one number.", courseIds: ["arithmetic-number-sense"], levelIds: ["kindergarten"], order: 1 },
+  { id: "kindergarten-comparing", label: "Comparing quantities", description: "Compare groups and decide which has more, fewer, or the same number.", courseIds: ["arithmetic-number-sense"], levelIds: ["kindergarten"], order: 2 },
+  { id: "kindergarten-patterns", label: "Patterns", description: "Notice and continue simple repeating and growing patterns.", courseIds: ["arithmetic-number-sense"], levelIds: ["kindergarten"], order: 3 },
+  { id: "kindergarten-shapes", label: "Shapes and attributes", description: "Recognize familiar flat shapes and describe sides and corners.", courseIds: ["arithmetic-number-sense"], levelIds: ["kindergarten"], order: 4 },
+
+  { id: "grade-1-add-subtract", label: "Addition and subtraction within 20", description: "Build and solve addition and subtraction situations with numbers to 20.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-1"], order: 1 },
+  { id: "grade-1-place-value", label: "Tens and ones", description: "Read, compose, and compare two-digit numbers using tens and ones.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-1"], order: 2 },
+  { id: "grade-1-time-shapes", label: "Time and shape attributes", description: "Read hour and half-hour times and describe simple shape attributes.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-1"], order: 3 },
+
+  { id: "grade-2-place-value", label: "Place value to 1,000", description: "Use hundreds, tens, and ones to compose and compare three-digit numbers.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-2"], order: 1 },
+  { id: "grade-2-equal-groups", label: "Equal groups and skip counting", description: "Represent equal groups, repeated addition, and skip-counting patterns.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-2"], order: 2 },
+  { id: "grade-2-money-data", label: "Money and simple data", description: "Solve simple money totals and read small data displays.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-2"], order: 3 },
+
+  { id: "grade-3-multiplication-division", label: "Multiplication and division", description: "Connect multiplication facts, equal groups, arrays, and fair sharing.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-3"], order: 1 },
+  { id: "grade-3-fractions", label: "Fractions as equal parts", description: "Read and compare simple fractions as equal parts of a whole.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-3"], order: 2 },
+  { id: "grade-3-area-perimeter", label: "Area and perimeter", description: "Measure rectangular arrays and reason about the boundary of shapes.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-3"], order: 3 },
+
+  { id: "grade-4-multidigit-operations", label: "Multidigit arithmetic", description: "Use place-value strategies for larger whole-number operations.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-4"], order: 1 },
+  { id: "grade-4-fractions", label: "Equivalent fractions and fraction operations", description: "Recognize equivalent fractions and combine fractions with like denominators.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-4"], order: 2 },
+  { id: "grade-4-angles-measure", label: "Angles and measurement", description: "Measure angles and convert within a single measurement system.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-4"], order: 3 },
+
+  { id: "grade-5-decimals-fractions", label: "Decimal and fraction operations", description: "Calculate with decimals and add or subtract fractions with unlike denominators.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-5"], order: 1 },
+  { id: "grade-5-volume", label: "Volume", description: "Find the volume of rectangular prisms using unit cubes and dimensions.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-5"], order: 2 },
+  { id: "grade-5-expressions-coordinates", label: "Expressions and coordinate grids", description: "Evaluate numerical expressions and read points in the first quadrant.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-5"], order: 3 },
+
   { id: "place-value", label: "Place value", description: "Read, compose, and compare the value of digits in whole numbers.", courseIds: [arithmetic], order: 1 },
   { id: "comparing-ordering-numbers", label: "Comparing and ordering numbers", description: "Use place value and number lines to compare and arrange whole numbers.", courseIds: [arithmetic], order: 2 },
   { id: "addition", label: "Addition", description: "Add whole numbers using place value, regrouping, and estimation.", courseIds: [arithmetic], order: 3 },
@@ -212,20 +255,38 @@ export const challengeTopics: ChallengeTopic[] = [
   { id: "least-squares", label: "Least squares", description: "Find approximate solutions by minimizing squared error.", courseIds: [linearAlgebra], order: 13 },
 ];
 
-export const gradeCourses = courseCatalog
+export const gradeCourses: GradeCourse[] = [
+  ...elementaryChallengeLevels
+    .slice()
+    .sort((left, right) => left.order - right.order)
+    .map((level) => level.label),
+  ...courseCatalog
   .slice()
   .sort((left, right) => left.order - right.order)
-  .map((course) => course.name);
+  .map((course) => course.name),
+];
 
 export function getCourseByName(gradeCourse: GradeCourse) {
-  return courseCatalog.find((course) => course.name === gradeCourse);
+  const selectedCourse = courseCatalog.find((course) => course.name === gradeCourse);
+  if (selectedCourse) return selectedCourse;
+  const level = elementaryChallengeLevels.find((item) => item.label === gradeCourse);
+  return courseCatalog.find((course) => course.id === level?.courseId);
 }
 
 export function getTopicsForGrade(gradeCourse: GradeCourse): ChallengeTopic[] {
   const course = getCourseByName(gradeCourse);
   if (!course) return [];
+  const elementaryLevel = elementaryChallengeLevels.find(
+    (item) => item.label === gradeCourse,
+  );
   return challengeTopics
-    .filter((topic) => topic.courseIds.includes(course.id))
+    .filter(
+      (topic) =>
+        topic.courseIds.includes(course.id) &&
+        (elementaryLevel
+          ? topic.levelIds?.includes(elementaryLevel.id)
+          : !topic.levelIds),
+    )
     .sort((left, right) => left.order - right.order);
 }
 

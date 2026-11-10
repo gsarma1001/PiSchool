@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Tutoring | The Pi School",
   description:
-    "Explore the math tutoring scope and session formats described by The Pi School.",
+    "Ask about math tutoring from foundational skills through advanced courses. Current subjects and availability need confirmation.",
 };
 
 const sessionFormats = [
@@ -34,9 +34,11 @@ export default function TutoringPage() {
         </h1>
         <p className="public-lede">
           The Pi School’s source FAQ describes math tutoring from foundational
-          skills through advanced classes such as AP Calculus. It does not
-          provide an exhaustive subject list, so tell us the course or topic
-          you’re asking about.
+          skills through advanced classes such as AP Calculus. This broad scope
+          includes questions from Kindergarten through college and advanced
+          math; it is not a guarantee that every grade or course is currently
+          available. Tell us the student’s US grade or course so the team can
+          confirm whether it can help.
         </p>
         <Link className="button button-primary" href="/contact">
           Request tutoring <span aria-hidden="true">↗</span>
@@ -70,6 +72,11 @@ export default function TutoringPage() {
               These details were captured from the existing public FAQ. Please
               ask about current subjects, format, location, and availability;
               the owner has not yet reconfirmed them for the new site.
+            </p>
+            <p>
+              For a younger student, a parent or guardian can send the inquiry.
+              Share only a grade or course and the kind of math support needed;
+              do not include a child’s full name or sensitive personal details.
             </p>
           </div>
         </div>

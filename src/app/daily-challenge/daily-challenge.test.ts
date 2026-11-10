@@ -25,13 +25,14 @@ import type {
   QuestionRecord,
   QuestionRepository,
 } from "./question-service/repository";
+import { elementaryChallengeLevels } from "../../lib/curriculum";
 
 describe("daily challenge catalog and question bank", () => {
   it("lists all curriculum courses and their requested topics", () => {
-    assert.equal(gradeCourses.length, 14);
+    assert.equal(gradeCourses.length, 20);
     assert.equal(courseCatalog.length, 14);
     assert.equal(courseCatalog[0].id, "arithmetic-number-sense");
-    assert.equal(challengeTopics.length, 154);
+    assert.equal(challengeTopics.length, 173);
     assert.equal(questionBank.length, 180);
 
     const trig = getTopicsForGrade("Trigonometry").find(
@@ -54,6 +55,203 @@ describe("daily challenge catalog and question bank", () => {
           question.gradeCourses.includes("Precalculus"),
         ),
     );
+  });
+
+  it("provides grade-scoped elementary topics and five accessible choice questions", () => {
+    const expectedTopicCounts = [4, 3, 3, 3, 3, 3];
+    for (const [index, level] of elementaryChallengeLevels.entries()) {
+      assert.equal(gradeCourses.includes(level.label), true);
+      const topics = getTopicsForGrade(level.label);
+      assert.equal(topics.length, expectedTopicCounts[index]);
+      assert.ok(topics.every((topic) => topic.levelIds?.includes(level.id)));
+
+      for (const topic of topics) {
+        const context = {
+          date: "2026-11-08",
+          timeZone: "UTC",
+          courseId: level.courseId,
+          gradeCourse: level.label,
+          topicId: topic.id,
+        };
+        const generated = getGeneratedTemplateQuestions(question, context);
+        assert.deepEqual(
+          generated.map((item) => item.difficulty),
+          [1, 2, 3, 4, 5],
+          `${level.label}: ${topic.id}`,
+        );
+        for (const item of generated) {
+          assert.equal(item.answer.type, "choice");
+          if (item.answer.type !== "choice") continue;
+          const expectedChoiceCount = [
+            "Group A",
+            "Group B",
+            "Same",
+            "Acute",
+            "Right",
+            "Obtuse",
+          ].includes(item.answer.canonical)
+            ? 3
+            : 4;
+          assert.equal(item.answer.options.length, expectedChoiceCount);
+          assert.equal(
+            new Set(item.answer.options.map((option) => option.value)).size,
+            expectedChoiceCount,
+          );
+          assert.ok(
+            item.answer.options.every(
+              (option) => !option.label.startsWith("Other choice"),
+            ),
+          );
+          assert.ok(item.answer.options.some((option) => option.value === item.answer.canonical));
+          assert.ok(item.hint.trim());
+          assert.equal(item.solutionSteps.length >= 2, true);
+          const correct = item.answer.options.find(
+            (option) => option.value === item.answer.canonical,
+          );
+          assert.ok(correct);
+          for (const option of item.answer.options) {
+            assert.deepEqual(
+              checkAnswer(item.answer, option.id),
+              option.value === item.answer.canonical
+                ? { status: "correct" }
+                : { status: "incorrect" },
+              `${level.label}: ${topic.id} difficulty ${item.difficulty} option ${option.label}`,
+            );
+          }
+          if (topic.id === "grade-1-add-subtract") {
+            assert.ok(
+              Number(item.parameters.first) + Number(item.parameters.second) <= 20,
+              `Grade 1 addition values stay within 20 at difficulty ${item.difficulty}`,
+            );
+          }
+          if (topic.id === "kindergarten-comparing" && item.difficulty === 4) {
+            assert.ok(Number(item.parameters.left) >= Number(item.parameters.right));
+          }
+        }
+
+        const snapshot = getQuestionService().createDailyChallenge(
+          context.date,
+          context.timeZone,
+          context.courseId,
+          context.topicId,
+        );
+        assert.equal(snapshot?.gradeCourse, level.label);
+        assert.equal(snapshot?.questions.length, 5);
+        assert.ok(snapshot?.questions.every(
+          (item) =>
+            item.choices !== undefined &&
+            item.choices.length >= 3 &&
+            item.choices.length <= 4 &&
+            item.parameters === undefined,
+        ));
+        const publicQuestion = snapshot?.questions[0];
+        const privateQuestion = generated.find(
+          (item) => item.id === publicQuestion?.id,
+        );
+        assert.ok(publicQuestion);
+        assert.ok(privateQuestion?.answer.type === "choice");
+        if (privateQuestion?.answer.type !== "choice") continue;
+        const correctChoice = publicQuestion.choices?.find(
+          (choice) =>
+            privateQuestion.answer.type === "choice" &&
+            privateQuestion.answer.options.find(
+              (option) => option.id === choice.id,
+            )?.value === privateQuestion.answer.canonical,
+        );
+        assert.ok(correctChoice);
+        assert.deepEqual(
+          getQuestionService().checkAnswer(
+            {
+              date: snapshot.date,
+              timeZone: snapshot.timeZone,
+              courseId: snapshot.courseId,
+              gradeCourse: snapshot.gradeCourse,
+              topicId: snapshot.topicId,
+              question: publicQuestion,
+            },
+            correctChoice.id,
+          ),
+          { status: "correct" },
+        );
+      }
+    }
+  });
+
+  it("keeps generated grade-level problems valid across changing daily seeds", () => {
+    const kindergarten = elementaryChallengeLevels[0];
+    const grade1 = elementaryChallengeLevels[1];
+    const grade2 = elementaryChallengeLevels[2];
+    const grade4 = elementaryChallengeLevels[4];
+    for (let day = 1; day <= 28; day += 1) {
+      const date = `2026-10-${String(day).padStart(2, "0")}`;
+      const context = (
+        level: (typeof elementaryChallengeLevels)[number],
+        topicId: string,
+      ) => ({
+        date,
+        timeZone: "UTC",
+        courseId: level.courseId,
+        gradeCourse: level.label,
+        topicId,
+      });
+      const grade1Questions = getGeneratedTemplateQuestions(
+        question,
+        context(grade1, "grade-1-add-subtract"),
+      );
+      for (const item of grade1Questions) {
+        const first = Number(item.parameters.first);
+        const second = Number(item.parameters.second);
+        assert.ok(first + second <= 20, `${date}: Grade 1 values stay within 20`);
+        const expected = item.difficulty === 3
+          ? second
+          : item.difficulty === 4
+            ? first + second
+            : item.difficulty === 5
+              ? first
+              : item.difficulty === 2
+                ? first
+                : first + second;
+        assert.equal(item.answer.type, "choice");
+        if (item.answer.type === "choice") {
+          assert.equal(item.answer.canonical, String(expected), `${date}: ${item.prompt}`);
+        }
+      }
+
+      const comparison = getGeneratedTemplateQuestions(
+        question,
+        context(kindergarten, "kindergarten-comparing"),
+      );
+      const catchUp = comparison.find((item) => item.difficulty === 4);
+      assert.ok(catchUp);
+      assert.ok(
+        Number(catchUp.parameters.left) >= Number(catchUp.parameters.right),
+        `${date}: a student never needs to collect a negative number of objects`,
+      );
+
+      const angles = getGeneratedTemplateQuestions(
+        question,
+        context(grade4, "grade-4-angles-measure"),
+      );
+      const classification = angles.find((item) => item.difficulty === 2);
+      assert.ok(classification);
+      const angle = Number(classification.parameters.angle);
+      const expectedClass = angle < 90 ? "Acute" : angle === 90 ? "Right" : "Obtuse";
+      assert.equal(classification.answer.type, "choice");
+      if (classification.answer.type === "choice") {
+        assert.equal(classification.answer.canonical, expectedClass, `${date}: ${angle}°`);
+      }
+
+      const money = getGeneratedTemplateQuestions(
+        question,
+        context(grade2, "grade-2-money-data"),
+      ).find((item) => item.difficulty === 1);
+      assert.ok(money);
+      assert.match(money.prompt, /\$\d+\.\d{2}/);
+      assert.equal(money.answer.type, "choice");
+      if (money.answer.type === "choice") {
+        assert.match(money.answer.canonical, /^\$\d+\.\d{2}$/);
+      }
+    }
   });
 
   it("completes every Arithmetic topic with one question at each difficulty", () => {
@@ -136,6 +334,12 @@ describe("daily challenge catalog and question bank", () => {
         course.remainingTopics,
       ]),
       [
+        ["Kindergarten", 4, 4, 0],
+        ["Grade 1", 3, 3, 0],
+        ["Grade 2", 3, 3, 0],
+        ["Grade 3", 3, 3, 0],
+        ["Grade 4", 3, 3, 0],
+        ["Grade 5", 3, 3, 0],
         ["Arithmetic and Number Sense", 11, 11, 0],
         ["Fractions, Decimals, and Percentages", 8, 1, 7],
         ["Ratios and Proportional Reasoning", 8, 1, 7],
@@ -154,15 +358,46 @@ describe("daily challenge catalog and question bank", () => {
     );
     const readyTopicIdsByCourse = Object.fromEntries(
       coverage.map((course) => [
-        course.id,
+        course.name,
         service
-          .listTopics(course.id)
+          .listTopics(course.id, course.name)
           .filter((topic) => topic.ready)
           .map((topic) => topic.id),
       ]),
     );
     assert.deepEqual(readyTopicIdsByCourse, {
-      "arithmetic-number-sense": [
+      Kindergarten: [
+        "kindergarten-counting",
+        "kindergarten-comparing",
+        "kindergarten-patterns",
+        "kindergarten-shapes",
+      ],
+      "Grade 1": [
+        "grade-1-add-subtract",
+        "grade-1-place-value",
+        "grade-1-time-shapes",
+      ],
+      "Grade 2": [
+        "grade-2-place-value",
+        "grade-2-equal-groups",
+        "grade-2-money-data",
+      ],
+      "Grade 3": [
+        "grade-3-multiplication-division",
+        "grade-3-fractions",
+        "grade-3-area-perimeter",
+      ],
+      "Grade 4": [
+        "grade-4-multidigit-operations",
+        "grade-4-fractions",
+        "grade-4-angles-measure",
+      ],
+      "Grade 5": [
+        "grade-5-decimals-fractions",
+        "grade-5-volume",
+        "grade-5-expressions-coordinates",
+      ],
+      "Arithmetic and Number Sense": [
         "place-value",
         "comparing-ordering-numbers",
         "addition",
@@ -175,24 +410,24 @@ describe("daily challenge catalog and question bank", () => {
         "prime-numbers",
         "whole-number-operations",
       ],
-      "fractions-decimals-percentages": ["fraction-operations"],
-      "ratios-proportional-reasoning": ["ratio-proportions"],
-      "pre-algebra": ["linear-equations"],
-      "algebra-1": ["linear-equations", "evaluating-functions"],
-      geometry: ["pythagorean-theorem"],
-      "algebra-2": ["quadratic-equations"],
-      trigonometry: ["trigonometry-special-angles"],
-      precalculus: ["trigonometry-special-angles"],
-      "calculus-1": ["derivatives-at-a-point"],
-      "calculus-2": ["definite-integrals"],
-      "multivariable-calculus": ["partial-derivatives"],
-      "differential-equations": ["differential-equations"],
-      "linear-algebra": ["matrix-determinants"],
+      "Fractions, Decimals, and Percentages": ["fraction-operations"],
+      "Ratios and Proportional Reasoning": ["ratio-proportions"],
+      "Pre-Algebra": ["linear-equations"],
+      "Algebra 1": ["linear-equations", "evaluating-functions"],
+      Geometry: ["pythagorean-theorem"],
+      "Algebra 2": ["quadratic-equations"],
+      Trigonometry: ["trigonometry-special-angles"],
+      Precalculus: ["trigonometry-special-angles"],
+      "Calculus 1": ["derivatives-at-a-point"],
+      "Calculus 2": ["definite-integrals"],
+      "Multivariable Calculus": ["partial-derivatives"],
+      "Differential Equations": ["differential-equations"],
+      "Linear Algebra": ["matrix-determinants"],
     });
     for (const course of coverage) {
       const topics = getTopicsForGrade(course.name);
       const readyIds = service
-        .listTopics(course.id)
+        .listTopics(course.id, course.name)
         .filter((topic) => topic.ready)
         .map((topic) => topic.id);
       assert.equal(readyIds.length, course.readyTopics, course.name);
@@ -202,14 +437,20 @@ describe("daily challenge catalog and question bank", () => {
         course.name,
       );
       for (const topicId of readyIds) {
+        const generated = getGeneratedTemplateQuestions(question, {
+          date: "2026-01-01",
+          timeZone: "UTC",
+          courseId: course.id,
+          gradeCourse: course.name,
+          topicId,
+        });
         for (let difficulty = 1; difficulty <= 5; difficulty += 1) {
           assert.ok(
-            questionBank.some(
-              (question) =>
-                question.topicId === topicId &&
-                question.difficulty === difficulty &&
-                question.gradeCourses.includes(course.name),
-            ),
+            questionBank.some((question) =>
+              question.topicId === topicId &&
+              question.difficulty === difficulty &&
+              question.gradeCourses.includes(course.name),
+            ) || generated.some((item) => item.difficulty === difficulty),
             `${course.name}: ${topicId} difficulty ${difficulty}`,
           );
         }

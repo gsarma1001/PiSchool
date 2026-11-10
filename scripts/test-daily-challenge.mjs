@@ -44,7 +44,7 @@ try {
     "--noEmit",
     "false",
     "--rootDir",
-    path.join(root, "src", "app", "daily-challenge"),
+    path.join(root, "src"),
     "--outDir",
     testDirectory,
     testSource,
@@ -59,7 +59,7 @@ try {
           path.join(scriptDirectory, "daily-challenge-test-setup.mjs"),
         ).href,
         "--test",
-        "./daily-challenge.test.js",
+        "./app/daily-challenge/daily-challenge.test.js",
       ],
       testDirectory,
     );

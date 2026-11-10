@@ -4,6 +4,12 @@ export type AnswerRule =
   | { type: "integer"; canonical: string }
   | { type: "fraction"; canonical: string; acceptDecimal?: boolean }
   | {
+      type: "choice";
+      canonical: string;
+      valueType: "integer" | "fraction" | "text";
+      options: { id: string; label: string; value: string }[];
+    }
+  | {
       type: "rounded-decimal";
       canonical: string;
       decimalPlaces: number;
@@ -109,6 +115,27 @@ export function checkAnswer(rule: AnswerRule, value: string): AnswerCheck {
       status: "invalid",
       message: "Enter an answer before checking it. This does not count as an attempt.",
     };
+  }
+
+  if (rule.type === "choice") {
+    const option = rule.options.find((item) => item.id === answer);
+    if (!option) {
+      return {
+        status: "invalid",
+        message: "Choose one of the listed answers.",
+      };
+    }
+    if (rule.valueType === "text") {
+      return option.value === rule.canonical
+        ? { status: "correct" }
+        : { status: "incorrect" };
+    }
+    return checkAnswer(
+      rule.valueType === "fraction"
+        ? { type: "fraction", canonical: rule.canonical }
+        : { type: "integer", canonical: rule.canonical },
+      option.value,
+    );
   }
 
   if (rule.type === "integer") {

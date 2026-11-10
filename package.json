@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test:daily-challenge": "node scripts/test-daily-challenge.mjs"
+    "test:daily-challenge": "node scripts/test-daily-challenge.mjs",
+    "test:events": "node scripts/test-events.mjs",
+    "report:events": "node scripts/report-events.mjs"
   },
   "dependencies": {
     "next": "16.4.3",

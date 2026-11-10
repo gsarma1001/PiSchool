@@ -2,11 +2,13 @@ import "server-only";
 import {
   challengeTopics,
   courseCatalog,
+  getCourseByName,
   getTopicDisplayName,
   getTopicsForGrade,
   type CourseId,
   type GradeCourse,
 } from "../catalog";
+import { elementaryChallengeLevels } from "../../../lib/curriculum";
 import { checkAnswer, chooseDailyIds, type AnswerCheck } from "../domain";
 import { question } from "../question-bank";
 import { FileQuestionRepository } from "./file-question-repository";
@@ -57,9 +59,11 @@ function validCourseTopic(
   const topic = challengeTopics.find(
     (item) => item.id === topicId && item.courseIds.includes(courseId),
   );
-  return course && topic
-    ? { gradeCourse: course.name, topic }
-    : undefined;
+  if (!course || !topic) return undefined;
+  const elementaryLevel = elementaryChallengeLevels.find((level) =>
+    topic.levelIds?.includes(level.id),
+  );
+  return { gradeCourse: elementaryLevel?.label ?? course.name, topic };
 }
 
 function isQuestionLocator(value: QuestionLocator): boolean {
@@ -81,11 +85,16 @@ function isQuestionLocator(value: QuestionLocator): boolean {
     return false;
   }
   if (question.source === "template") {
-    return (
+    const validIdentity =
       typeof question.templateId === "string" &&
       question.templateId.length <= 100 &&
       Number.isInteger(question.templateVersion) &&
-      (question.templateVersion ?? 0) > 0 &&
+      (question.templateVersion ?? 0) > 0;
+    if (!validIdentity) return false;
+    if (question.templateId === "elementary-math-foundations") {
+      return question.parameters === undefined;
+    }
+    return (
       Boolean(question.parameters) &&
       typeof question.parameters === "object" &&
       Object.values(question.parameters ?? {}).every(
@@ -139,7 +148,9 @@ function selectionKey(item: QuestionRecord | GeneratedQuestion): string {
 
 function publicTemplateParameters(
   parameters: GeneratedQuestion["parameters"],
-): GeneratedQuestion["parameters"] {
+  templateId: string,
+): GeneratedQuestion["parameters"] | undefined {
+  if (templateId === "elementary-math-foundations") return undefined;
   return Object.fromEntries(
     Object.entries(parameters).filter(
       ([key]) => key !== "solution" && key !== "quotient",
@@ -154,6 +165,9 @@ function toPublicQuestion(
 ): PublicQuestion {
   const generated =
     "source" in item && item.source === "template" ? item : undefined;
+  const publicParameters = generated
+    ? publicTemplateParameters(generated.parameters, generated.templateId)
+    : undefined;
   return {
     id: item.id,
     version: item.version,
@@ -168,12 +182,18 @@ function toPublicQuestion(
     difficulty: item.difficulty,
     prompt: item.prompt,
     ...(item.instructions ? { instructions: item.instructions } : {}),
+    ...(item.visual ? { visual: item.visual } : {}),
+    ...(item.answer.type === "choice"
+      ? {
+          choices: item.answer.options.map(({ id, label }) => ({ id, label })),
+        }
+      : {}),
     source: generated ? "template" : "bank",
     ...(generated
       ? {
           templateId: generated.templateId,
           templateVersion: generated.templateVersion,
-          parameters: publicTemplateParameters(generated.parameters),
+          ...(publicParameters ? { parameters: publicParameters } : {}),
         }
       : {}),
   };
@@ -227,7 +247,9 @@ function recordForLocator(
       item.difficulty === locator.question.difficulty &&
       item.templateId === templateId &&
       item.templateVersion === templateVersion &&
-      JSON.stringify(publicTemplateParameters(item.parameters)) ===
+      JSON.stringify(
+        publicTemplateParameters(item.parameters, item.templateId),
+      ) ===
         JSON.stringify(locator.question.parameters),
   );
   return generated;
@@ -257,7 +279,7 @@ function isReady(
 function getCoverage(repository: QuestionRepository): CourseCoverage[] {
   const date = "2026-01-01";
   const timeZone = "UTC";
-  return courseCatalog
+  const advancedCoverage = courseCatalog
     .slice()
     .sort((left, right) => left.order - right.order)
     .map((course) => {
@@ -272,30 +294,65 @@ function getCoverage(repository: QuestionRepository): CourseCoverage[] {
         remainingTopics: topics.length - readyTopics,
       };
     });
+  const elementaryCoverage = elementaryChallengeLevels.map((level) => {
+    const course = courseCatalog.find((item) => item.id === level.courseId);
+    if (!course) throw new Error(`Unknown course for ${level.label}.`);
+    const topics = getTopicsForGrade(level.label);
+    const readyTopics = topics.filter((topic) =>
+      isReady(repository, date, timeZone, course.id, level.label, topic.id),
+    ).length;
+    return {
+      id: course.id,
+      name: level.label,
+      description: `${level.label} mathematics topics and activities.`,
+      order: level.order,
+      totalTopics: topics.length,
+      readyTopics,
+      remainingTopics: topics.length - readyTopics,
+    };
+  });
+  return [...elementaryCoverage, ...advancedCoverage];
 }
 
 function listCourses(): PublicCourse[] {
-  return courseCatalog
+  const elementaryCourses: PublicCourse[] = elementaryChallengeLevels.map(
+    (level) => {
+      const course = courseCatalog.find((item) => item.id === level.courseId);
+      if (!course) throw new Error(`Unknown course for ${level.label}.`);
+      return {
+        id: course.id,
+        name: level.label,
+        description: `${level.label} mathematics topics and activities.`,
+        order: level.order,
+      };
+    },
+  );
+  const advancedCourses = courseCatalog
     .slice()
     .sort((left, right) => left.order - right.order)
     .map((item) => ({ ...item }));
+  return [...elementaryCourses, ...advancedCourses];
 }
 
 function listTopics(
   repository: QuestionRepository,
   courseId: CourseId,
+  gradeCourse?: GradeCourse,
 ): PublicTopic[] {
   const course = courseCatalog.find((item) => item.id === courseId);
   if (!course) return [];
+  const selection = gradeCourse ?? course.name;
+  if (getCourseByName(selection)?.id !== courseId) return [];
   const date = "2026-01-01";
   const timeZone = "UTC";
-  return getTopicsForGrade(course.name).map((topic) => ({
+  return getTopicsForGrade(selection).map((topic) => ({
     id: topic.id,
-    label: getTopicDisplayName(topic, course.name),
+    label: getTopicDisplayName(topic, selection),
     description: topic.description,
     courseId,
+    gradeCourse: selection,
     order: topic.order,
-    ready: isReady(repository, date, timeZone, courseId, course.name, topic.id),
+    ready: isReady(repository, date, timeZone, courseId, selection, topic.id),
   }));
 }
 
@@ -400,7 +457,8 @@ export function createQuestionService(
 ): QuestionService {
   return {
     listCourses,
-    listTopics: (courseId) => listTopics(repository, courseId),
+    listTopics: (courseId, gradeCourse) =>
+      listTopics(repository, courseId, gradeCourse),
     getCoverage: () => getCoverage(repository),
     createDailyChallenge: (date, timeZone, courseId, topicId, existingIds) =>
       createDailyChallenge(
@@ -435,7 +493,8 @@ export function getQuestionServiceCatalog() {
     courses,
     topics: courses.map((course) => ({
       courseId: course.id,
-      topics: service.listTopics(course.id),
+      gradeCourse: course.name,
+      topics: service.listTopics(course.id, course.name),
     })),
     coverage: service.getCoverage(),
   };

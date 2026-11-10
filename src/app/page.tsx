@@ -6,49 +6,58 @@ const testimonials = testimonialArchive.testimonials;
 const plannedFeatures = [
   {
     number: "01",
-    title: "Daily Quick Mind",
+    title: "Schedule your first trial lesson",
     description:
-      "Short, focused math practice is planned for a future release. The first reviewed topics are still to be selected.",
-    label: "Planned",
-    symbol: "√",
+      "Tell us about the student’s grade or course and the math support you’re looking for.",
+    label: "Get started",
+    symbol: "π",
     style: "feature-card-teal",
+    href: "/contact",
+    linkLabel: "Get started",
   },
   {
     number: "02",
     title: "Math opportunities",
     description:
-      "A future guide to competitions, Olympiads, conferences, and other opportunities—with sources checked before publishing.",
-    label: "Planned",
+      "Browse math competitions, Olympiads, conferences, and other events, with official details and eligibility clearly shown.",
+    label: "Explore",
     symbol: "↗",
     style: "feature-card-gold",
+    href: "/events",
+    linkLabel: "Browse math events",
   },
   {
     number: "03",
-    title: "Math discoveries",
+    title: "Math news",
     description:
-      "Research explainers, math news, and interesting facts are planned for a later phase.",
-    label: "Planned",
+      "Read reviewed stories about mathematical discoveries, achievements, and ideas from around the world.",
+    label: "Read stories",
     symbol: "∑",
     style: "feature-card-blue",
+    href: "/math-news",
+    linkLabel: "Read math news",
   },
   {
     number: "04",
     title: "Homework help",
     description:
-      "A homework-help calendar is planned. No session schedule or registration is available in this preview.",
-    label: "Planned",
+      "Tell us what you need help with. For now, homework questions go through our tutoring inquiry form.",
+    label: "Send an inquiry",
     symbol: "□",
     style: "feature-card-cream",
+    href: "/contact",
+    linkLabel: "Ask for homework help",
   },
   {
     number: "05",
-    title: "Daily Math Challenge",
+    title: "Daily Challenge",
     description:
-      "A new original problem with progressive hints and a worked solution will be published each day after review.",
-    label: "Preparing",
+      "Practice with five daily questions, supportive feedback, hints, and worked solutions.",
+    label: "Practice now",
     symbol: "?",
     style: "feature-card-blue",
     href: "/daily-challenge",
+    linkLabel: "Open Daily Challenge",
   },
 ];
 
@@ -70,8 +79,9 @@ export default function Home() {
               Discover math.
             </h1>
             <p className="hero-description">
-              A welcoming starting point for tutoring and a growing collection
-              of ways to explore mathematics.
+              A welcoming place to explore mathematics, from early number
+              sense through advanced courses. Find out what practice and
+              tutoring information is currently available.
             </p>
             <div className="hero-actions">
               <Link className="button button-primary" href="/tutoring">
@@ -111,7 +121,9 @@ export default function Home() {
       <section aria-labelledby="tutoring-title" className="tutoring-section" id="tutoring">
         <div className="section-grid page-width">
           <div className="section-intro">
-            <p className="eyebrow eyebrow-dark">Start with the foundations</p>
+            <p className="eyebrow eyebrow-dark">
+              Kindergarten through advanced math
+            </p>
             <h2 id="tutoring-title">
               Math makes more sense
               <br />
@@ -119,9 +131,9 @@ export default function Home() {
             </h2>
             <p>
               The Pi School is preparing a clear, student-centered home for
-              tutoring and math learning. Specific subjects, tutor information,
-              and session availability will be added only after they are
-              confirmed.
+              math tutoring and learning. The source FAQ describes support
+              from foundational skills through advanced classes; exact subjects,
+              tutor information, and current availability still need confirmation.
             </p>
             <Link className="inline-link" href="#explore">
               Explore what&apos;s taking shape <span aria-hidden="true">→</span>
@@ -182,8 +194,8 @@ export default function Home() {
               </h2>
             </div>
             <p>
-              These ideas are part of the roadmap—not live services yet. Each
-              preview is labeled so it&apos;s clear what is planned.
+              Explore tutoring, practice, math events, and stories. Each card
+              links to the relevant page or inquiry form.
             </p>
           </div>
 
@@ -207,11 +219,11 @@ export default function Home() {
                 <p>{feature.description}</p>
                 {feature.href ? (
                   <Link
-                    aria-label={`Visit ${feature.title}`}
+                    aria-label={feature.linkLabel ?? `Explore ${feature.title}`}
                     className="feature-arrow feature-card-link"
                     href={feature.href}
                   >
-                    Explore <span aria-hidden="true">↗</span>
+                    {feature.linkLabel ?? "Explore"} <span aria-hidden="true">↗</span>
                   </Link>
                 ) : (
                   <span aria-hidden="true" className="feature-arrow">

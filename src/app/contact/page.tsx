@@ -5,7 +5,7 @@ import { InquiryForm } from "./inquiry-form";
 export const metadata: Metadata = {
   title: "Request tutoring | The Pi School",
   description:
-    "Send The Pi School a tutoring inquiry about a student’s grade, course, and learning needs.",
+    "Send The Pi School a tutoring inquiry about a student’s US grade, course, and math learning needs, from early foundations through advanced math.",
 };
 
 export default function ContactPage() {

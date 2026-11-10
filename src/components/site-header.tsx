@@ -50,6 +50,9 @@ export function SiteHeader() {
             <Link href="/daily-challenge" onClick={closeMenu}>
               Daily challenge
             </Link>
+            <Link href="/events" onClick={closeMenu}>
+              Events
+            </Link>
             <Link href="/#testimonials" onClick={closeMenu}>
               Testimonials
             </Link>

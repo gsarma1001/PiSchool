@@ -13,6 +13,19 @@ function validatePublishedRecord(question: QuestionRecord): boolean {
   const validAnswer =
     (answer.type === "integer" && typeof answer.canonical === "string") ||
     (answer.type === "fraction" && typeof answer.canonical === "string") ||
+    (answer.type === "choice" &&
+      typeof answer.canonical === "string" &&
+      ["integer", "fraction", "text"].includes(answer.valueType) &&
+      answer.options.length >= 2 &&
+      new Set(answer.options.map((option) => option.id)).size ===
+        answer.options.length &&
+      answer.options.some((option) => option.value === answer.canonical) &&
+      answer.options.every(
+        (option) =>
+          typeof option.id === "string" &&
+          typeof option.label === "string" &&
+          typeof option.value === "string",
+      )) ||
     (answer.type === "rounded-decimal" &&
       typeof answer.canonical === "string" &&
       Number.isInteger(answer.decimalPlaces) &&
@@ -60,8 +73,11 @@ function validatePublishedRecord(question: QuestionRecord): boolean {
   const canonical =
     answer.type === "unordered-integer-set"
       ? `{${answer.canonical.join(", ")}}`
-      : answer.canonical;
-  return checkAnswer(answer, canonical).status === "correct";
+      : answer.type === "choice"
+        ? answer.options.find((option) => option.value === answer.canonical)?.id
+        : answer.canonical;
+  return canonical !== undefined &&
+    checkAnswer(answer, canonical).status === "correct";
 }
 
 export class FileQuestionRepository implements QuestionRepository {

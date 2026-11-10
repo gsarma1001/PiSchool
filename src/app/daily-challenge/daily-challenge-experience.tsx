@@ -16,6 +16,7 @@ import {
   getQuestionSolution,
 } from "./actions";
 import type { CourseId, GradeCourse } from "./catalog";
+import { elementaryChallengeLevels } from "../../lib/curriculum";
 import {
   emptyProgress,
   parseProgress,
@@ -43,6 +44,7 @@ type ChallengeCatalog = {
   }[];
   topics: {
     courseId: CourseId;
+    gradeCourse: GradeCourse;
     topics: {
       id: string;
       label: string;
@@ -115,6 +117,7 @@ export function DailyChallengeExperience({
   const [progress, setProgress] = useState<ChallengeProgress>(emptyProgress);
   const [loaded, setLoaded] = useState(false);
   const [storageMessage, setStorageMessage] = useState("");
+  const [browseMode, setBrowseMode] = useState<"grade" | "course">("grade");
   const [selectedGrade, setSelectedGrade] = useState<GradeCourse | "">("");
   const [selectedTopic, setSelectedTopic] = useState("");
   const [topicSearch, setTopicSearch] = useState("");
@@ -146,27 +149,77 @@ export function DailyChallengeExperience({
   const topics = useMemo(
     () =>
       selectedCourse
-        ? catalog.topics.find((item) => item.courseId === selectedCourse.id)
+        ? catalog.topics.find(
+            (item) =>
+              item.courseId === selectedCourse.id &&
+              item.gradeCourse === selectedGrade,
+          )
             ?.topics ?? []
         : [],
-    [catalog.topics, selectedCourse],
+    [catalog.topics, selectedCourse, selectedGrade],
   );
-  const readyTopicIds = useMemo(
-    () => topics.filter((topic) => topic.ready).map((topic) => topic.id),
+  const readyTopics = useMemo(
+    () => topics.filter((topic) => topic.ready),
     [topics],
   );
-  const readyTopicIdSet = useMemo(() => new Set(readyTopicIds), [readyTopicIds]);
-  const filteredTopics = useMemo(() => {
+  const readyTopicIdSet = useMemo(
+    () => new Set(readyTopics.map((topic) => topic.id)),
+    [readyTopics],
+  );
+  const gradeOptions = useMemo(
+    () =>
+      catalog.courses.filter((item) =>
+        elementaryChallengeLevels.some((level) => level.label === item.name),
+      ),
+    [catalog.courses],
+  );
+  const courseOptions = useMemo(
+    () =>
+      catalog.courses.filter(
+        (item) =>
+          !elementaryChallengeLevels.some((level) => level.label === item.name),
+      ),
+    [catalog.courses],
+  );
+  const upcomingTopics = useMemo(
+    () => topics.filter((topic) => !topic.ready),
+    [topics],
+  );
+  const isElementarySelection = elementaryChallengeLevels.some(
+    (level) => level.label === selectedGrade,
+  );
+  const showTopicSearch =
+    !isElementarySelection || readyTopics.length > 6;
+  const filteredReadyTopics = useMemo(() => {
     const query = topicSearch.trim().toLocaleLowerCase();
-    return topics.filter(
+    return readyTopics.filter(
       (topic) =>
         !query ||
         topic.label.toLocaleLowerCase().includes(query) ||
         topic.description.toLocaleLowerCase().includes(query),
     );
-  }, [topicSearch, topics]);
+  }, [readyTopics, topicSearch]);
+  const selectableTopics = useMemo(() => {
+    if (!selectedTopic || !showTopicSearch) return filteredReadyTopics;
+    return filteredReadyTopics.some((topic) => topic.id === selectedTopic)
+      ? filteredReadyTopics
+      : [
+          ...filteredReadyTopics,
+          ...readyTopics.filter((topic) => topic.id === selectedTopic),
+        ];
+  }, [filteredReadyTopics, readyTopics, selectedTopic, showTopicSearch]);
   const curriculumCoverage = catalog.coverage;
   const selectedTopicIsReady = readyTopicIdSet.has(selectedTopic);
+  const availabilityNote =
+    readyTopics.length === 0
+      ? upcomingTopics.length > 0
+        ? `No topics available · ${upcomingTopics.length} coming soon`
+        : "No topics available yet"
+      : `${readyTopics.length} topic${readyTopics.length === 1 ? "" : "s"} available${
+          upcomingTopics.length > 0
+            ? ` · ${upcomingTopics.length} coming soon`
+            : ""
+        }`;
   const streaks = useMemo(
     () => getStreaks(progress.completedDates, localDateKey(new Date())),
     [progress.completedDates],
@@ -175,6 +228,21 @@ export function DailyChallengeExperience({
     session?.questions.filter(
       (item) => item.outcome === "correct" || item.outcome === "helped",
     ).length ?? 0;
+
+  function getTopicStatus(topicId: string): "Not started" | "Practicing" | "Completed today" {
+    if (!selectedGrade) return "Not started";
+    const key = sessionKey(localDateKey(new Date()), selectedGrade, topicId);
+    const savedSession = progress.sessions[key];
+    if (savedSession && progress.results[key]) return "Completed today";
+    if (
+      savedSession &&
+      (savedSession.currentQuestion > 0 ||
+        savedSession.questions.some((item) => item.outcome !== "pending"))
+    ) {
+      return "Practicing";
+    }
+    return "Not started";
+  }
 
   const saveProgress = useCallback((next: ChallengeProgress) => {
     setProgress(next);
@@ -226,7 +294,7 @@ export function DailyChallengeExperience({
 
       if (!challengeSnapshot || challengeSnapshot.questions.length !== 5) {
         setStorageMessage(
-          "We couldn’t load a complete five-question set for this selection. Please choose another course/level or topic.",
+          "We couldn’t load a complete five-question set for this selection. Please choose another US grade or course/level.",
         );
         setIsLoadingChallenge(false);
         return;
@@ -302,7 +370,9 @@ export function DailyChallengeExperience({
       );
       const restoredTopics =
         catalog.topics.find(
-          (item) => item.courseId === restoredCourse?.id,
+          (item) =>
+            item.courseId === restoredCourse?.id &&
+            item.gradeCourse === restored.selectedGradeCourse,
         )?.topics ?? [];
       const savedChallengeKey = restored.selectedTopicId
         ? sessionKey(
@@ -415,9 +485,9 @@ export function DailyChallengeExperience({
     [activeKey, progress, saveProgress],
   );
 
-  function handleGradeChange(value: string) {
-    const gradeCourse = isGradeCourse(value, catalog.courses) ? value : "";
-    setSelectedGrade(gradeCourse);
+  function handleSelectionChange(value: string) {
+    const nextGradeCourse = isGradeCourse(value, catalog.courses) ? value : "";
+    setSelectedGrade(nextGradeCourse);
     setSelectedTopic("");
     setTopicSearch("");
     setActiveKey("");
@@ -425,9 +495,21 @@ export function DailyChallengeExperience({
     setStorageMessage("");
     saveProgress({
       ...progress,
-      selectedGradeCourse: gradeCourse || undefined,
+      selectedGradeCourse: nextGradeCourse || undefined,
       selectedTopicId: undefined,
     });
+  }
+
+  function handleBrowseModeChange(nextMode: "grade" | "course") {
+    setBrowseMode(nextMode);
+    const nextOptions =
+      nextMode === "grade" ? gradeOptions : courseOptions;
+    if (
+      selectedGrade &&
+      !nextOptions.some((item) => item.name === selectedGrade)
+    ) {
+      handleSelectionChange("");
+    }
   }
 
   function handleTopicChange(topicId: string) {
@@ -624,6 +706,22 @@ export function DailyChallengeExperience({
     });
   }
 
+  function handleSurpriseMe() {
+    if (!selectedGrade || readyTopics.length === 0) return;
+    const nextTopic = readyTopics[Math.floor(Math.random() * readyTopics.length)];
+    setSelectedTopic(nextTopic.id);
+    setTopicSearch("");
+    void openChallenge(selectedGrade, nextTopic.id);
+  }
+
+  const hasResumeProgress = Boolean(
+    selectedGrade &&
+      selectedTopic &&
+      progress.sessions[
+        sessionKey(localDateKey(new Date()), selectedGrade, selectedTopic)
+      ],
+  );
+
   if (!loaded) {
     return (
       <div aria-live="polite" className="challenge-loading">
@@ -718,138 +816,243 @@ export function DailyChallengeExperience({
         </>
       )}
       <div className="challenge-selector">
+        <div
+          aria-label="Browse challenge options"
+          className="browse-mode-toggle"
+          role="tablist"
+        >
+          <button
+            aria-selected={browseMode === "grade"}
+            className={`toggle-button${browseMode === "grade" ? " toggle-button-selected" : ""}`}
+            onClick={() => handleBrowseModeChange("grade")}
+            role="tab"
+            type="button"
+          >
+            Browse by Grade
+          </button>
+          <button
+            aria-selected={browseMode === "course"}
+            className={`toggle-button${browseMode === "course" ? " toggle-button-selected" : ""}`}
+            onClick={() => handleBrowseModeChange("course")}
+            role="tab"
+            type="button"
+          >
+            Browse by Course
+          </button>
+        </div>
         <div className="form-field">
-          <label htmlFor="challenge-grade">Choose a course or level</label>
+          <label htmlFor="challenge-grade">
+            {browseMode === "grade" ? "Choose a grade/level" : "Choose a course"}
+          </label>
           <select
             id="challenge-grade"
-            onChange={(event) => handleGradeChange(event.target.value)}
+            onChange={(event) => handleSelectionChange(event.target.value)}
             value={selectedGrade}
           >
-            <option value="">Select a course or level</option>
-            {catalog.courses.map(({ name: gradeCourse }) => {
-              const summary = curriculumCoverage.find(
-                (item) => item.name === gradeCourse,
-              );
-              return (
-                <option key={gradeCourse} value={gradeCourse}>
-                  {gradeCourse}
-                  {summary
-                    ? ` (${summary.readyTopics}/${summary.totalTopics} ready)`
-                    : ""}
-                </option>
-              );
-            })}
+            <option value="">
+              {browseMode === "grade" ? "Select a grade/level" : "Select a course"}
+            </option>
+            {(browseMode === "grade" ? gradeOptions : courseOptions).map(
+              ({ name: gradeCourse }) => {
+                return (
+                  <option key={gradeCourse} value={gradeCourse}>
+                    {gradeCourse}
+                  </option>
+                );
+              },
+            )}
           </select>
         </div>
-        <div aria-live="polite" className="topic-picker">
-          <div className="form-field">
-            <label htmlFor="challenge-topic-search">Search topics</label>
-            <input
-              autoComplete="off"
-              disabled={!selectedGrade || isLoadingChallenge}
-              id="challenge-topic-search"
-              onChange={(event) => setTopicSearch(event.target.value)}
-              placeholder="Search this course’s topics"
-              type="search"
-              value={topicSearch}
-            />
+        <div className="topic-picker">
+          <div className="topic-picker-heading">
+            <h2 id="challenge-topic-heading">Choose a topic</h2>
             {selectedGrade && selectedCourse && (
               <p aria-live="polite" className="field-hint">
-                {topics.length} topics · {readyTopicIds.length} challenge
-                {readyTopicIds.length === 1 ? "" : "s"} ready ·{" "}
-                {topics.length - readyTopicIds.length} coming soon
+                {availabilityNote}
               </p>
             )}
           </div>
-          {selectedGrade && (
-            <ul aria-label="Topics for selected course" className="topic-list">
-              {filteredTopics.map((topic) => {
-                const isReady = readyTopicIdSet.has(topic.id);
-                const isSelected = selectedTopic === topic.id;
-                return (
-                  <li key={topic.id}>
-                    <button
-                      aria-pressed={isSelected}
-                      className={`topic-option${isSelected ? " topic-option-selected" : ""}`}
-                      onClick={() => handleTopicChange(topic.id)}
-                      type="button"
+          {!selectedGrade ? (
+            <p className="topic-empty">
+              Choose a grade or level to see its available topics.
+            </p>
+          ) : readyTopics.length === 0 ? (
+            <p className="topic-empty" role="status">
+              No challenges are available for this level yet. Choose another
+              level to get started.
+            </p>
+          ) : isElementarySelection ? (
+            <>
+              {showTopicSearch && (
+                <div className="form-field">
+                  <label htmlFor="challenge-topic-search">Search available topics</label>
+                  <input
+                    autoComplete="off"
+                    disabled={isLoadingChallenge}
+                    id="challenge-topic-search"
+                    onChange={(event) => setTopicSearch(event.target.value)}
+                    placeholder="Search topics"
+                    type="search"
+                    value={topicSearch}
+                  />
+                </div>
+              )}
+              <fieldset
+                aria-labelledby="challenge-topic-heading"
+                className="topic-card-group"
+                disabled={isLoadingChallenge}
+              >
+                <legend className="visually-hidden">Choose a topic</legend>
+                {filteredReadyTopics.map((topic) => {
+                  const topicStatus = getTopicStatus(topic.id);
+                  return (
+                    <label
+                      className={`topic-card${selectedTopic === topic.id ? " topic-card-selected" : ""}`}
+                      key={topic.id}
                     >
-                      <span className="topic-option-copy">
-                        <strong>
-                          {topic.label}
-                        </strong>
+                      <input
+                        checked={selectedTopic === topic.id}
+                        name="challenge-topic"
+                        onChange={() => handleTopicChange(topic.id)}
+                        type="radio"
+                        value={topic.id}
+                      />
+                      <span className="topic-card-copy">
+                        <strong>{topic.label}</strong>
                         <span>{topic.description}</span>
                       </span>
-                      <span
-                        className={`topic-availability${isReady ? " topic-availability-ready" : ""}`}
-                      >
-                        {isReady ? "Ready" : "Coming soon"}
+                      <span className="topic-card-meta">
+                        <span
+                          className={`topic-status topic-status-${topicStatus === "Completed today" ? "done" : topicStatus === "Practicing" ? "active" : "pending"}`}
+                        >
+                          {topicStatus}
+                        </span>
+                        <span aria-hidden="true" className="topic-card-check">
+                          {selectedTopic === topic.id ? "✓" : ""}
+                        </span>
                       </span>
-                    </button>
+                    </label>
+                  );
+                })}
+                {filteredReadyTopics.length === 0 && (
+                  <p className="topic-empty">
+                    No available topics match “{topicSearch}”. Try another
+                    search.
+                  </p>
+                )}
+              </fieldset>
+            </>
+          ) : (
+            <>
+              <div className="form-field">
+                <label htmlFor="challenge-topic-search">Search available topics</label>
+                <input
+                  autoComplete="off"
+                  disabled={isLoadingChallenge}
+                  id="challenge-topic-search"
+                  onChange={(event) => setTopicSearch(event.target.value)}
+                  placeholder="Type to find a topic"
+                  type="search"
+                  value={topicSearch}
+                />
+              </div>
+              <div className="form-field">
+                <label htmlFor="challenge-topic-select">Available topics</label>
+                <select
+                  disabled={isLoadingChallenge || readyTopics.length === 0}
+                  id="challenge-topic-select"
+                  onChange={(event) => handleTopicChange(event.target.value)}
+                  value={selectedTopic}
+                >
+                  <option value="">Select a topic</option>
+                  {selectableTopics.map((topic) => (
+                    <option key={topic.id} value={topic.id}>
+                      {topic.label}
+                    </option>
+                  ))}
+                </select>
+                {readyTopics.length > 0 && selectedTopic && (() => {
+                  const selectedDetails =
+                    readyTopics.find((topic) => topic.id === selectedTopic) ??
+                    topics.find((topic) => topic.id === selectedTopic);
+                  return (
+                    <div className="selected-topic-meta">
+                      <span
+                        className={`topic-status topic-status-${getTopicStatus(selectedTopic) === "Completed today" ? "done" : getTopicStatus(selectedTopic) === "Practicing" ? "active" : "pending"}`}
+                      >
+                        {getTopicStatus(selectedTopic)}
+                      </span>
+                      <p className="selected-topic-description">
+                        {selectedDetails?.description}
+                      </p>
+                    </div>
+                  );
+                })()}
+                {filteredReadyTopics.length === 0 && topicSearch && (
+                  <p className="topic-empty" role="status">
+                    No available topics match “{topicSearch}”. Try another
+                    search.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+          {upcomingTopics.length > 0 && (
+            <details className="upcoming-topics">
+              <summary>View upcoming topics</summary>
+              <ul>
+                {upcomingTopics.map((topic) => (
+                  <li key={topic.id}>
+                    <strong>{topic.label}</strong>
+                    <span>{topic.description}</span>
                   </li>
-                );
-              })}
-              {filteredTopics.length === 0 && (
-                <li className="topic-empty">
-                  No topics match “{topicSearch}”. Try another search.
-                </li>
-              )}
-            </ul>
+                ))}
+              </ul>
+            </details>
           )}
-          {selectedGrade && (
-            <button
-              className="button button-primary topic-start-button"
-              disabled={
-                !selectedTopic ||
-                !selectedTopicIsReady ||
-                isLoadingChallenge
-              }
-              onClick={() => {
-                if (selectedGrade && selectedTopicIsReady) {
-                  void openChallenge(selectedGrade, selectedTopic);
+          <div className="challenge-start-group">
+            <div className="challenge-start-actions">
+              <button
+                className="button button-primary topic-start-button"
+                disabled={
+                  !selectedGrade ||
+                  !selectedTopic ||
+                  !selectedTopicIsReady ||
+                  isLoadingChallenge
                 }
-              }}
-              type="button"
-            >
-              {isLoadingChallenge ? "Preparing challenge…" : "Start Challenge"}
-            </button>
-          )}
+                onClick={() => {
+                  if (selectedGrade && selectedTopicIsReady) {
+                    void openChallenge(selectedGrade, selectedTopic);
+                  }
+                }}
+                type="button"
+              >
+                {isLoadingChallenge
+                  ? "Preparing challenge…"
+                  : "Start 5-Problem Challenge"}
+              </button>
+              <button
+                className="button button-secondary"
+                disabled={!selectedGrade || readyTopics.length === 0 || isLoadingChallenge}
+                onClick={handleSurpriseMe}
+                type="button"
+              >
+                Surprise me
+              </button>
+            </div>
+            {hasResumeProgress && selectedGrade && selectedTopic && (
+              <button
+                className="button button-text challenge-resume-button"
+                onClick={() => void openChallenge(selectedGrade, selectedTopic, progress)}
+                type="button"
+              >
+                Resume challenge
+              </button>
+            )}
+            <p>Choose a topic. Solve five problems. Build your confidence.</p>
+          </div>
         </div>
       </div>
-      <section
-        aria-labelledby="curriculum-coverage-title"
-        className="curriculum-coverage"
-      >
-        <div>
-          <h2 id="curriculum-coverage-title">Curriculum coverage</h2>
-          <p>
-            Readiness is based on whether a topic has at least one verified
-            question at every difficulty level, with a hint and worked solution.
-          </p>
-        </div>
-        <div className="coverage-table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Course / level</th>
-                <th scope="col">Topics</th>
-                <th scope="col">Ready</th>
-                <th scope="col">Remaining</th>
-              </tr>
-            </thead>
-            <tbody>
-              {curriculumCoverage.map((course) => (
-                <tr key={course.id}>
-                  <th scope="row">{course.name}</th>
-                  <td>{course.totalTopics}</td>
-                  <td>{course.readyTopics}</td>
-                  <td>{course.remainingTopics}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
       <p className="progress-device-note">
         Progress is saved on this device only; it does not sync across devices.
       </p>
@@ -901,6 +1104,50 @@ export function DailyChallengeExperience({
             {currentQuestion.subtopic}
           </h2>
           <p className="question-prompt">{currentQuestion.prompt}</p>
+          {currentQuestion.visual && (
+            <figure className="challenge-visual">
+              <figcaption>{currentQuestion.visual.label}</figcaption>
+              {currentQuestion.visual.groups ? (
+                <div
+                  aria-label={currentQuestion.visual.groups
+                    .map((group) => `${group.label}: ${group.count}`)
+                    .join("; ")}
+                  className="challenge-visual-comparison"
+                  role="img"
+                >
+                  {currentQuestion.visual.groups.map((group) => (
+                    <div className="challenge-visual-group" key={group.label}>
+                      <span>{group.label}</span>
+                      <div className="challenge-visual-items">
+                        {Array.from(
+                          { length: Math.min(group.count, 60) },
+                          (_, index) => <span aria-hidden="true" key={index} />,
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  aria-label={`${currentQuestion.visual.count} visual counters`}
+                  className={`challenge-visual-items challenge-visual-${currentQuestion.visual.kind}`}
+                  role="img"
+                  style={
+                    currentQuestion.visual.kind === "array"
+                      ? {
+                          gridTemplateColumns: `repeat(${currentQuestion.visual.columns ?? 5}, minmax(0, 1fr))`,
+                        }
+                      : undefined
+                  }
+                >
+                  {Array.from(
+                    { length: Math.min(currentQuestion.visual.count, 60) },
+                    (_, index) => <span aria-hidden="true" key={index} />,
+                  )}
+                </div>
+              )}
+            </figure>
+          )}
           {currentQuestion.instructions && (
             <p className="answer-instructions">
               {currentQuestion.instructions}
@@ -908,21 +1155,45 @@ export function DailyChallengeExperience({
           )}
 
           <div className="answer-entry">
-            <label htmlFor="challenge-answer">Your answer</label>
-            <input
-              autoComplete="off"
-              id="challenge-answer"
-              inputMode="text"
-              maxLength={200}
-              onChange={(event) => handleAnswerChange(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  void handleCheckAnswer();
-                }
-              }}
-              value={currentProgress.answer}
-            />
+            {currentQuestion.choices?.length ? (
+              <fieldset className="challenge-choice-options">
+                <legend>Your answer</legend>
+                {currentQuestion.choices.map((choice) => {
+                  const choiceId = `challenge-answer-${choice.id}`;
+                  return (
+                    <label className="challenge-choice-option" htmlFor={choiceId} key={choice.id}>
+                      <input
+                        checked={currentProgress.answer === choice.id}
+                        id={choiceId}
+                        name="challenge-answer"
+                        onChange={() => handleAnswerChange(choice.id)}
+                        type="radio"
+                        value={choice.id}
+                      />
+                      <span>{choice.label}</span>
+                    </label>
+                  );
+                })}
+              </fieldset>
+            ) : (
+              <>
+                <label htmlFor="challenge-answer">Your answer</label>
+                <input
+                  autoComplete="off"
+                  id="challenge-answer"
+                  inputMode="text"
+                  maxLength={200}
+                  onChange={(event) => handleAnswerChange(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      void handleCheckAnswer();
+                    }
+                  }}
+                  value={currentProgress.answer}
+                />
+              </>
+            )}
             <button
               className="button button-primary"
               disabled={
@@ -1047,6 +1318,41 @@ export function DailyChallengeExperience({
           </p>
         </section>
       )}
+
+      <details className="curriculum-coverage">
+        <summary>Available challenge topics</summary>
+        <p>
+          Each available challenge includes five problems, hints, and worked
+          solutions.
+        </p>
+        <div
+          aria-label="Available challenge topics by course or level"
+          className="coverage-table-wrap"
+          role="region"
+          tabIndex={0}
+        >
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Course / level</th>
+                <th scope="col">Topics listed</th>
+                <th scope="col">Available</th>
+                <th scope="col">Coming soon</th>
+              </tr>
+            </thead>
+            <tbody>
+              {curriculumCoverage.map((course) => (
+                <tr key={course.name}>
+                  <th scope="row">{course.name}</th>
+                  <td>{course.totalTopics}</td>
+                  <td>{course.readyTopics}</td>
+                  <td>{course.remainingTopics}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
 
     </div>
   );

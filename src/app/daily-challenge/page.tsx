@@ -18,15 +18,9 @@ export default function DailyChallengePage() {
         className="public-hero page-width"
       >
         <p className="eyebrow eyebrow-dark">Think it through</p>
-        <h1 id="challenge-page-title">
-          Daily Math
-          <br />
-          <span>Challenge.</span>
-        </h1>
+        <h1 id="challenge-page-title">What will you discover today?</h1>
         <p className="public-lede">
-          Choose a level and topic, then work through five questions that build
-          in challenge. Your answers are checked with deterministic math rules;
-          progress stays on this device.
+          Choose a topic. Solve five problems. Build your confidence.
         </p>
       </section>
 

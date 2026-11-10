@@ -6,7 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "The Pi School | Build understanding. Grow confidence.",
   description:
-    "A welcoming starting point for tutoring and a growing collection of ways to explore mathematics.",
+    "Explore mathematics from early number sense through advanced courses with The Pi School’s tutoring information and math learning activities.",
 };
 
 export default function RootLayout({
