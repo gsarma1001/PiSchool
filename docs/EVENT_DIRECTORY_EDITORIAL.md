@@ -118,73 +118,113 @@ Other equal sort keys resolve by event name and then stable event or route ID.
 The directory filters and sort are encoded in URL query parameters, and browser
 back/forward restores the prior state.
 
-## Initial review coverage and limitations
+## Source review and catalog update — 2026-11-10
 
-The reviewed collection currently has seven published editions: MAA AMC 8,
-AMC 10 B, and AMC 12 B (United States/Canada); Purple Comet! Math Meet 2027
-(online, with its published eligibility restrictions); IMO 2027 (Budapest;
-participant eligibility and participation mode remain unconfirmed); Math
-Kangaroo USA 2027 (U.S. grades K–12, no next event date announced); and a
-specific UW Monthly Math Hour student talk on November 22, 2026. The 2026
-Canadian Open Mathematics Challenge is available only in the archive view. One
-Australian Maths Competition 2027 record remains a non-public draft.
+The directory now has 12 published editions, two archived editions, and one
+non-public draft. The published additions are the 2026–27 MATHCOUNTS series,
+Berkeley Math Tournament 2026, MOEMS 2026–27, Noetic Learning Math Contest
+Fall 2026 School Edition, and Primary Mathematics Challenge 2026. Berkeley
+mini Math Tournament (BmMT) 2026 is archived. BMT and BmMT remain separate
+families; the in-person and online routes, dates, and status are kept distinct
+within their respective editions. The Math Kangaroo record remains the source
+for verified U.S. Kindergarten–Grade 12 coverage; MOEMS adds Grades 4–8,
+Noetic adds Grades 2–8, and MATHCOUNTS adds Grades 6–8.
 
-Official pages reviewed on 2026-11-08:
+Event facts are stored in the repository catalog at `src/lib/events/data.ts`,
+not in page components. `src/app/events/page.tsx` reads published records from
+that catalog, and the detail route reads the same records by slug. No event
+families or edition facts were found embedded in a page component. The
+source-review process is editorial and offline: review an organizer's
+edition-specific pages, update the family/edition records and source claims,
+record the actual check date, then run `npm run report:events`,
+`npm run test:events`, `npm run typecheck`, `npm run lint`, and `npm run build`.
+Check the directory search/details after a catalog update; page UI code should
+not need to change for new or refreshed records. There is no automated page
+scraper, import command, or scheduled source-refresh workflow.
 
-- [MAA AMC overview](https://maa.org/student-programs/amc/) — current
-  2026–27 dates, published age/grade rules, approved-site and student
-  registration instructions.
-- [MAA AMC registration page](https://maa.org/amcreg/) — site/competition
-  manager registration status and deadlines, verified on 2026-11-08.
-- [Purple Comet! Math Meet](https://purplecomet.org/) and its
-  [official FAQ](https://purplecomet.org/faq) — 2027 dates, online/international
-  format, team supervision, and competitive/noncompetitive eligibility.
-- [IMO 2027 official edition page](https://www.imo-official.org/editions/2027/)
-  — edition, Budapest host location, and dates.
-- [COMC 2026 official event page](https://cms.math.ca/competitions/comc/comc2026/)
-  and [eligibility/proctoring page](https://cms.math.ca/competitions/comc/comc2026/eligibility/)
-  — past edition dates, status, eligibility, proctoring, and official problem set.
-- [Math Kangaroo USA competition page](https://mathkangaroo.org/mks/math-kangaroo-competition/)
-  and [2027 registration page](https://mathkangaroo.org/mks/registration/) —
-  U.S. grade eligibility, location restrictions, available routes, status, and
-  published fee. The next contest date was not published in the reviewed pages.
-- [UW Monthly Math Hour](https://sites.math.washington.edu/~mathcircle/mathhour/)
-  — the November 22, 2026 talk, Grades 6–10 audience, Seattle venue, free
-  attendance, and no-registration-required route.
-- Berkeley Math Tournament and MATHCOUNTS official pages were checked as
-  research leads but did not provide a reviewed edition record during this
-  pass. Their source links, along with the remaining leads, remain in
-  `src/lib/events/source-registry.ts`; a source lead is not a verified event
-  listing.
-- [Australian Maths Trust AMC overview](https://www.amt.edu.au/amc) — sufficient
-  to identify the organizer and event series, but not to publish 2027 dates,
-  mode, eligibility, or registration.
+### Official organizer pages checked on 2026-11-10
 
-The MAA registration page confirmed site/competition-manager registration was
-open when reviewed on 2026-11-08. It lists AMC 10 B and AMC 12 B additional
-student-license bundle orders through 2026-11-12 at 11:59 PM ET, AMC 8 new
-manager site registration through 2027-01-05 at 11:59 PM ET, and AMC 8 late
-registration for returning managers through 2027-01-14 at 11:59 PM ET. These
-are educator/site routes, not student entry deadlines. Student registration
-availability, direct student links, and student deadlines remain unknown. The
-AMC 8 additional-bundle deadline published for 2027-01-26 is conditional on a
-site's scheduled contest date and is not represented as a universal deadline.
-Timed open statuses are derived from the verified organizer status and close
-after their cutoff; recheck source information near and after those dates.
+- [MATHCOUNTS rules and FAQ](https://www.mathcounts.org/programs/competition-rules-faq),
+  [critical dates](https://www.mathcounts.org/programs/critical-dates),
+  [registration](https://www.mathcounts.org/registration), and
+  [chapter/state search](https://www.mathcounts.org/programs/chapter-state-competition-search):
+  Grades 6–8, school/chapter/state/national schedule, 2027 national venue,
+  school and Non-School Competitor routes, and the December 15 regular-rate
+  registration deadline. Local chapter dates vary and the organizer updates
+  its search page; the directory does not invent a local session.
+- [BMT 2026 in-person](https://berkeley.mt/events/bmt-2026/) and
+  [online](https://berkeley.mt/events/bmt-2026-online/): grade-12-and-below
+  eligibility, separate dates, venues/mode, registration route, the
+  in-person capacity/waitlist status, and online registration deadline.
+- [BmMT 2026 in-person](https://berkeley.mt/events/bmmt-2026/) and
+  [online](https://berkeley.mt/events/bmmt-2026-online/): Grade 8 and below,
+  no lower age limit, distinct dates, worldwide entrant eligibility,
+  registration routes/deadlines, and the Berkeley venue for the in-person
+  edition. Both 2026 sessions are archived.
+- [MOEMS](https://www.moems.org/): all five 2026–27 administration windows,
+  Division E Grades 4–6, Division M Grades 6–8, up-to-35-student teams, paper
+  and online formats, and the March 31 score-entry deadline. The enrollment
+  link was not available at the checked URL; student enrollment status and
+  deadline remain unconfirmed. Score-entry deadlines are not represented as
+  student registration deadlines.
+- [Noetic Learning contest details](https://www.noetic-learning.com/mathcontest/details.jsp),
+  [FAQ](https://www.noetic-learning.com/mathcontest/faq.jsp), and
+  [At-Home details](https://www.noetic-learning.com/mathcontest/details_athome.jsp):
+  Fall 2026 dates, regular/late registration dates, school-team versus
+  at-home routes, paper/online format, and official sample/past-test links.
+  At-home participation is a separate format and does not qualify for official
+  awards. Late registration had ended by the review date.
+- [Primary Mathematics Challenge](https://www.primarymathschallenge.org.uk/pmc):
+  November 9–20 window, ages 9–11, school-only ordering, worldwide school
+  participation, online/PDF/paper modes, and separate paper-pack versus
+  online/PDF order deadlines. Age eligibility is not mapped to a US grade.
+- [MAA AMC overview](https://maa.org/student-programs/amc/) and
+  [registration page](https://maa.org/amcreg/): current A/B and AMC 8 dates,
+  eligibility, approved-site process, and manager/license deadlines. Site and
+  student routes are not conflated.
 
-The collection has no verified upcoming conference, student workshop, or
-university tournament yet and does not provide country-by-country coverage.
-Thirty-two source leads are recorded, not represented as checked events.
-KPMT (Newport Knights of Pi Math Tournament), BMT (Berkeley Math Tournament),
-and BmMT (Berkeley mini Math Tournament) are distinct opportunities; do not
-merge their records or infer organizer, eligibility, or entry pathway from
-similar names. This is an editorial research backlog, not an implemented
-automation or publication schedule. Expand only when official,
-edition-specific sources have been reviewed.
+Previously reviewed sources remain in the catalog: [Purple Comet](https://purplecomet.org/),
+[IMO 2027](https://www.imo-official.org/editions/2027/), [COMC 2026](https://cms.math.ca/competitions/comc/comc2026/),
+[Math Kangaroo USA](https://mathkangaroo.org/mks/), [UW Monthly Math Hour](https://sites.math.washington.edu/~mathcircle/mathhour/),
+and [Australian Maths Trust](https://www.amt.edu.au/amc). The Australian 2027
+edition remains a draft until its dates, eligibility, and route are published.
 
-The directory offers URL-backed purpose views and filters, mobile event cards,
-separate confirmed and “Eligibility to check” results, archived editions, and
-student-purpose deadline sorting. `npm run report:events` reports missing
-edition information and records whose next editorial review date has passed.
-Future source imports and organizer submissions must enter human review; no
-submission form or automated source-change monitor is running.
+### Research backlog and coverage gaps
+
+`src/lib/events/source-registry.ts` retains organizer leads for Newport High
+School clubs (including the Knights of Pi/KPMT lead), Washington Student Math
+Association, UW Math Hour, MAA AMC, Berkeley BMT/BmMT, Math Kangaroo, Noetic,
+MOEMS, MATHCOUNTS, Purple Comet, COMAP, Waterloo CEMC, UKMT, Australian Maths
+Trust, national olympiad organizers linked from IMO, Julia Robinson Math
+Festival, Math Circle Network, Stanford festivals, MAA MathFest, and NCTM.
+These source leads are not themselves verified active listings. In particular,
+the Newport clubs page did not establish KPMT's current event dates, eligibility,
+registration, or exact event identity, so no KPMT edition was published.
+
+Additional organizer leads include Bebras, Bay Area Math Olympiad, Mandelbrot,
+and SEAMO, all marked discovery-only pending edition-level review. The
+following were not added as active events: Bebras' page did not render useful
+content without JavaScript; WMTC was blocked by a CAPTCHA; North Star's
+candidate domain did not resolve; Rocket City Math League domains were
+ambiguous; Math League search results included stale material and similarly
+named organizations; Online Math Open appeared inactive; Caribou Contests
+appeared to have ceased operations; and the official international Kangaroo
+organizer domain remains unresolved. Third-party directories (High School
+Opportunity, PrepScholar, and general search results) were used only to find
+leads; their claims were not imported as event facts.
+
+Still open: verify an edition and registration details for KPMT and WSMA; check
+MOEMS enrollment status through an accessible organizer enrollment page; review
+the current Australian Maths Competition edition; expand verified CEMC, UKMT,
+COMAP/modeling, Olympiad, student workshop/festival, MathFest, and NCTM
+listings; and extend country-by-country coverage. The directory is not yet a
+comprehensive global calendar. No student workshop, festival session, or
+school-age conference was added without an official edition/session page.
+
+The MAA registration page lists manager/site and license deadlines separately
+from student enrollment; those are not represented as student deadlines.
+Time-limited status should be rechecked after the stated date. The directory
+has URL-backed filters, confirmed and “Eligibility to check” result groups,
+archived editions, and student-purpose deadline sorting. `npm run
+report:events` identifies missing information and overdue reviews. No
+submission form, automated source monitor, or scheduled refresh is running.

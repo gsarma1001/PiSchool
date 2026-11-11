@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { InquiryForm } from "./inquiry-form";
 
 export const metadata: Metadata = {
@@ -8,7 +9,9 @@ export const metadata: Metadata = {
     "Send The Pi School a tutoring inquiry about a student’s US grade, course, and math learning needs, from early foundations through advanced math.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  await connection();
+
   const deliveryConfigured = Boolean(
     process.env.RESEND_API_KEY &&
       process.env.INQUIRY_FROM_EMAIL &&

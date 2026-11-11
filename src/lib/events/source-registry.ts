@@ -8,12 +8,13 @@ export type EventSourceLead = {
 
 export const eventSourceLeads: EventSourceLead[] = [
   { id: "math-kangaroo", organization: "Math Kangaroo USA", focus: "Elementary and school-age competitions", url: "https://mathkangaroo.org/", role: "organizer" },
-  { id: "noetic-learning", organization: "Noetic Learning", focus: "Elementary and middle-school contests", url: "https://www.noetic-learning.com/mathcontest/index.jsp", role: "organizer" },
+  { id: "noetic-learning", organization: "Noetic Learning", focus: "Elementary and middle-school contest editions", url: "https://www.noetic-learning.com/mathcontest/details.jsp", role: "organizer" },
   { id: "moems", organization: "MOEMS", focus: "Elementary and middle-school contests", url: "https://www.moems.org/", role: "organizer" },
-  { id: "mathcounts", organization: "MATHCOUNTS", focus: "Middle-school competitions", url: "https://mathcounts.org/", role: "organizer" },
+  { id: "mathcounts", organization: "MATHCOUNTS", focus: "Competition Series rules, dates, and local chapter/state schedules", url: "https://www.mathcounts.org/programs/competition-rules-faq", role: "organizer" },
   { id: "mathleague", organization: "mathleague.org", focus: "School-age competitions", url: "https://mathleague.org/", role: "organizer" },
   { id: "maa-amc", organization: "Mathematical Association of America", focus: "AMC competitions", url: "https://maa.org/student-programs/amc/", role: "organizer" },
   { id: "berkeley-math-tournament", organization: "Berkeley Math Tournament", focus: "Middle- and high-school tournament", url: "https://berkeley.mt/", role: "organizer" },
+  { id: "berkeley-bmmt", organization: "Berkeley Math Tournament", focus: "BmMT is a separate middle-school tournament; verify each in-person and online edition independently", url: "https://berkeley.mt/events/bmmt-2026/", role: "organizer" },
   { id: "hmmt", organization: "Harvard-MIT Mathematics Tournament", focus: "High-school tournament", url: "https://www.hmmt.org/", role: "organizer" },
   { id: "pumac", organization: "Princeton University Mathematics Competition", focus: "High-school competition", url: "https://pumac.princeton.edu/", role: "organizer" },
   { id: "cmimc", organization: "Carnegie Mellon competitions", focus: "Secondary-school competitions", url: "https://cmimc.com/competitions", role: "organizer" },
@@ -26,6 +27,7 @@ export const eventSourceLeads: EventSourceLead[] = [
   { id: "uw-monthly-math-hour", organization: "University of Washington", focus: "Student talks and math circles", url: "https://sites.math.washington.edu/~mathcircle/mathhour/", role: "organizer" },
   { id: "waterloo-cemc", organization: "University of Waterloo CEMC", focus: "Canadian contests", url: "https://cemc.uwaterloo.ca/contests", role: "organizer" },
   { id: "ukmt", organization: "UK Mathematics Trust", focus: "United Kingdom competitions", url: "https://ukmt.org.uk/competitions", role: "organizer" },
+  { id: "primary-maths-challenge", organization: "Association for Mathematics in Education", focus: "Primary pupils aged 9–11; school-administered challenge", url: "https://www.primarymathschallenge.org.uk/pmc", role: "organizer" },
   { id: "australian-maths-trust", organization: "Australian Maths Trust", focus: "Australian competitions", url: "https://amt.edu.au/competitions", role: "organizer" },
   { id: "hbcse-olympiads", organization: "Homi Bhabha Centre for Science Education", focus: "India Olympiad program", url: "https://olympiads.hbcse.tifr.res.in/", role: "organizer" },
   { id: "singapore-mathematical-society", organization: "Singapore Mathematical Society", focus: "Singapore Mathematical Olympiad", url: "https://sgmathsociety.org/singapore-mathematical-olympiad-smo/", role: "organizer" },
@@ -40,6 +42,10 @@ export const eventSourceLeads: EventSourceLead[] = [
   { id: "high-school-opportunity", organization: "High School Opportunity", focus: "Discovery lead only; verify with event organizer", url: "https://highschoolopportunity.org/categories/competitions/math", role: "discovery-only" },
   { id: "prepscholar-competitions", organization: "PrepScholar", focus: "Discovery lead only; verify with event organizer", url: "https://blog.prepscholar.com/high-school-math-competitions", role: "discovery-only" },
   { id: "comap-blog", organization: "COMAP", focus: "Discovery lead; verify current facts on the event page", url: "https://www.comap.org/blog/item/math-competitions-for-students", role: "discovery-only" },
+  { id: "bebras-international", organization: "Bebras International", focus: "Discovery lead; JavaScript-rendered site requires organizer-page verification", url: "https://www.bebras.org/", role: "discovery-only" },
+  { id: "bay-area-math-olympiad", organization: "Bay Area Math Olympiad", focus: "Discovery lead; verify current edition, eligibility, and registration with organizer", url: "https://www.bamo.org/", role: "discovery-only" },
+  { id: "mandelbrot-competition", organization: "Mandelbrot Competition", focus: "Discovery lead; verify current organizer and edition details", url: "https://www.mandelbrot.org/", role: "discovery-only" },
+  { id: "seamo", organization: "Southeast Asian Mathematical Olympiad", focus: "Discovery lead; verify current organizer, eligibility, and country routes", url: "https://seamo-official.org/", role: "discovery-only" },
 ];
 
 export function validateEventSourceLeads(

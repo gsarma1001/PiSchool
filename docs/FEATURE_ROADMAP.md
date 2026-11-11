@@ -1,6 +1,6 @@
 # The Pi School — Feature Roadmap and Requirements
 
-Updated: November 8, 2026
+Updated: November 11, 2026
 Suggested repository location: `docs/FEATURE_ROADMAP.md`
 Status: Planning baseline. Proposed features are not authorization to implement every phase at once.
 
@@ -12,9 +12,14 @@ This document supplements `docs/PROJECT_PLAN.md`; it does not replace its origin
 
 AoPS is a reference for academic presentation and learning patterns. Keep The Pi School's branding, wording, imagery, teaching approach, and implementation original.
 
-## 2. Current state — checked November 7, 2026
+## 2. Current state — checked November 11, 2026
 
-The local application has a Next.js App Router, TypeScript, Tailwind styling, a responsive shared site shell, a homepage, tutoring and contact pages, and seven owner-approved testimonials published locally. F05 includes a short inquiry form with server-side validation, a honeypot, a best-effort in-process rate limit, and Resend email delivery code. Local email environment variables are populated, but a test request was rejected by Resend with HTTP 403 because `thepischools.com` is not verified. No email was accepted or sent; F05 delivery is not complete.
+The local application has a Next.js App Router, TypeScript, Tailwind styling, a responsive shared site shell, a homepage, tutoring and contact pages, and seven owner-approved testimonials published locally. F05 includes a short inquiry form with server-side validation, a honeypot, a best-effort in-process rate limit, and Resend email delivery code. Local email environment variables are populated. A 2026-11-07 test request was rejected by Resend with HTTP 403; a later local test was accepted as noted below.
+
+A later clearly labeled local test was accepted by Resend, as recorded in
+`docs/PROJECT_PLAN.md`. That confirms provider acceptance for that local test
+only; staging runtime delivery, inbox receipt, and actual Reply-To behavior
+remain unverified.
 
 The public source archive and F01 reconciliation are complete. On 2026-11-07, the owner confirmed reviewing the flagged team/contact/outcome-claim content and confirmed no private records were collected or kept for this website. The review did not record specific corrections or republication approvals, so flagged details remain unverified and must not be presented as current facts. The testimonial portion of F04 is complete locally; current tutor profiles remain unverified and unpublished. Booking, accounts, database-backed storage, and AI are not implemented.
 
@@ -22,11 +27,11 @@ F06 has a working local daily challenge route with a typed question-service and 
 
 The shared curriculum labels Kindergarten, US Grades 1–12, and college/advanced math while keeping grade separate from course and topic. K–5 challenge coverage is a starter set, not a complete grade-by-grade curriculum; topic gaps and further review are tracked in `docs/CURRICULUM_SCOPE.md`.
 
-F07's local directory redesign is complete: seven published editions across
-seven event families, one archived edition, and one non-public draft. Families
-and annual editions are separately modeled; the public view has purpose tabs,
+F07's local directory redesign is complete: 12 published editions across 13
+event families, two archived editions, and one non-public draft. Families and
+annual editions are separately modeled; the public view has purpose tabs,
 URL-backed filters, compact cards, separate uncertain-eligibility results,
-and student-only deadline handling. Thirty-two source leads remain research
+and student-only deadline handling. Thirty-nine source leads remain research
 starting points, not verified event listings. No verified upcoming conference,
 student workshop, or university tournament is published; the global
 30–40-family expansion remains open. See
@@ -136,7 +141,7 @@ Seven owner-approved testimonials are published in readable cards on the local h
 
 Explain the source-confirmed broad math scope and tutoring formats, and provide a request path without implying current availability. The contact form collects only parent/guardian name, reply email, student grade or course, and requested help. It validates on the server, includes a hidden honeypot and best-effort in-process rate limit, and sends through Resend using server-only `RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`, and `INQUIRY_TO_EMAIL`. The intended recipient is `thepischooltutoring@gmail.com`; the sender must be an address on a domain verified with Resend. The owner still needs to configure these values and production edge rate limiting.
 
-**Status:** routes, form, validation, spam controls, and delivery code are implemented locally. The test inquiry was rejected with HTTP 403: Resend reports that `thepischools.com` is not verified. Verify the domain in Resend, then repeat the inbox/Reply-To test. No test inquiry has been delivered.
+**Status:** routes, form, validation, spam controls, and delivery code are implemented locally. A clearly labeled local form test was accepted by Resend (message ID `01a1c94c-4c4c-76a6-aae3-0e6f2d566492`). Inbox receipt and actual Reply-To behavior have not been independently verified.
 
 **Done when:** a real inquiry reaches its intended destination; failure and validation states work; private inquiries are protected; expected response arrangements are accurately described. A provider acceptance is not proof of final inbox receipt.
 
@@ -257,14 +262,14 @@ priority over quota.
 The F07 directory redesign is complete locally: directory/detail/guide routes,
 responsive cards, purpose views, normalized family/edition records,
 URL-backed filters, confirmed/uncertain eligibility groups, student-purpose
-deadline handling, runtime validation, an editorial report, and 20 focused
-event tests are in place. The reviewed collection has seven published editions
-across seven families, one archived COMC edition, and one Australian Maths
-Competition draft excluded from public results. Current geographic coverage
-includes US/Canada, Europe, and online international opportunities. There is
-not yet a verified upcoming conference, student workshop, or university
-tournament. Thirty-two source leads remain research starting points, and the
-30–40-family expansion remains open; accuracy takes priority over a numeric
+deadline handling, runtime validation, an editorial report, and 22 focused
+event tests are in place. The reviewed collection has 12 published editions
+across 13 families, two archived editions, and one Australian Maths
+Competition draft excluded from public results. Thirty-nine source leads
+remain research starting points. Current geographic coverage includes
+US/Canada, Europe, and online international opportunities. There is not yet a
+verified upcoming conference, student workshop, or university tournament.
+The 30–40-family expansion remains open; accuracy takes priority over a numeric
 target. AMC student deadlines depend on each local host; organizer/site
 deadlines are purpose-labeled and kept separate from student entry. No live
 website/domain changes were made. See `docs/EVENT_DIRECTORY_EDITORIAL.md` for

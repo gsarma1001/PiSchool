@@ -159,7 +159,7 @@ export async function submitInquiry(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `The Pi School <${fromAddress}>`,
+        from: `Pi School <${fromAddress}>`,
         to: [recipient],
         reply_to: inquiry.email,
         subject: "New tutoring inquiry",
@@ -208,6 +208,29 @@ export async function submitInquiry(
         "We couldn’t deliver your inquiry right now. No success was recorded; please try again later.",
       values: inquiry,
     };
+  }
+
+  let responseBody: unknown;
+  try {
+    responseBody = await response.json();
+  } catch (error) {
+    console.error(
+      "Resend accepted the inquiry, but its response could not be parsed.",
+      error instanceof Error ? error.message : "Unknown response parsing error",
+    );
+  }
+
+  if (
+    typeof responseBody === "object" &&
+    responseBody !== null &&
+    "id" in responseBody &&
+    typeof responseBody.id === "string"
+  ) {
+    console.info(`Resend accepted the inquiry. Message ID: ${responseBody.id}`);
+  } else {
+    console.info(
+      `Resend accepted the inquiry (HTTP ${response.status}) without returning a message ID.`,
+    );
   }
 
   return {

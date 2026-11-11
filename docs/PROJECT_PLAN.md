@@ -4,23 +4,34 @@ I reviewed your homepage, team page, and FAQ page. Your domain currently display
 
 I’m assuming you mean **Visual Studio Code with an AI coding assistant**, such as GitHub Copilot or Codex. The prompts below can be used sequentially in its coding chat.
 
-## Implementation status — 2026-11-10
+## Implementation status — 2026-11-11
 
 Prompt 1 is complete: the App Router, TypeScript, and Tailwind CSS foundation; responsive shared site shell and minimal homepage; project brief, implementation plan, curriculum scope, environment example, and local setup instructions are in place. Lint, TypeScript, production build, and local production HTTP checks passed. Phase 0 public-source capture includes the accessible pages and assets, six unique homepage testimonials, and seven expanded FAQs. The owner supplied and approved an additional testimonial; all seven are displayed in the local application. The owner has reviewed the flagged preservation content and confirmed no private records were collected or kept; specific corrections or republication decisions for flagged claims/contact/team content are still unrecorded. The live site/domain were not changed.
 
-F05 has since added local tutoring/contact routes and a short, server-validated inquiry form with Resend delivery code. Local credentials are configured, but Resend has not verified the sender domain and rejected the test email; inbox receipt and Reply-To behavior remain unverified. See `docs/FEATURE_ROADMAP.md` for the current F05 status.
+F05 has since added local tutoring/contact routes and a short, server-validated inquiry form with Resend delivery code. A clearly labeled local form test was accepted by Resend; inbox receipt and actual Reply-To behavior remain unverified. See `docs/FEATURE_ROADMAP.md` for the current F05 status.
 
-Final validation and hardening pass completed locally: the app routes respond successfully, internal links resolve without 404s, the daily challenge and events test suites pass, and the production build completes. The remaining inquiry-email deployment step still depends on verified Resend sender configuration and an inbox/Reply-To test; no production website or live-domain edits were made.
+Final validation and hardening pass completed locally: the app routes respond successfully, internal links resolve without 404s, the daily challenge and events test suites pass, and the production build completes. The remaining inquiry-email deployment step depends on confirming inbox receipt and actual Reply-To behavior; no production website or live-domain edits were made.
 
 | Prompt or phase | Status | Notes |
 |---|---|---|
 | Prompt 1 — Establish the project and working rules | Complete | The local application foundation and minimal homepage are implemented. Lint, TypeScript, production build, and production-server homepage checks pass. |
 | Phase 0 — Preserve | Complete | Public pages, assets, six unique testimonials, and seven expanded FAQs are archived and reconciled. The owner completed the flagged-content review and confirmed there are no private records to export. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
-| Phase 1 — Redesign | Foundation plus partial F05 | Tutoring/contact routes and the validated inquiry form are implemented locally. Resend DNS verification and inbox/Reply-To verification remain outstanding; current tutor details also need review. |
-| Phase 2 — Math hub | Partial — F06/F07 elementary support updated locally; F07 directory redesign complete; F08 Math News initial slice available | K–5 challenge topics and source-backed event grade filters are implemented, but broader curriculum coverage and educator/editorial review remain incomplete. Math Kangaroo USA's 2027 rules provide verified US Grades K–12 eligibility; other elementary matches remain source-dependent. The redesigned directory has seven published editions across seven families, one archived edition, and one non-public draft; the broader 30–40 verified-family expansion remains a research backlog. A small, source-linked Math News page is an initial F08 slice; research explainers, facts, and editorial tooling remain future work. Preserve future Phase 2 work and incomplete topic banks; see `docs/FEATURE_ROADMAP.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md`, and `docs/EVENT_DIRECTORY_EDITORIAL.md`. |
+| Phase 1 — Redesign | Foundation plus partial F05 | Tutoring/contact routes and the validated inquiry form are implemented locally. Resend accepted a clearly labeled local test inquiry; inbox receipt and actual Reply-To verification remain outstanding. Current tutor details also need review. |
+| Phase 2 — Math hub | Partial — F06/F07 elementary support updated locally; F07 directory redesign complete; F08 Math News initial slice available | K–5 challenge topics and source-backed event grade filters are implemented, but broader curriculum coverage and educator/editorial review remain incomplete. The event directory now has 12 published editions, two archived editions, and one draft across verified US, online, and international opportunities; the wider global organizer and edition research backlog remains open. A small, source-linked Math News page is an initial F08 slice; research explainers, facts, and editorial tooling remain future work. Preserve future Phase 2 work and incomplete topic banks; see `docs/FEATURE_ROADMAP.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md`, and `docs/EVENT_DIRECTORY_EDITORIAL.md`. |
 | Phase 3 — Daily Quick Mind pilot | Partial — daily challenge browsing experience refreshed locally | The daily challenge now offers clearer grade/course browsing, topic status labels, a surprise-me flow, and resume handling while preserving deterministic questions, hints, worked solutions, and stored device-local progress. Broader pilot expansion remains future work. |
 | Phase 4 — Expand learning | Partial — Kindergarten–Grade 5 starter challenge topics are implemented locally | 19 elementary topics now have deterministic five-question challenge sets. Coverage gaps, educator review, remaining K–12 catalog mapping, and advanced curriculum expansion remain open. No AI, accounts, or child information collection was added. |
 | Phase 5 — Launch and operate | Not started | Future phase; production website and domain have not been changed. |
+
+**Staging validation — 2026-11-11:** Local production build, automated tests,
+public-route checks, mobile layout checks, Get Started required-field
+validation, Daily Challenge play-through, and event-directory filters were
+verified. The Azure staging deployment, runtime secret check, real staging
+Resend submission, and inbox/Reply-To checks are blocked: this repository has
+no staging deployment workflow or resource, and Azure resource access is not
+available in this workspace. The intended changes are prepared on a local
+`staging` branch; they have not been pushed or deployed. Resume those checks
+after a separate staging Static Web App is provisioned and deployed from that
+branch. Production, `thepischools.com` routing, and GoDaddy DNS remain untouched.
 
 F06 remains a local pilot, not a complete curriculum or a production
 publishing workflow. The shared catalog defines 14 advanced course IDs and
@@ -36,17 +47,17 @@ existing bank. Elementary coverage gaps and educator review remain open; see
 F07's directory redesign, purpose views, URL-backed filters, compact result
 cards, confirmed/uncertain eligibility separation, annual-edition family
 model, deadline-purpose handling, source registry, and editorial report are
-implemented locally. The reviewed collection has seven published editions
-across seven families, one archived edition, and one non-public draft. It
-includes United States/Canada, Europe, online opportunities, and a specific
-Washington student talk. No verified upcoming conference, workshop, or
-university tournament is published; 32 source leads remain research starting
-points, not verified listings. The wider 30–40-family expansion remains open.
-MAA site/competition-manager deadlines are explicitly separated from student
-registration; AMC student deadlines depend on each local host and remain
-unpublished. See `docs/EVENT_DIRECTORY_EDITORIAL.md` for checked sources,
-limitations, and the research backlog. No live website/domain changes were
-made.
+implemented locally. The reviewed collection now has 12 published editions,
+two archived editions, and one non-public draft. New verified coverage
+includes MATHCOUNTS, separate Berkeley BMT/BmMT families and routes, MOEMS,
+Noetic's Fall school edition, and Primary Mathematics Challenge. MAA
+site/competition-manager deadlines remain distinct from student registration;
+AMC student deadlines depend on each local host and remain unpublished. The
+offline editorial catalog can be updated without page-code changes, but there
+is no automatic import or refresh workflow. Additional verified workshops,
+festivals, conferences, and international editions remain open research. See
+`docs/EVENT_DIRECTORY_EDITORIAL.md` for checked sources, limitations, and the
+research backlog. No live website/domain changes were made.
 
 The elementary expansion adds shared Kindergarten–Grade 5 event filters and
 beginner guidance. Math Kangaroo USA's 2027 edition has a verified US K–12

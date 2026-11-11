@@ -47,15 +47,20 @@ clearly report that an inquiry was **not sent** until Resend is configured.
    address entered in the form.
 
 These are server-only variables; do not prefix them with `NEXT_PUBLIC_` or
-commit `.env.local`. The checked-in `.env.example` contains placeholders.
+commit `.env.local`. The checked-in `.env.example` contains a placeholder API
+key and example sender and recipient addresses.
 
 ### Production configuration
 
 Before deploying, add the same three variables to the hosting provider's
-server-side environment settings. Verify the sender domain with Resend and
-configure the host to trust and sanitize its forwarded client-IP headers.
-Rebuild/redeploy after changing production variables. Keep the Resend key
-secret and never expose it to browser code.
+server-side runtime settings. The app requires a Node.js/Next.js hybrid
+runtime; do not deploy it as a static export. The contact page checks delivery
+configuration at request time, and the inquiry handler reads the values on the
+server. Follow the host's instructions for applying runtime-setting changes,
+then verify them with a clearly identified inquiry test. Verify the sender
+domain with Resend and configure the host to trust and sanitize its forwarded
+client-IP headers. Keep the Resend key secret and never expose it to browser
+code.
 
 The inquiry handler validates fields on the server, includes a hidden
 honeypot, and applies a small in-process rate limit. In-process limits are

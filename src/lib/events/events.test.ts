@@ -172,7 +172,12 @@ describe("event directory filters and source boundaries", () => {
       { ...noFilters(), eligibleCountry: "HU", includeOnline: true },
       new Date("2026-11-07T12:00:00Z"),
     ).events;
-    assert.deepEqual(eligibleHungary.map((event) => event.id), ["purple-comet-2027"]);
+    assert.deepEqual(eligibleHungary.map((event) => event.id), [
+      "primary-mathematics-challenge-2026",
+      "noetic-learning-school-fall-2026",
+      "berkeley-bmt-2026",
+      "purple-comet-2027",
+    ]);
 
     const eligibleUs = filterAndSortEvents(
       records,
@@ -366,6 +371,7 @@ describe("event directory filters and source boundaries", () => {
     const current = filterAndSortEvents(allRecords, noFilters(), now).events;
     assert.ok(current.every((event) => event.editorialStatus === "published"));
     assert.ok(!current.some((event) => event.id === "comc-2026"));
+    assert.ok(!current.some((event) => event.id === "berkeley-bmmt-2026"));
     assert.ok(!current.some((event) => event.id === "australian-maths-competition-2027-draft"));
 
     const withArchive = filterAndSortEvents(
@@ -382,9 +388,30 @@ describe("event directory filters and source boundaries", () => {
       now,
     ).events;
     assert.deepEqual(closedArchive.map((event) => event.id), [
+      "berkeley-bmmt-2026",
       "comc-2026",
+      "noetic-learning-school-fall-2026",
+      "berkeley-bmt-2026",
       "math-kangaroo-usa-2027",
     ]);
+  });
+
+  it("keeps BMT and BmMT as separate families with mode-specific routes", () => {
+    const bmt = eventRecords.find((event) => event.id === "berkeley-bmt-2026");
+    const bmmt = eventRecords.find((event) => event.id === "berkeley-bmmt-2026");
+    assert.equal(bmt?.familyId, "berkeley-math-tournament");
+    assert.equal(bmmt?.familyId, "berkeley-mini-math-tournament");
+    assert.notEqual(bmt?.familyId, bmmt?.familyId);
+    assert.equal(bmt?.mode, "hybrid");
+    assert.equal(bmmt?.editorialStatus, "archived");
+    assert.equal(
+      bmt?.registrationRoutes.find((route) => route.id === "online-registration")?.status,
+      "open",
+    );
+    assert.equal(
+      bmt?.registrationRoutes.find((route) => route.id === "in-person-waitlist")?.status,
+      "closed",
+    );
   });
 });
 
