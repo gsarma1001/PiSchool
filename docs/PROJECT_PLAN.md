@@ -18,20 +18,31 @@ Final validation and hardening pass completed locally: the app routes respond su
 | Phase 0 — Preserve | Complete | Public pages, assets, six unique testimonials, and seven expanded FAQs are archived and reconciled. The owner completed the flagged-content review and confirmed there are no private records to export. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
 | Phase 1 — Redesign | Foundation plus partial F05 | Tutoring/contact routes and the validated inquiry form are implemented locally. Resend accepted a clearly labeled local test inquiry; inbox receipt and actual Reply-To verification remain outstanding. Current tutor details also need review. |
 | Phase 2 — Math hub | Partial — F06/F07 elementary support updated locally; F07 directory redesign complete; F08 Math News initial slice available | K–5 challenge topics and source-backed event grade filters are implemented, but broader curriculum coverage and educator/editorial review remain incomplete. The event directory now has 12 published editions, two archived editions, and one draft across verified US, online, and international opportunities; the wider global organizer and edition research backlog remains open. A small, source-linked Math News page is an initial F08 slice; research explainers, facts, and editorial tooling remain future work. Preserve future Phase 2 work and incomplete topic banks; see `docs/FEATURE_ROADMAP.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md`, and `docs/EVENT_DIRECTORY_EDITORIAL.md`. |
-| Phase 3 — Daily Quick Mind pilot | Partial — daily challenge browsing experience refreshed locally | The daily challenge now offers clearer grade/course browsing, topic status labels, a surprise-me flow, and resume handling while preserving deterministic questions, hints, worked solutions, and stored device-local progress. Broader pilot expansion remains future work. |
+| Phase 3 — Daily Quick Mind pilot | Partial — daily challenge browsing experience refreshed locally | The daily challenge offers grade/course browsing, topic status labels, and resume handling while preserving deterministic questions, hints, worked solutions, and stored device-local progress. Broader pilot expansion remains future work. |
 | Phase 4 — Expand learning | Partial — Kindergarten–Grade 5 starter challenge topics are implemented locally | 19 elementary topics now have deterministic five-question challenge sets. Coverage gaps, educator review, remaining K–12 catalog mapping, and advanced curriculum expansion remain open. No AI, accounts, or child information collection was added. |
 | Phase 5 — Launch and operate | Not started | Future phase; production website and domain have not been changed. |
 
-**Staging validation — 2026-11-11:** Local production build, automated tests,
+**Staging validation — 2026-11-13:** The separate staging resource is
+`https://agreeable-water-00b9db610.5.azurestaticapps.net`. Its workflow fix
+`aaadcd20e457d7b87aa105a5cc7b011cea43ac65` succeeded on GitHub Actions.
+The new application changes are still being verified locally and have not
+been deployed. Runtime email settings, a staging inquiry, inbox delivery, and
+Reply-To are not yet verified.
+
+Local checks on November 13: build and typecheck pass; 23 event and 17
+Daily Challenge tests pass; lint reports two existing warnings. Browser checks
+covered desktop/mobile route rendering, keyboard menu and skip link, inquiry
+required fields, the tutoring redirect, event deep links and filter history,
+and challenge selection, reload, scoring, help, and one-day streak behavior.
+Math News discovery returned candidates from five feeds and the new Condorcet
+story was checked against its original report and research paper. These are
+not staging regression results.
+
+**Previous local validation — 2026-11-11:** Local production build, automated tests,
 public-route checks, mobile layout checks, Get Started required-field
 validation, Daily Challenge play-through, and event-directory filters were
-verified. The Azure staging deployment, runtime secret check, real staging
-Resend submission, and inbox/Reply-To checks are blocked: this repository has
-no staging deployment workflow or resource, and Azure resource access is not
-available in this workspace. The intended changes are prepared on a local
-`staging` branch; they have not been pushed or deployed. Resume those checks
-after a separate staging Static Web App is provisioned and deployed from that
-branch. Production, `thepischools.com` routing, and GoDaddy DNS remain untouched.
+verified. Those checks were local, not staging evidence. Production,
+`thepischools.com` routing, and GoDaddy DNS were not changed.
 
 F06 remains a local pilot, not a complete curriculum or a production
 publishing workflow. The shared catalog defines 14 advanced course IDs and

@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test:daily-challenge": "node scripts/test-daily-challenge.mjs",
     "test:events": "node scripts/test-events.mjs",
-    "report:events": "node scripts/report-events.mjs"
+    "report:events": "node scripts/report-events.mjs",
+    "news:discover": "node scripts/discover-math-news.mjs"
   },
   "dependencies": {
     "next": "16.4.3",
@@ -24,6 +25,7 @@
     "@types/react-dom": "^19",
     "eslint": "^10.13.0",
     "eslint-config-next": "16.4.3",
+    "fast-xml-parser": "^5.3.8",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

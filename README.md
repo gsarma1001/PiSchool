@@ -22,6 +22,31 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000). Stop the development
 server with `Ctrl+C`.
 
+The public routes include Home, `/contact`, `/daily-challenge`, `/events`,
+`/events/guides`, event details, and `/math-news`. `/tutoring` redirects to
+`/contact`; `/weekly-challenge` redirects to `/daily-challenge`.
+
+The separate staging branch deploys to
+`https://agreeable-water-00b9db610.5.azurestaticapps.net` through the Azure
+Static Web Apps workflow in the staging repository. Keep staging-specific
+workflow commits separate from application changes intended for the original
+repository. Configure `RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`, and
+`INQUIRY_TO_EMAIL` as server-side runtime settings, never in browser code.
+
+### Refresh Math News
+
+Run `npm run news:discover` to list candidates from the feeds in
+`src/lib/math-news/sources.json`. This is a manual discovery step, not an
+automatic publisher: it fetches feeds outside page requests and never changes
+the published catalog. Feed failures are reported and return a nonzero exit
+status; existing stories remain available. Review the original article and
+underlying mathematical source, verify date and claims, identify syndicated
+duplicates manually, and add an original four-to-five-sentence summary to
+`src/lib/math-news/data.ts` with the original URL and review date. The new
+Condorcet story was checked against Quanta and arXiv:2601.07283. The AMS
+newsroom is a manual research lead; no working AMS RSS feed was verified.
+There is no scheduled refresh.
+
 The site pages work without email configuration. The contact form will
 clearly report that an inquiry was **not sent** until Resend is configured.
 

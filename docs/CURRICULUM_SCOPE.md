@@ -24,6 +24,39 @@ with the relevant course sequence. Do not assume a standard topic list.
 
 ## Current status
 
+- The catalog controls the two local browsing choices: grades K–5 and
+  courses. The following table separates playable topics from the number of
+  catalog topics still planned. The complete planned-topic names are listed
+  under “View upcoming topics” for each selection in the app.
+
+  | Grade or course | Playable topics | Planned catalog topics |
+  |---|---|---:|
+  | Kindergarten | Counting collections; Comparing quantities; Patterns; Shapes and attributes | 0 |
+  | Grade 1 | Addition and subtraction within 20; Tens and ones; Time and shape attributes | 0 |
+  | Grade 2 | Place value to 1,000; Equal groups and skip counting; Money and simple data | 0 |
+  | Grade 3 | Multiplication and division; Fractions as equal parts; Area and perimeter | 0 |
+  | Grade 4 | Multidigit arithmetic; Equivalent fractions and fraction operations; Angles and measurement | 0 |
+  | Grade 5 | Decimal and fraction operations; Volume; Expressions and coordinate grids | 0 |
+  | Arithmetic and Number Sense | Place value; Comparing and ordering numbers; Addition; Subtraction; Multiplication; Division; Order of operations; Rounding and estimation; Factors and multiples; Prime numbers; Whole-number operations (mixed review) | 0 |
+  | Fractions, Decimals, and Percentages | Adding and subtracting fractions | 7 |
+  | Ratios and Proportional Reasoning | Proportions | 7 |
+  | Pre-Algebra | One-step and two-step equations | 9 |
+  | Algebra 1 | One-step and two-step equations; Function notation | 11 |
+  | Geometry | Pythagorean theorem | 13 |
+  | Algebra 2 | Quadratic equations | 11 |
+  | Trigonometry | Trigonometric ratios | 8 |
+  | Precalculus | Trigonometric functions | 11 |
+  | Calculus 1 | Differentiation rules | 11 |
+  | Calculus 2 | Definite integrals | 13 |
+  | Multivariable Calculus | Partial derivatives | 12 |
+  | Differential Equations | Separable equations | 8 |
+  | Linear Algebra | Determinants | 12 |
+
+  Zero planned catalog topics does not mean complete curriculum coverage;
+  the grade-level gaps described below are not yet all represented as topics.
+  The earlier committed authored question bank was compared with the current
+  bank: existing authored questions remain, and the catalog changes added
+  grade-scoped topics. No lost playable bank was identified in that comparison.
 - The shared curriculum definitions in `src/lib/curriculum.ts` provide
   US Kindergarten and Grades 1–12 filter options, broader school-level labels,
   and the six elementary Daily Challenge levels. Grade level is separate from
@@ -45,11 +78,9 @@ with the relevant course sequence. Do not assume a standard topic list.
   multistep problems, Grade 4 factors/multiples and broader conversions, and
   Grade 5 several requested strands need further content. Existing generated
   templates also need independent educator review before production use.
-- F07 includes US grade filter choices, but published event records have no
-  verified US-grade equivalency mappings for Kindergarten–Grade 5. The
-  directory must therefore show no elementary matches until an editor adds
-  official, source-backed eligibility and any grade mapping; original
-  international school-year labels remain unchanged.
+- F07 uses school-stage filters and source-backed grade mappings. Original
+  organizer age and school-year labels remain unchanged; an unverified
+  equivalence must not become a confirmed grade match.
 - The typed curriculum catalog now defines 14 stable course IDs and 154
   distinct advanced-course topic IDs plus 19 elementary topic IDs (173
   distinct topic IDs total), including every topic in the requested advanced

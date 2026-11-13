@@ -118,6 +118,16 @@ Other equal sort keys resolve by event name and then stable event or route ID.
 The directory filters and sort are encoded in URL query parameters, and browser
 back/forward restores the prior state.
 
+The student-level selector offers Kindergarten, elementary, middle, high
+school, and college/university stages. A match requires an organizer-backed
+stage or verified US-grade mapping; unknown eligibility is shown separately.
+Existing `level` query values, including `elementary-school` and older
+individual-grade links, retain their meaning. Venue country and region are
+separate selectors; changing country clears an incompatible region. Location
+is distinct from participant eligibility and both venue filters must match the
+same venue. Refresh the catalog offline using the organizer-review process
+below; there is no scheduled import.
+
 ## Source review and catalog update — 2026-11-10
 
 The directory now has 12 published editions, two archived editions, and one
@@ -190,6 +200,14 @@ and [Australian Maths Trust](https://www.amt.edu.au/amc). The Australian 2027
 edition remains a draft until its dates, eligibility, and route are published.
 
 ### Research backlog and coverage gaps
+
+On 2026-11-13 the MAA registration, Noetic contest details, BMT online,
+MOEMS, and Primary Mathematics Challenge pages were checked again. The MAA
+page still lists the November 12 manager-bundle deadline and November 13
+AMC 10 B/12 B dates; Noetic still lists its November 12–25 fall window and
+November 5 late-registration deadline. The report continues to flag those
+editions for full editorial review; this targeted check does not claim that
+every catalog fact or registration route was reverified.
 
 `src/lib/events/source-registry.ts` retains organizer leads for Newport High
 School clubs (including the Knights of Pi/KPMT lead), Washington Student Math

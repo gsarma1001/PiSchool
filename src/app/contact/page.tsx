@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { connection } from "next/server";
 import { InquiryForm } from "./inquiry-form";
 
@@ -22,18 +21,11 @@ export default async function ContactPage() {
     <main className="public-page" id="main-content">
       <section aria-labelledby="contact-page-title" className="public-hero page-width">
         <p className="eyebrow eyebrow-dark">Start a conversation</p>
-        <h1 id="contact-page-title">
-          Request tutoring
-          <br />
-          <span>for a math course.</span>
-        </h1>
+        <h1 id="contact-page-title">Request a trial lesson</h1>
         <p className="public-lede">
-          Share the student’s grade or course and the help you’re looking for.
-          We’ll only ask for the information needed to respond.
+          Tell us the student’s grade or course and what kind of math support
+          you’re looking for. Ask us about current subjects, formats, and availability.
         </p>
-        <Link className="inline-link" href="/tutoring">
-          Review tutoring information <span aria-hidden="true">→</span>
-        </Link>
       </section>
 
       <section aria-labelledby="inquiry-form-title" className="public-section">
@@ -48,8 +40,7 @@ export default async function ContactPage() {
             </p>
             {!deliveryConfigured && (
               <p className="delivery-notice" role="status">
-                Email delivery has not been configured for this local preview.
-                Submissions will show an error and will not be reported as sent.
+                The inquiry form is currently unavailable. Please try again later.
               </p>
             )}
           </div>

@@ -30,6 +30,14 @@ const purposes: { id: EventPurpose | ""; label: string }[] = [
   { id: "conference-educator", label: "Conferences & Educator Events" },
 ];
 
+const schoolStages = [
+  { id: "kindergarten", label: "Kindergarten" },
+  { id: "elementary-school", label: "Elementary School" },
+  { id: "middle-school", label: "Middle School" },
+  { id: "high-school", label: "High School" },
+  { id: "college-university", label: "College / University" },
+];
+
 const categoryLabels: Record<(typeof eventCategories)[number], string> = {
   conference: "Conference",
   competition: "Competition",
@@ -144,8 +152,8 @@ function activeFilters(filters: EventFilters): { key: keyof EventFilters; label:
   const chips: { key: keyof EventFilters; label: string }[] = [];
   if (filters.query) chips.push({ key: "query", label: `Search: ${filters.query}` });
   if (filters.purpose) chips.push({ key: "purpose", label: purposes.find((item) => item.id === filters.purpose)?.label ?? filters.purpose });
-  if (filters.level) chips.push({ key: "level", label: `Grade/age: ${usGradeFilterOptions.find((item) => item.id === filters.level)?.label ?? filters.level}` });
-  if (filters.venueCountry) chips.push({ key: "venueCountry", label: `Venue country: ${filters.venueCountry}` });
+  if (filters.level) chips.push({ key: "level", label: `Student level: ${schoolStages.find((item) => item.id === filters.level)?.label ?? usGradeFilterOptions.find((item) => item.id === filters.level)?.label ?? filters.level.replaceAll("-", " ")}` });
+  if (filters.venueCountry) chips.push({ key: "venueCountry", label: `Venue country: ${countryName(filters.venueCountry)}` });
   if (filters.venueRegion) chips.push({ key: "venueRegion", label: `Venue region: ${filters.venueRegion}` });
   if (!filters.includeOnline) chips.push({ key: "includeOnline", label: "Online opportunities excluded" });
   if (filters.mode) chips.push({ key: "mode", label: `Format: ${filters.mode}` });
@@ -154,11 +162,11 @@ function activeFilters(filters: EventFilters): { key: keyof EventFilters; label:
   if (filters.audience) chips.push({ key: "audience", label: `Audience: ${audienceLabels[filters.audience] ?? filters.audience}` });
   if (filters.division) chips.push({ key: "division", label: `Division: ${filters.division}` });
   if (filters.registrationRoute) chips.push({ key: "registrationRoute", label: `Route: ${routeLabels[filters.registrationRoute] ?? filters.registrationRoute}` });
-  if (filters.eligibleCountry) chips.push({ key: "eligibleCountry", label: `Eligibility country: ${filters.eligibleCountry}` });
+  if (filters.eligibleCountry) chips.push({ key: "eligibleCountry", label: `Eligibility country: ${countryName(filters.eligibleCountry)}` });
   if (filters.eligibleRegion) chips.push({ key: "eligibleRegion", label: `Eligibility region: ${filters.eligibleRegion}` });
   if (filters.from) chips.push({ key: "from", label: `From: ${filters.from}` });
   if (filters.to) chips.push({ key: "to", label: `Through: ${filters.to}` });
-  if (filters.registrationStatus) chips.push({ key: "registrationStatus", label: `Status: ${filters.registrationStatus}` });
+  if (filters.registrationStatus) chips.push({ key: "registrationStatus", label: `Status: ${filters.registrationStatus.replaceAll("-", " ")}` });
   if (filters.entryPathway) chips.push({ key: "entryPathway", label: pathwayLabels[filters.entryPathway] ?? filters.entryPathway });
   if (filters.freeOnly) chips.push({ key: "freeOnly", label: "Free only" });
   if (filters.includeUnknown) chips.push({ key: "includeUnknown", label: "Include eligibility to check" });
@@ -184,7 +192,9 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
       : []),
   ))).sort((a, b) => a[1].localeCompare(b[1]));
   const venueRegions = Array.from(new Set(initialEvents.flatMap((event) =>
-    event.venues.flatMap((venue) => venue.region ? [venue.region] : []),
+    event.venues.flatMap((venue) =>
+      venue.region && (!filters.venueCountry || venue.countryCode === filters.venueCountry)
+        ? [venue.region] : []),
   ))).sort();
   const eligibleCountries = Array.from(new Set(initialEvents.flatMap((event) =>
     event.eligibility.eligibleCountries,
@@ -193,12 +203,18 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
     event.eligibility.eligibleRegions,
   ))).sort();
 
-  function updateVenueLocation(value: string) {
-    if (value.startsWith("region:")) {
-      applyFilters({ ...filters, venueCountry: "", venueRegion: value.slice(7) });
-    } else {
-      applyFilters({ ...filters, venueCountry: value, venueRegion: "" });
-    }
+  function updateVenueCountry(value: string) {
+    const regionIsCompatible = initialEvents.some((event) =>
+      event.venues.some((venue) =>
+        venue.region === filters.venueRegion &&
+        (!value || venue.countryCode === value),
+      ),
+    );
+    applyFilters({
+      ...filters,
+      venueCountry: value,
+      venueRegion: regionIsCompatible ? filters.venueRegion : "",
+    });
   }
 
   useEffect(() => {
@@ -321,27 +337,38 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
           </div>
         </label>
         <label>
-          Student grade / age
+          Student level
           <select onChange={(event) => updateFilter("level", event.target.value)} value={filters.level}>
-            <option value="">All grades and ages</option>
-            {usGradeFilterOptions.map((grade) => (
-              <option key={grade.id} value={grade.id}>{grade.label}</option>
-            ))}
-            {[...new Set(initialEvents.flatMap((event) => event.eligibility.levels))]
-              .filter((level) => !usGradeFilterOptions.some((grade) => grade.id === level))
-              .sort()
-              .map((level) => <option key={level} value={level}>{level.replaceAll("-", " ")}</option>)}
+            <option value="">All student levels</option>
+            {schoolStages.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}
+            {filters.level && !schoolStages.some((stage) => stage.id === filters.level) && (
+              <option value={filters.level}>
+                {usGradeFilterOptions.find((grade) => grade.id === filters.level)?.label ?? filters.level.replaceAll("-", " ")} (legacy)
+              </option>
+            )}
           </select>
         </label>
         <label>
-          Venue location
+          Venue country
           <select
-            onChange={(event) => updateVenueLocation(event.target.value)}
-            value={filters.venueRegion ? `region:${filters.venueRegion}` : filters.venueCountry}
+            onChange={(event) => updateVenueCountry(event.target.value)}
+            value={filters.venueCountry}
           >
-            <option value="">Any venue</option>
+            <option value="">Any country</option>
             {venueCountries.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
-            {venueRegions.map((region) => <option key={region} value={`region:${region}`}>{region}</option>)}
+            {filters.venueCountry && !venueCountries.some(([code]) => code === filters.venueCountry) && (
+              <option value={filters.venueCountry}>{countryName(filters.venueCountry)}</option>
+            )}
+          </select>
+        </label>
+        <label>
+          State / province / region
+          <select onChange={(event) => updateFilter("venueRegion", event.target.value)} value={filters.venueRegion}>
+            <option value="">Any region</option>
+            {venueRegions.map((region) => <option key={region} value={region}>{region}</option>)}
+            {filters.venueRegion && !venueRegions.includes(filters.venueRegion) && (
+              <option value={filters.venueRegion}>{filters.venueRegion}</option>
+            )}
           </select>
         </label>
         <label className="events-check-filter">
@@ -444,14 +471,6 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
               <select onChange={(event) => updateFilter("entryPathway", event.target.value)} value={filters.entryPathway}>
                 <option value="">Any pathway</option>
                 {Object.entries(pathwayLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-              </select>
-            </label>
-            <label>
-              Sort results
-              <select onChange={(event) => updateFilter("sort", event.target.value as EventFilters["sort"])} value={filters.sort}>
-                <option value="date">Upcoming dates</option>
-                <option value="deadline">Student registration deadline</option>
-                <option value="name">Event name</option>
               </select>
             </label>
             <label className="events-check-filter">

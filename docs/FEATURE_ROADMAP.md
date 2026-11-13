@@ -4,6 +4,13 @@ Updated: November 11, 2026
 Suggested repository location: `docs/FEATURE_ROADMAP.md`
 Status: Planning baseline. Proposed features are not authorization to implement every phase at once.
 
+**Local update, November 13:** Home and navigation now point directly to the
+inquiry, challenge, events, news, and testimonials; `/tutoring` redirects to
+`/contact`. Challenge browsing restores the selected grade or course and uses
+catalog-backed readiness. Events use school stages and separate venue country
+and region. News discovery is manual via publisher feeds and editorial review.
+Staging deployment and runtime inquiry checks remain to be verified.
+
 ## 1. Purpose and relationship to the project plan
 
 Build a welcoming mathematics learning hub that connects personalized tutoring, independent practice, homework help, mathematical exploration, and competition opportunities.
@@ -14,7 +21,7 @@ AoPS is a reference for academic presentation and learning patterns. Keep The Pi
 
 ## 2. Current state — checked November 11, 2026
 
-The local application has a Next.js App Router, TypeScript, Tailwind styling, a responsive shared site shell, a homepage, tutoring and contact pages, and seven owner-approved testimonials published locally. F05 includes a short inquiry form with server-side validation, a honeypot, a best-effort in-process rate limit, and Resend email delivery code. Local email environment variables are populated. A 2026-11-07 test request was rejected by Resend with HTTP 403; a later local test was accepted as noted below.
+The local application has a Next.js App Router, TypeScript, Tailwind styling, a responsive shared site shell, a homepage, an inquiry page, and seven owner-approved testimonials published locally. `/tutoring` redirects to the inquiry page. F05 includes a short inquiry form with server-side validation, a honeypot, a best-effort in-process rate limit, and Resend email delivery code. Local email environment variables are populated. A 2026-11-07 test request was rejected by Resend with HTTP 403; a later local test was accepted as noted below.
 
 A later clearly labeled local test was accepted by Resend, as recorded in
 `docs/PROJECT_PLAN.md`. That confirms provider acceptance for that local test
@@ -288,7 +295,7 @@ include parent/guardian guidance for younger participants.
 
 Separate **Research Explained**, **Math News**, and **Interesting Facts**. Include learning-level/topic tags, original summaries, sources, publication date, review date and optional diagrams. Explain research uncertainty and distinguish established facts from new claims. Avoid confusing source publication date with your summary's publication date.
 
-**Progress:** A small, manually reviewed Math News page is now available at `/math-news`, linked from Explore. It contains two source-linked stories and is an initial slice of F08 only; research explainers, interesting facts, topic/level filters, and an editorial publishing workflow remain future work. Stories are static, curated records—not a live feed.
+**Progress:** `/math-news` is linked from the main navigation and displays three manually reviewed stories. RSS discovery is run manually outside page requests; editors verify sources and update the static catalog before publication. Research explainers, topic/level filters, and scheduled refresh remain future work.
 
 **Done when:** every published item is reviewed and attributed; summaries are original; links work; research claims reflect the source; no unsupported feed content appears.
 

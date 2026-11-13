@@ -1,0 +1,27 @@
+[
+  {
+    "id": "quanta-mathematics",
+    "publisher": "Quanta Magazine",
+    "feed": "https://www.quantamagazine.org/mathematics/feed/"
+  },
+  {
+    "id": "mit-mathematics",
+    "publisher": "MIT News",
+    "feed": "https://news.mit.edu/rss/topic/mathematics"
+  },
+  {
+    "id": "columbia-mathematics",
+    "publisher": "Columbia Mathematics",
+    "feed": "https://www.math.columbia.edu/feed/"
+  },
+  {
+    "id": "new-scientist-mathematics",
+    "publisher": "New Scientist",
+    "feed": "https://www.newscientist.com/subject/mathematics/feed/"
+  },
+  {
+    "id": "science-news",
+    "publisher": "Science / AAAS",
+    "feed": "https://www.science.org/rss/news_current.xml"
+  }
+]

@@ -41,17 +41,14 @@ export function SiteHeader() {
             className={`main-nav${menuOpen ? " is-open" : ""}`}
             id="main-navigation"
           >
-            <Link href="/tutoring" onClick={closeMenu}>
-              Tutoring
-            </Link>
-            <Link href="/#explore" onClick={closeMenu}>
-              Explore
-            </Link>
             <Link href="/daily-challenge" onClick={closeMenu}>
               Daily challenge
             </Link>
             <Link href="/events" onClick={closeMenu}>
               Events
+            </Link>
+            <Link href="/math-news" onClick={closeMenu}>
+              News
             </Link>
             <Link href="/#testimonials" onClick={closeMenu}>
               Testimonials

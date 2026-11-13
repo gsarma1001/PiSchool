@@ -175,37 +175,20 @@ export async function submitInquiry(
     return {
       status: "error",
       message:
-        "We couldn’t deliver your inquiry right now. No success was recorded; please try again later.",
+        "We couldn’t confirm whether your inquiry was sent. Please contact The Pi School before trying again to avoid sending it twice.",
       values: inquiry,
     };
   }
 
   if (!response.ok) {
-    const responseText = await response.text();
-    let providerReason = "No error details were returned.";
-    try {
-      const errorBody: unknown = JSON.parse(responseText);
-      if (
-        typeof errorBody === "object" &&
-        errorBody !== null &&
-        "message" in errorBody &&
-        typeof errorBody.message === "string"
-      ) {
-        providerReason = errorBody.message;
-      }
-    } catch (error) {
-      console.error(
-        "Could not parse the inquiry provider error response.",
-        error instanceof Error ? error.message : "Unknown response parsing error",
-      );
-    }
     console.error(
-      `Inquiry delivery provider rejected the request (HTTP ${response.status}): ${providerReason}`,
+      `Inquiry delivery provider rejected the request (HTTP ${response.status}).`,
     );
     return {
       status: "error",
-      message:
-        "We couldn’t deliver your inquiry right now. No success was recorded; please try again later.",
+      message: response.status >= 500
+        ? "We couldn’t confirm whether your inquiry was sent. Please contact The Pi School before trying again to avoid sending it twice."
+        : "We couldn’t deliver your inquiry right now. Please try again later.",
       values: inquiry,
     };
   }
@@ -235,7 +218,6 @@ export async function submitInquiry(
 
   return {
     status: "success",
-    message:
-      "Your inquiry was sent to The Pi School. No response-time estimate is currently available.",
+    message: "Thanks! Your inquiry was sent to The Pi School.",
   };
 }

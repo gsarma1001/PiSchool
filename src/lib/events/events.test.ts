@@ -196,6 +196,40 @@ describe("event directory filters and source boundaries", () => {
     assert.deepEqual(europeVenue.map((event) => event.id), ["imo-2027"]);
   });
 
+  it("uses verified grade mappings for school stages and keeps venue pairs together", () => {
+    const mapped = fixture("mapped", []);
+    mapped.eligibility = {
+      ...mapped.eligibility,
+      confirmed: true,
+      levels: [],
+      verifiedGradeMappings: [{
+        label: "Grade 3",
+        equivalent: "Grade 3 (US)",
+        usGradeId: "grade-3",
+        sourceId: "test-source",
+      }],
+    };
+    mapped.venues = [
+      { country: "United States", countryCode: "US", region: "Washington", description: "Washington venue" },
+      { country: "Canada", countryCode: "CA", region: "Ontario", description: "Ontario venue" },
+    ];
+    const now = new Date("2026-01-01T00:00:00Z");
+    const matching = filterAndSortEvents(
+      [mapped], { ...noFilters(), level: "elementary-school", venueCountry: "US", venueRegion: "Washington" }, now,
+    );
+    assert.deepEqual(matching.events.map((event) => event.id), ["mapped"]);
+    assert.deepEqual(
+      filterAndSortEvents(
+        [mapped], { ...noFilters(), venueCountry: "US", venueRegion: "Ontario" }, now,
+      ).events,
+      [],
+    );
+    assert.equal(
+      parseEventFilters(new URLSearchParams("level=elementary-school")).level,
+      "elementary-school",
+    );
+  });
+
   it("matches organizer grade labels without inventing grade equivalencies", () => {
     const records = getPublishedEvents(true);
     const gradeEight = filterAndSortEvents(

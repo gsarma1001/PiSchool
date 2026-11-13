@@ -455,6 +455,23 @@ function regionMatches(event: EventSummary, region: string): boolean {
       event.eligibility.eligibleRegions.includes(region));
 }
 
+const stageGrades: Record<string, readonly string[]> = {
+  kindergarten: ["kindergarten"],
+  "elementary-school": ["grade-1", "grade-2", "grade-3", "grade-4", "grade-5"],
+  "middle-school": ["grade-6", "grade-7", "grade-8"],
+  "high-school": ["grade-9", "grade-10", "grade-11", "grade-12"],
+};
+
+function matchesLevel(event: EventSummary, level: string): boolean {
+  return event.eligibility.levels.includes(level) ||
+    event.eligibility.verifiedGradeMappings.some(
+      (mapping) =>
+        mapping.usGradeId === level ||
+        (mapping.usGradeId !== undefined &&
+          stageGrades[level]?.includes(mapping.usGradeId)),
+    );
+}
+
 export function filterAndSortEvents(
   records: readonly EventSummary[],
   filters: EventFilters,
@@ -526,14 +543,11 @@ export function filterAndSortEvents(
       return false;
     }
     if (
-      filters.venueCountry &&
-      !event.venues.some((venue) => venue.countryCode === filters.venueCountry)
-    ) {
-      return false;
-    }
-    if (
-      filters.venueRegion &&
-      !event.venues.some((venue) => venue.region === filters.venueRegion)
+      (filters.venueCountry || filters.venueRegion) &&
+      !event.venues.some((venue) =>
+        (!filters.venueCountry || venue.countryCode === filters.venueCountry) &&
+        (!filters.venueRegion || venue.region === filters.venueRegion),
+      )
     ) {
       return false;
     }
@@ -579,8 +593,7 @@ export function filterAndSortEvents(
     if (!hasEligibilityFilter) return false;
     if (
       filters.level &&
-      !event.eligibility.levels.includes(filters.level) &&
-      !event.eligibility.verifiedGradeMappings.some((mapping) => mapping.usGradeId === filters.level) &&
+      !matchesLevel(event, filters.level) &&
       (
         usGradeFilterOptions.some((grade) => grade.id === filters.level) ||
         event.eligibility.levels.length === 0
@@ -601,9 +614,7 @@ export function filterAndSortEvents(
   const confirmedEligibilityMatch = (event: EventSummary) => {
     if (!hasEligibilityFilter) return true;
     if (!event.eligibility.confirmed) return false;
-    const levelMatch = !filters.level ||
-      event.eligibility.levels.includes(filters.level) ||
-      event.eligibility.verifiedGradeMappings.some((mapping) => mapping.usGradeId === filters.level);
+    const levelMatch = !filters.level || matchesLevel(event, filters.level);
     const countryMatch = !filters.eligibleCountry ||
       countryMatches(event, filters.eligibleCountry);
     const regionMatch = !filters.eligibleRegion ||

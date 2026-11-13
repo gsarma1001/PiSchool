@@ -1,5 +1,11 @@
 # Implementation plan
 
+**Local update, November 13:** The contact inquiry replaces the old tutoring
+route, challenge selection restores its browsing mode, events separate venue
+country from region, and Math News has a manual RSS discovery and review
+process. These changes remain local until staging validation is complete;
+unverified availability, event editions, and news claims require review.
+
 This plan tracks work against `PROJECT_PLAN.md`. Implement each phase only
 when requested, preserving the existing source material and avoiding
 production changes.
@@ -10,7 +16,7 @@ production changes.
 |---|---|---|
 | Prompt 1 — Foundation and homepage | Complete | App Router, TypeScript, Tailwind, responsive shared shell and homepage; required docs and setup instructions; ESLint, TypeScript, production build, and HTTP 200 homepage content checks passed. |
 | Phase 0 — Preserve | Complete | Accessible public pages, assets, six unique source testimonials, seven expanded FAQs, and one owner-provided testimonial are archived. The owner completed the flagged-content review and confirmed no private records were collected or kept. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
-| Phase 1 — Redesign | Foundation only | Responsive homepage, shared header/footer, and testimonials are implemented. Reviewed tutoring/team/FAQ/contact pages and a configured contact flow remain future work. |
+| Phase 1 — Redesign | Partial | Responsive homepage, shared header/footer, testimonials, and the contact inquiry are implemented. Current tutor details and staging email delivery remain unverified. |
 | Phase 2 — Math hub | Partial — F06/F07 elementary support updated locally; F07 directory redesign complete; broader content coverage remains | K–5 challenge topics and shared US-grade event filters are implemented locally. F07 has 12 published editions across 13 families, two archived editions, and one non-public draft. Math Kangaroo USA's 2027 edition has verified US K–12 eligibility; broader coverage remains incomplete and the directory lacks a verified upcoming conference, workshop, or university tournament. |
 | Phase 3 — Daily Quick Mind pilot | Not started | Reviewed topics and validated server-side grading for a small pilot. |
 | Phase 4 — Expand learning | Partial — K–5 challenge starter set added | 19 elementary topics have deterministic five-question challenge sets. Broader topic coverage, educator review, remaining grade/course mappings, and advanced curriculum expansion remain open. |

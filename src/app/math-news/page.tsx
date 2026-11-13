@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { mathNewsStories } from "@/lib/math-news/data";
 
 export const metadata: Metadata = {
@@ -26,9 +25,6 @@ export default function MathNewsPage() {
         <p className="public-lede">
           Discoveries, achievements, and ideas from across mathematics. Each
           story is summarized for readers and links to its original reporting.
-        </p>
-        <p className="events-heading-links">
-          <Link href="/#explore">Back to Explore</Link>
         </p>
       </section>
 

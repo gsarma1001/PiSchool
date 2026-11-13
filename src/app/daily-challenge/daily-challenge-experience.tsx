@@ -188,8 +188,7 @@ export function DailyChallengeExperience({
   const isElementarySelection = elementaryChallengeLevels.some(
     (level) => level.label === selectedGrade,
   );
-  const showTopicSearch =
-    !isElementarySelection || readyTopics.length > 6;
+  const showTopicSearch = readyTopics.length > 6;
   const filteredReadyTopics = useMemo(() => {
     const query = topicSearch.trim().toLocaleLowerCase();
     return readyTopics.filter(
@@ -326,6 +325,11 @@ export function DailyChallengeExperience({
       };
 
       setSelectedGrade(gradeCourse);
+      setBrowseMode(
+        elementaryChallengeLevels.some((level) => level.label === gradeCourse)
+          ? "grade"
+          : "course",
+      );
       setSelectedTopic(topicId);
       setSnapshot(challengeSnapshot);
       setActiveKey(key);
@@ -383,6 +387,13 @@ export function DailyChallengeExperience({
         : undefined;
       startTransition(() => {
         setSelectedGrade(restored.selectedGradeCourse!);
+        setBrowseMode(
+          elementaryChallengeLevels.some(
+            (level) => level.label === restored.selectedGradeCourse,
+          )
+            ? "grade"
+            : "course",
+        );
       });
       if (
         restored.selectedTopicId &&
@@ -706,14 +717,6 @@ export function DailyChallengeExperience({
     });
   }
 
-  function handleSurpriseMe() {
-    if (!selectedGrade || readyTopics.length === 0) return;
-    const nextTopic = readyTopics[Math.floor(Math.random() * readyTopics.length)];
-    setSelectedTopic(nextTopic.id);
-    setTopicSearch("");
-    void openChallenge(selectedGrade, nextTopic.id);
-  }
-
   const hasResumeProgress = Boolean(
     selectedGrade &&
       selectedTopic &&
@@ -828,7 +831,7 @@ export function DailyChallengeExperience({
             role="tab"
             type="button"
           >
-            Browse by Grade
+            By Grade (K–5)
           </button>
           <button
             aria-selected={browseMode === "course"}
@@ -837,7 +840,7 @@ export function DailyChallengeExperience({
             role="tab"
             type="button"
           >
-            Browse by Course
+            By Course (e.g., Algebra, Calculus)
           </button>
         </div>
         <div className="form-field">
@@ -944,18 +947,20 @@ export function DailyChallengeExperience({
             </>
           ) : (
             <>
-              <div className="form-field">
-                <label htmlFor="challenge-topic-search">Search available topics</label>
-                <input
-                  autoComplete="off"
-                  disabled={isLoadingChallenge}
-                  id="challenge-topic-search"
-                  onChange={(event) => setTopicSearch(event.target.value)}
-                  placeholder="Type to find a topic"
-                  type="search"
-                  value={topicSearch}
-                />
-              </div>
+              {showTopicSearch && (
+                <div className="form-field">
+                  <label htmlFor="challenge-topic-search">Search available topics</label>
+                  <input
+                    autoComplete="off"
+                    disabled={isLoadingChallenge}
+                    id="challenge-topic-search"
+                    onChange={(event) => setTopicSearch(event.target.value)}
+                    placeholder="Type to find a topic"
+                    type="search"
+                    value={topicSearch}
+                  />
+                </div>
+              )}
               <div className="form-field">
                 <label htmlFor="challenge-topic-select">Available topics</label>
                 <select
@@ -1031,14 +1036,6 @@ export function DailyChallengeExperience({
                   ? "Preparing challenge…"
                   : "Start 5-Problem Challenge"}
               </button>
-              <button
-                className="button button-secondary"
-                disabled={!selectedGrade || readyTopics.length === 0 || isLoadingChallenge}
-                onClick={handleSurpriseMe}
-                type="button"
-              >
-                Surprise me
-              </button>
             </div>
             {hasResumeProgress && selectedGrade && selectedTopic && (
               <button
@@ -1049,7 +1046,6 @@ export function DailyChallengeExperience({
                 Resume challenge
               </button>
             )}
-            <p>Choose a topic. Solve five problems. Build your confidence.</p>
           </div>
         </div>
       </div>
