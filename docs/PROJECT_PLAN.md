@@ -24,10 +24,27 @@ Final validation and hardening pass completed locally: the app routes respond su
 
 **Staging validation — 2026-11-13:** The separate staging resource is
 `https://agreeable-water-00b9db610.5.azurestaticapps.net`. Its workflow fix
-`aaadcd20e457d7b87aa105a5cc7b011cea43ac65` succeeded on GitHub Actions.
-The new application changes are still being verified locally and have not
-been deployed. Runtime email settings, a staging inquiry, inbox delivery, and
-Reply-To are not yet verified.
+`aaadcd20e457d7b87aa105a5cc7b011cea43ac65` was preserved. GitHub Actions
+run 43392529398 succeeded for application commit
+`f76ad3f04ef99801c2f68300d3ccebb36f9574a8`. The deployed homepage displays
+the updated content. On staging, six main routes rendered at desktop and mobile
+widths without horizontal overflow; `/tutoring` redirected to `/contact`; the
+new reviewed News story appeared; and the contact form reported all four
+required fields invalid when empty. The Events elementary deep link, dependent
+venue selectors, browser Back, clearing, empty results, and archived editions
+were checked. A course challenge restored after reload and completed twice on
+the same day with a one-day streak, including a correct answer, incorrect
+answers, hints, and worked solutions.
+
+The staging browser automation timed out waiting for ordinary clicks to become
+stable; the interactive challenge and some filter checks used DOM-dispatched
+clicks instead. Therefore this is not evidence that staging pointer and
+keyboard interactions pass, and the full staging regression remains open.
+The contact page did not show its configuration-unavailable notice, but this
+does not independently verify each runtime setting or the sender and recipient
+addresses. No staging inquiry has been sent; Resend acceptance, inbox delivery,
+and Reply-To remain unverified. Confirm the staging resource's Production
+environment settings before submitting one test inquiry.
 
 Local checks on November 13: build and typecheck pass; 23 event and 17
 Daily Challenge tests pass; lint reports two existing warnings. Browser checks
