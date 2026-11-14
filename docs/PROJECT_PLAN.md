@@ -42,9 +42,11 @@ clicks instead. Therefore this is not evidence that staging pointer and
 keyboard interactions pass, and the full staging regression remains open.
 The contact page did not show its configuration-unavailable notice, but this
 does not independently verify each runtime setting or the sender and recipient
-addresses. No staging inquiry has been sent; Resend acceptance, inbox delivery,
-and Reply-To remain unverified. Confirm the staging resource's Production
-environment settings before submitting one test inquiry.
+addresses. The owner subsequently confirmed that the staging email worked as
+expected, including delivery and reply behavior. No Resend message ID was
+recorded in this project log. The owner should still verify the staging
+resource's Production environment settings if the configuration needs to be
+audited; the key value must never be disclosed.
 
 Local checks on November 13: build and typecheck pass; 23 event and 17
 Daily Challenge tests pass; lint reports two existing warnings. Browser checks
