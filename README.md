@@ -185,14 +185,14 @@ npm run start
 
 | Package | Version |
 |---|---|
-| Next.js | 16.4.3 |
+| Next.js | 16.4.6 |
 | React | 19.3.0 |
 | React DOM | 19.3.0 |
 | `@tailwindcss/turbopack` | 4.3.3 |
 | Tailwind CSS | 4.3.3 |
 | TypeScript | 5.9.3 |
 | ESLint | 10.13.0 |
-| `eslint-config-next` | 16.4.3 |
+| `eslint-config-next` | 16.4.6 |
 | `@types/node` | 20.19.43 |
 | `@types/react` | 19.3.0 |
 | `@types/react-dom` | 19.3.0 |
