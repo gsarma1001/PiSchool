@@ -789,9 +789,9 @@ function elementaryQuestion(
       answer = String(count);
       distractors = [String(Math.max(0, count - 1)), String(count + 1), String(count + 2)];
       subtopic = "Question";
-      prompt = difficulty < 3
+      prompt = difficulty < 4
         ? "How many stars do you see?"
-        : difficulty < 5
+        : difficulty === 4
           ? `There are ${count - c} blocks. How many more make ${count}?`
           : `You have ${count} counters and add ${c}. How many counters are there now?`;
       if (difficulty === 4) answer = String(c);

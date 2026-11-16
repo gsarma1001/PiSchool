@@ -222,6 +222,31 @@ describe("daily challenge catalog and question bank", () => {
         question,
         context(kindergarten, "kindergarten-comparing"),
       );
+      const counting = getGeneratedTemplateQuestions(
+        question,
+        context(kindergarten, "kindergarten-counting"),
+      );
+      for (const item of counting) {
+        assert.equal(item.answer.type, "choice");
+        if (item.answer.type !== "choice") continue;
+
+        const count = Number(item.parameters.count);
+        const extra = Number(item.parameters.extra);
+        const expectedPrompt = item.difficulty < 4
+          ? "How many stars do you see?"
+          : item.difficulty === 4
+            ? `There are ${count - extra} blocks. How many more make ${count}?`
+            : `You have ${count} counters and add ${extra}. How many counters are there now?`;
+        const expectedAnswer = item.difficulty < 4
+          ? count
+          : item.difficulty === 4
+            ? extra
+            : count + extra;
+
+        assert.equal(item.prompt, expectedPrompt, `${date}: ${item.prompt}`);
+        assert.equal(item.answer.canonical, String(expectedAnswer), `${date}: ${item.prompt}`);
+      }
+
       const catchUp = comparison.find((item) => item.difficulty === 4);
       assert.ok(catchUp);
       assert.ok(
