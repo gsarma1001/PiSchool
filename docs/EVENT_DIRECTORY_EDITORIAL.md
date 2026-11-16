@@ -118,6 +118,12 @@ Other equal sort keys resolve by event name and then stable event or route ID.
 The directory filters and sort are encoded in URL query parameters, and browser
 back/forward restores the prior state.
 
+The Seattle & Washington quick filter is a venue-location shortcut; it does
+not imply participant eligibility. Event-type options are limited to types
+present in the current result set. When an edition offers different
+registration states by participation mode, cards show the relevant status for
+each route rather than implying one status applies to every mode.
+
 The student-level selector offers Kindergarten, elementary, middle, high
 school, and college/university stages. A match requires an organizer-backed
 stage or verified US-grade mapping; unknown eligibility is shown separately.

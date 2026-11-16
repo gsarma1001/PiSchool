@@ -8,7 +8,7 @@ import {
 import type { DailyChallengeSnapshot } from "./question-service/types";
 
 export const progressStorageKey = "pi-school.daily-challenge";
-export const progressVersion = 3;
+export const progressVersion = 4;
 
 export type QuestionOutcome = "pending" | "incorrect" | "correct" | "helped";
 
@@ -18,8 +18,9 @@ export type QuestionProgress = {
   incorrectAttempts: number;
   outcome: QuestionOutcome;
   feedback: string;
-  hintViewed: boolean;
-  solutionViewed: boolean;
+  hintViewed?: boolean;
+  solutionViewed?: boolean;
+  helpHistoryKnown?: boolean;
 };
 
 export type ChallengeSession = {
@@ -38,9 +39,14 @@ export type ChallengeResult = {
   solvedIndependently: number;
   firstAttemptCorrect: number;
   completedWithHelp: number;
+  unclassifiedCompleted: number;
   incorrectAttempts: number;
   currentStreak: number;
   bestStreak: number;
+};
+
+type StoredChallengeResult = Omit<ChallengeResult, "unclassifiedCompleted"> & {
+  unclassifiedCompleted?: number;
 };
 
 export type ChallengeProgress = {
@@ -52,6 +58,36 @@ export type ChallengeProgress = {
   completedDates: string[];
   results: Record<string, ChallengeResult>;
 };
+
+export function getSessionKeys(
+  progress: ChallengeProgress,
+  date: string,
+  gradeCourse: GradeCourse,
+  topicId: string,
+): string[] {
+  const baseKey = sessionKey(date, gradeCourse, topicId);
+  return Object.keys(progress.sessions)
+    .filter((key) => key === baseKey || key.startsWith(`${baseKey}|practice-`))
+    .sort((left, right) => practiceNumber(left, baseKey) - practiceNumber(right, baseKey));
+}
+
+function practiceNumber(key: string, baseKey: string): number {
+  if (key === baseKey) return 0;
+  const match = key.match(/\|practice-(\d+)$/);
+  return match && key.startsWith(`${baseKey}|`) ? Number(match[1]) : 0;
+}
+
+export function nextSessionKey(
+  progress: ChallengeProgress,
+  date: string,
+  gradeCourse: GradeCourse,
+  topicId: string,
+): string {
+  const keys = getSessionKeys(progress, date, gradeCourse, topicId);
+  const baseKey = sessionKey(date, gradeCourse, topicId);
+  if (!keys.length) return baseKey;
+  return `${baseKey}|practice-${practiceNumber(keys.at(-1)!, baseKey) + 1}`;
+}
 
 export function emptyProgress(): ChallengeProgress {
   return {
@@ -92,9 +128,15 @@ function isQuestionProgress(value: unknown): value is QuestionProgress {
     ) &&
     typeof item.feedback === "string" &&
     item.feedback.length <= 1000 &&
-    typeof item.hintViewed === "boolean" &&
-    typeof item.solutionViewed === "boolean" &&
-    (item.outcome !== "helped" || item.solutionViewed) &&
+    (item.hintViewed === undefined || typeof item.hintViewed === "boolean") &&
+    (item.solutionViewed === undefined || typeof item.solutionViewed === "boolean") &&
+    (item.helpHistoryKnown === undefined ||
+      typeof item.helpHistoryKnown === "boolean") &&
+    (item.outcome !== "helped" ||
+      item.hintViewed === true ||
+      item.solutionViewed === true ||
+      (item.solutionViewed === undefined &&
+        item.helpHistoryKnown === undefined)) &&
     (item.outcome !== "correct" || item.attempts > 0) &&
     (item.outcome !== "incorrect" || item.incorrectAttempts > 0)
   );
@@ -202,17 +244,17 @@ export function parseProgress(raw: string | null): {
 
     const value = parsed as Partial<ChallengeProgress>;
     if (
-      (value.version !== 2 && value.version !== progressVersion) ||
+      ![2, 3, progressVersion].includes(value.version ?? 0) ||
       !value.sessions ||
       typeof value.sessions !== "object" ||
       Array.isArray(value.sessions) ||
       !Array.isArray(value.completedDates) ||
       !value.results ||
       typeof value.results !== "object" ||
-      (value.version === progressVersion &&
+      (value.version === 3 || value.version === progressVersion) &&
         (!value.challengeSnapshots ||
           typeof value.challengeSnapshots !== "object" ||
-          Array.isArray(value.challengeSnapshots)))
+          Array.isArray(value.challengeSnapshots))
     ) {
       return { progress: emptyProgress(), recovered: true };
     }
@@ -221,7 +263,12 @@ export function parseProgress(raw: string | null): {
     const validSessions = storedSessions.filter(([, session]) =>
       isSession(session),
     );
-    const sessions = Object.fromEntries(validSessions);
+    const sessions = Object.fromEntries(
+      validSessions.map(([key, session]) => [
+        key,
+        migrateSession(session as ChallengeSession, value.version ?? 0),
+      ]),
+    );
     const completedDates = value.completedDates.filter(
       (date): date is string =>
         typeof date === "string" && isLocalDateKey(date),
@@ -230,18 +277,35 @@ export function parseProgress(raw: string | null): {
     const validResults = storedResults.filter(([, result]) =>
       isChallengeResult(result),
     );
-    const results = Object.fromEntries(validResults);
+    const migratedResults = validResults.map(([key, result]) => [
+      key,
+      migrateResult(result as StoredChallengeResult, sessions[key]),
+    ] as const);
     const storedSnapshots =
       value.challengeSnapshots &&
       typeof value.challengeSnapshots === "object" &&
       !Array.isArray(value.challengeSnapshots)
         ? Object.entries(value.challengeSnapshots)
         : [];
-    const validSnapshots = storedSnapshots.filter(([key, snapshot]) =>
-      isSnapshot(snapshot) &&
-      key === `${snapshot.date}|${snapshot.gradeCourse}|${snapshot.topicId}`,
-    );
+    const validSnapshots = storedSnapshots.filter(([key, snapshot]) => {
+      if (!isSnapshot(snapshot)) return false;
+      const baseKey = `${snapshot.date}|${snapshot.gradeCourse}|${snapshot.topicId}`;
+      const suffix = key.slice(baseKey.length);
+      return key === baseKey || /^\|practice-\d+$/.test(suffix);
+    });
     const challengeSnapshots = Object.fromEntries(validSnapshots);
+    const results = Object.fromEntries(
+      migratedResults.filter(([key]) => sessions[key]?.questions.every(
+        (question) =>
+          question.outcome === "correct" || question.outcome === "helped",
+      ) ?? true),
+    );
+    const resultDates = new Set(
+      Object.values(results).map((result) => result.date),
+    );
+    const retainedCompletedDates = completedDates.filter((date) =>
+      resultDates.has(date),
+    );
     const selectedGradeCourseIsValid = gradeCourses.includes(
       value.selectedGradeCourse as GradeCourse,
     );
@@ -257,6 +321,7 @@ export function parseProgress(raw: string | null): {
     const recovered =
       validSessions.length !== storedSessions.length ||
       completedDates.length !== value.completedDates.length ||
+      retainedCompletedDates.length !== completedDates.length ||
       validResults.length !== storedResults.length ||
       validSnapshots.length !== storedSnapshots.length ||
       (value.selectedGradeCourse !== undefined &&
@@ -270,7 +335,7 @@ export function parseProgress(raw: string | null): {
         ...(selectedTopicId ? { selectedTopicId } : {}),
         sessions,
         challengeSnapshots,
-        completedDates,
+        completedDates: retainedCompletedDates,
         results,
       },
       recovered,
@@ -309,7 +374,11 @@ function isChallengeResult(value: unknown): value is ChallengeResult {
     Number.isInteger(completedWithHelp) &&
     completedWithHelp >= 0 &&
     completedWithHelp <= 5 &&
-    solvedIndependently + completedWithHelp === 5 &&
+    typeof (result.unclassifiedCompleted ?? 0) === "number" &&
+    Number.isInteger(result.unclassifiedCompleted ?? 0) &&
+    (result.unclassifiedCompleted ?? 0) >= 0 &&
+    (result.unclassifiedCompleted ?? 0) <= 5 &&
+    solvedIndependently + completedWithHelp + (result.unclassifiedCompleted ?? 0) === 5 &&
     typeof incorrectAttempts === "number" &&
     Number.isInteger(incorrectAttempts) &&
     incorrectAttempts >= 0 &&
@@ -320,6 +389,103 @@ function isChallengeResult(value: unknown): value is ChallengeResult {
     Number.isInteger(bestStreak) &&
     bestStreak >= currentStreak
   );
+}
+
+function migrateSession(
+  session: ChallengeSession,
+  sourceVersion: number,
+): ChallengeSession {
+  const questions = session.questions.map((question) => {
+    const helpHistoryKnown = question.helpHistoryKnown ?? false;
+    if (
+      sourceVersion < progressVersion &&
+      question.solutionViewed &&
+      question.outcome === "helped"
+    ) {
+      return {
+        ...question,
+        answer: "",
+        outcome: "pending" as const,
+        helpHistoryKnown,
+        feedback:
+          "A worked solution was viewed. Submit a correct answer to complete this problem.",
+      };
+    }
+    const usedHelp = question.hintViewed === true || question.solutionViewed === true;
+    return {
+      ...question,
+      hintViewed: question.hintViewed ?? false,
+      solutionViewed: question.solutionViewed ?? false,
+      helpHistoryKnown,
+      ...(question.outcome === "correct" && usedHelp
+        ? {
+            outcome: "helped" as const,
+            feedback: "Completed with help.",
+          }
+        : {}),
+    };
+  });
+  const firstIncomplete = questions.findIndex(
+    (question) => question.outcome !== "correct" && question.outcome !== "helped",
+  );
+  return {
+    ...session,
+    currentQuestion:
+      firstIncomplete < 0
+        ? session.currentQuestion
+        : Math.min(session.currentQuestion, firstIncomplete),
+    questions,
+  };
+}
+
+function migrateResult(
+  result: StoredChallengeResult,
+  session: ChallengeSession | undefined,
+): ChallengeResult {
+  if (typeof result.unclassifiedCompleted === "number") {
+    return result as ChallengeResult;
+  }
+  if (!session) {
+    return {
+      ...result,
+      solvedIndependently: 0,
+      firstAttemptCorrect: 0,
+      completedWithHelp: 0,
+      unclassifiedCompleted: 5,
+    };
+  }
+  const completed = session.questions.filter(
+    (question) => question.outcome === "correct" || question.outcome === "helped",
+  );
+  const solvedIndependently = completed.filter(
+    (question) =>
+      question.outcome === "correct" &&
+      question.helpHistoryKnown !== false &&
+      !question.hintViewed &&
+      !question.solutionViewed,
+  ).length;
+  const completedWithHelp = completed.filter(
+    (question) =>
+      question.outcome === "helped" &&
+      question.helpHistoryKnown !== false,
+  ).length;
+  return {
+    ...result,
+    solvedIndependently,
+    firstAttemptCorrect: Math.min(
+      solvedIndependently,
+      completed.filter(
+        (question) =>
+          question.outcome === "correct" &&
+          question.helpHistoryKnown !== false &&
+          !question.hintViewed &&
+          !question.solutionViewed &&
+          question.attempts === 1,
+      ).length,
+    ),
+    completedWithHelp,
+    unclassifiedCompleted: completed.length - solvedIndependently - completedWithHelp,
+  };
 }
 
 export function sessionKey(

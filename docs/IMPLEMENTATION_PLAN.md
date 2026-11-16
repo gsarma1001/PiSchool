@@ -1,10 +1,15 @@
 # Implementation plan
 
-**Local update, November 13:** The contact inquiry replaces the old tutoring
-route, challenge selection restores its browsing mode, events separate venue
-country from region, and Math News has a manual RSS discovery and review
-process. These changes remain local until staging validation is complete;
-unverified availability, event editions, and news claims require review.
+**Local update — 2026-11-16:** The contact inquiry replaces the old tutoring
+route, challenge selection restores its browsing mode, and three playable
+topics were added for each of Grades 6–8. Events separate venue country from
+region, and Math News has audience filters, a 20-story catalog, and manual
+RSS discovery and review. The trial terms and regular tutor rates were
+supplied; biographies remain unpublished pending tutor review. The targeted
+test suites, typecheck, lint, browser checks, and production build pass locally
+after upgrading Next.js and `eslint-config-next` to 16.4.6. Staging deployment
+and validation remain pending. Unverified availability, event editions, and
+news claims remain open for review.
 
 This plan tracks work against `PROJECT_PLAN.md`. Implement each phase only
 when requested, preserving the existing source material and avoiding
@@ -16,10 +21,10 @@ production changes.
 |---|---|---|
 | Prompt 1 — Foundation and homepage | Complete | App Router, TypeScript, Tailwind, responsive shared shell and homepage; required docs and setup instructions; ESLint, TypeScript, production build, and HTTP 200 homepage content checks passed. |
 | Phase 0 — Preserve | Complete | Accessible public pages, assets, six unique source testimonials, seven expanded FAQs, and one owner-provided testimonial are archived. The owner completed the flagged-content review and confirmed no private records were collected or kept. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
-| Phase 1 — Redesign | Partial | Responsive homepage, shared header/footer, testimonials, and the contact inquiry are implemented. Current tutor details and staging email delivery remain unverified. |
-| Phase 2 — Math hub | Partial — F06/F07 elementary support updated locally; F07 directory redesign complete; broader content coverage remains | K–5 challenge topics and shared US-grade event filters are implemented locally. F07 has 12 published editions across 13 families, two archived editions, and one non-public draft. Math Kangaroo USA's 2027 edition has verified US K–12 eligibility; broader coverage remains incomplete and the directory lacks a verified upcoming conference, workshop, or university tournament. |
+| Phase 1 — Redesign | Partial | Responsive homepage, shared header/footer, testimonials, tutoring offer, and contact inquiry are implemented. Trial price and delivery are unconfirmed; tutor biographies await individual review. The owner confirmed an earlier staging email test; the current changes are not deployed and still require staging retest. |
+| Phase 2 — Math hub | Partial — Grade 6–8 challenge starter content, Events filters, and Math News catalog are implemented locally; broader content coverage remains | Grades K–8 have three playable topics per grade and server-side answer/help generation. F07 has 12 published editions across 13 families, two archived editions, and one non-public draft. Math News has 20 curated stories and manual feed discovery; source coverage and independent mathematical review remain incomplete. The directory lacks a verified upcoming conference, workshop, or university tournament. Targeted suites, typecheck, lint, and production build pass on Next.js 16.4.6; staging has not yet been updated. |
 | Phase 3 — Daily Quick Mind pilot | Not started | Reviewed topics and validated server-side grading for a small pilot. |
-| Phase 4 — Expand learning | Partial — K–5 challenge starter set added | 19 elementary topics have deterministic five-question challenge sets. Broader topic coverage, educator review, remaining grade/course mappings, and advanced curriculum expansion remain open. |
+| Phase 4 — Expand learning | Partial — K–8 challenge starter set added | 28 grade-specific topics have deterministic five-question challenge sets. Broader topic coverage, educator review, remaining grade/course mappings, and advanced curriculum expansion remain open. |
 | Phase 5 — Launch and operate | Not started | Content, critical flows, backups, monitoring, and rollback verified; domain switch remains a separately approved action. |
 
 ## Prompt 1 — Foundation and homepage

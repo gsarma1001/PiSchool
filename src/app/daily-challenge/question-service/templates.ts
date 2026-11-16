@@ -55,11 +55,14 @@ const templates = [
   },
   {
     id: "linear-equation-one-variable",
-    version: 1,
+    version: 2,
     publicationStatus: "published",
     reviewStatus: "mathematically-reviewed",
     topicIds: ["linear-equations"],
-    generators: [{ version: 1, generate: linearEquationQuestion }],
+    generators: [
+      { version: 1, generate: linearEquationQuestion },
+      { version: 2, generate: linearEquationQuestion },
+    ],
   },
   {
     id: "elementary-math-foundations",
@@ -88,6 +91,24 @@ const templates = [
       "grade-5-expressions-coordinates",
     ],
     generators: [{ version: 1, generate: elementaryQuestion }],
+  },
+  {
+    id: "middle-school-math-foundations",
+    version: 1,
+    publicationStatus: "published",
+    reviewStatus: "mathematically-reviewed",
+    topicIds: [
+      "grade-6-ratios-percent",
+      "grade-6-expressions-equations",
+      "grade-6-statistics-data",
+      "grade-7-rational-numbers",
+      "grade-7-proportional-reasoning",
+      "grade-7-geometry",
+      "grade-8-linear-functions",
+      "grade-8-exponents",
+      "grade-8-geometry-data",
+    ],
+    generators: [{ version: 1, generate: middleSchoolQuestion }],
   },
 ] as const;
 
@@ -171,7 +192,7 @@ function makeGenerated(
     label,
     [context.gradeCourse],
     difficulty,
-    subtopic,
+    templateVersion >= 2 ? `Question ${difficulty}` : subtopic,
     prompt,
     typeof answer === "string"
       ? answerType === "fraction"
@@ -676,11 +697,15 @@ function linearEquationQuestion(
     parameters,
     subtopic,
     prompt,
-    String(x),
-    "Undo operations in reverse order, keeping both sides of the equation balanced.",
+    templateVersion >= 2
+      ? { type: "variable-integer", canonical: String(x), variable: "x" }
+      : String(x),
+    "Use the same operation on both sides of the equation to isolate the variable.",
     steps,
     "integer",
-    undefined,
+    templateVersion >= 2
+      ? "Enter the value of x, such as 3, or write x = 3."
+      : undefined,
     templateVersion,
   );
 }
@@ -763,7 +788,7 @@ function elementaryQuestion(
           : randomInt(seed, 6, 10 + difficulty);
       answer = String(count);
       distractors = [String(Math.max(0, count - 1)), String(count + 1), String(count + 2)];
-      subtopic = difficulty < 3 ? "Count the objects" : "Count and reason";
+      subtopic = "Question";
       prompt = difficulty < 3
         ? "How many stars do you see?"
         : difficulty < 5
@@ -774,10 +799,20 @@ function elementaryQuestion(
       if (difficulty === 4) distractors = [String(c - 1), String(c + 1), String(count)];
       if (difficulty === 5) distractors = [String(count + c - 1), String(count + c + 1), String(count + c + 2)];
       visual = difficulty <= 3
-        ? { kind: "counters", label: "Stars", count }
+        ? { kind: "counters", label: "Stars", count, symbol: "★", itemLabel: "stars" }
         : undefined;
-      hint = "Touch or count each object once. For a missing part, count on to the total.";
-      steps = [`Count the objects or identify the missing part.`, `The answer is ${answer}.`];
+      hint =
+        difficulty <= 3
+          ? "Point to each star once and say one counting number for each star."
+          : difficulty === 4
+            ? `Count on from ${count - c} until you reach ${count}. How many numbers did you say?`
+            : `Start with ${count} counters, then count on ${c} more.`;
+      steps =
+        difficulty <= 3
+          ? [`Count each of the ${count} stars once.`, `There are ${count} stars.`]
+          : difficulty === 4
+            ? [`Start at ${count - c} and count on to ${count}.`, `You counted ${c} more, so the missing number is ${c}.`]
+            : [`Start with ${count} counters.`, `Add ${c} more: ${count} + ${c} = ${count + c}.`];
       parameters.count = count;
       parameters.extra = c;
       break;
@@ -1229,7 +1264,7 @@ function elementaryQuestion(
     difficulty,
     "elementary-math-foundations",
     parameters,
-    subtopic,
+    templateVersion >= 2 ? `Question ${difficulty}` : subtopic,
     prompt!,
     rule,
     hint!,
@@ -1238,6 +1273,172 @@ function elementaryQuestion(
     "Choose one answer. A parent or teacher can help read the question if needed.",
     templateVersion,
     visual,
+  );
+}
+
+function middleSchoolQuestion(
+  makeQuestion: QuestionFactory,
+  context: GenerationContext,
+  difficulty: ChallengeDifficulty,
+  seed: number,
+  templateVersion: number = 1,
+): GeneratedQuestion {
+  const a = randomInt(seed, 2, 9);
+  const b = randomInt(nextRandom(seed), 2, 9);
+  let prompt: string;
+  let answer: number;
+  let subtopic: string;
+  let hint: string;
+  let steps: string[];
+  const parameters: TemplateParameters = { difficulty };
+
+  switch (context.topicId) {
+    case "grade-6-ratios-percent": {
+      const amount = a * 20;
+      answer = amount / 4;
+      prompt = `What is 25% of ${amount}?`;
+      subtopic = "Find a percent of a quantity";
+      hint = "25% is one quarter. Divide the quantity into four equal parts.";
+      steps = [`Write 25% as 1/4.`, `${amount} ÷ 4 = ${answer}.`];
+      parameters.amount = amount;
+      break;
+    }
+    case "grade-6-expressions-equations": {
+      const coefficient = a;
+      const solution = b;
+      const constant = randomInt(nextRandom(seed + 13), 1, 12);
+      answer = coefficient * solution + constant;
+      prompt = `Solve ${coefficient}x + ${constant} = ${answer}. What is x?`;
+      answer = solution;
+      subtopic = "Solve a two-step equation";
+      hint = `Subtract ${constant} from both sides, then divide by ${coefficient}.`;
+      steps = [
+        `Subtract ${constant}: ${coefficient}x = ${coefficient * solution}.`,
+        `Divide by ${coefficient}: x = ${solution}.`,
+      ];
+      parameters.coefficient = coefficient;
+      parameters.constant = constant;
+      parameters.solution = solution;
+      break;
+    }
+    case "grade-6-statistics-data": {
+      const values = [a, a + b, a + 2 * b];
+      answer = a + b;
+      prompt = `Find the mean of ${values.join(", ")}.`;
+      subtopic = "Find the mean";
+      hint = "Add the values, then divide by how many values there are.";
+      steps = [
+        `Add the values: ${values.join(" + ")} = ${values.reduce((sum, value) => sum + value, 0)}.`,
+        `Divide by 3: the mean is ${answer}.`,
+      ];
+      parameters.firstValue = a;
+      parameters.step = b;
+      break;
+    }
+    case "grade-7-rational-numbers": {
+      answer = b - a;
+      prompt = `Evaluate ${-a} + ${b}.`;
+      subtopic = "Add rational numbers";
+      hint = "Starting at the negative number, move right by the positive number.";
+      steps = [
+        `The signs differ, so subtract the absolute values: ${Math.max(a, b)} − ${Math.min(a, b)} = ${Math.abs(answer)}.`,
+        `${answer === 0 ? "The values cancel." : `The number with the greater absolute value determines the sign: ${answer}.`}`,
+      ];
+      parameters.negativeValue = a;
+      parameters.positiveValue = b;
+      break;
+    }
+    case "grade-7-proportional-reasoning": {
+      const count = a;
+      const cost = count * b;
+      answer = b;
+      prompt = `${count} notebooks cost $${cost}. At the same rate, how much does one notebook cost?`;
+      subtopic = "Find a unit rate";
+      hint = "Divide the total cost by the number of notebooks.";
+      steps = [`Divide $${cost} by ${count}.`, `One notebook costs $${answer}.`];
+      parameters.count = count;
+      parameters.totalCost = cost;
+      break;
+    }
+    case "grade-7-geometry": {
+      const firstAngle = a * 8;
+      const secondAngle = b * 8;
+      answer = 180 - firstAngle - secondAngle;
+      prompt = `A triangle has angles ${firstAngle}° and ${secondAngle}°. What is its third angle?`;
+      subtopic = "Use the triangle angle sum";
+      hint = "The angles in a triangle add to 180°.";
+      steps = [
+        `Subtract the known angles from 180°: 180° − ${firstAngle}° − ${secondAngle}°.`,
+        `The third angle is ${answer}°.`,
+      ];
+      parameters.firstAngle = firstAngle;
+      parameters.secondAngle = secondAngle;
+      break;
+    }
+    case "grade-8-linear-functions": {
+      const input = difficulty + 1;
+      answer = a * input + b;
+      prompt = `For f(x) = ${a}x + ${b}, what is f(${input})?`;
+      subtopic = "Evaluate a linear function";
+      hint = `Substitute ${input} for x, then multiply before adding.`;
+      steps = [
+        `Substitute: f(${input}) = ${a}(${input}) + ${b}.`,
+        `Multiply and add: ${a * input} + ${b} = ${answer}.`,
+      ];
+      parameters.slope = a;
+      parameters.intercept = b;
+      parameters.input = input;
+      break;
+    }
+    case "grade-8-exponents": {
+      const base = randomInt(seed, 2, 5);
+      const exponent = difficulty % 2 === 0 ? 3 : 2;
+      answer = base ** exponent;
+      prompt = `Evaluate ${base}^${exponent}.`;
+      subtopic = "Evaluate an integer exponent";
+      hint = `Multiply ${base} by itself ${exponent} times.`;
+      steps = [`${base}^${exponent} means ${Array(exponent).fill(base).join(" × ")}.`, `The value is ${answer}.`];
+      parameters.base = base;
+      parameters.exponent = exponent;
+      break;
+    }
+    case "grade-8-geometry-data": {
+      const scale = difficulty;
+      answer = 5 * scale;
+      prompt = `A right triangle has legs ${3 * scale} and ${4 * scale}. What is the hypotenuse?`;
+      subtopic = "Use the Pythagorean theorem";
+      hint = "For a right triangle, a² + b² = c². The 3–4–5 triangle is a useful pattern.";
+      steps = [
+        `The legs are ${3 * scale}, ${4 * scale}; their matching 3–4–5 scale factor is ${scale}.`,
+        `The hypotenuse is 5 × ${scale} = ${answer}.`,
+      ];
+      parameters.scale = scale;
+      break;
+    }
+    default:
+      throw new Error(`No middle-school generator exists for ${context.topicId}.`);
+  }
+
+  const numericAnswer = answer;
+  const distractors = [
+    String(numericAnswer + 1),
+    String(Math.max(0, numericAnswer - 1)),
+    String(numericAnswer + 2),
+  ];
+  return makeGenerated(
+    makeQuestion,
+    context,
+    difficulty,
+    "middle-school-math-foundations",
+    parameters,
+    templateVersion >= 2 ? `Question ${difficulty}` : subtopic,
+    prompt!,
+    choiceAnswer(String(numericAnswer), distractors, "integer", seed),
+    hint!,
+    steps!,
+    "integer",
+    "Choose one answer.",
+    templateVersion,
   );
 }
 

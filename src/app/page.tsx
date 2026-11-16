@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TutorOffer } from "@/components/tutor-offer";
 import testimonialArchive from "../../content/testimonials.json";
 
 const testimonials = testimonialArchive.testimonials;
@@ -40,7 +41,7 @@ export default function Home() {
             <div className="math-note">
               <span className="note-label">A little curiosity</span>
               <span className="note-equation">x + y = ?</span>
-              <span className="note-caption">Start with a question.</span>
+              <span className="note-caption">A question to think about.</span>
               <span className="note-stamp">π</span>
             </div>
             <div className="art-caption">
@@ -50,6 +51,20 @@ export default function Home() {
           </div>
         </div>
         <div aria-hidden="true" className="hero-bottom-line" />
+      </section>
+
+      <section aria-labelledby="tutoring-title" className="tutoring-section">
+        <div className="page-width">
+          <div className="section-intro">
+            <p className="eyebrow eyebrow-dark">Room to think, space to grow</p>
+            <h2 id="tutoring-title">Math support, one-on-one</h2>
+            <p>
+              The Pi School offers individual math lessons for elementary,
+              middle, high school, and advanced-course students.
+            </p>
+          </div>
+          <TutorOffer showCta={false} />
+        </div>
       </section>
 
       <section aria-labelledby="testimonials-title" className="preservation-section" id="testimonials">

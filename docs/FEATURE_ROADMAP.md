@@ -1,15 +1,21 @@
 # The Pi School — Feature Roadmap and Requirements
 
-Updated: November 11, 2026
+Updated: November 16, 2026
 Suggested repository location: `docs/FEATURE_ROADMAP.md`
 Status: Planning baseline. Proposed features are not authorization to implement every phase at once.
 
-**Local update, November 13:** Home and navigation now point directly to the
-inquiry, challenge, events, news, and testimonials; `/tutoring` redirects to
-`/contact`. Challenge browsing restores the selected grade or course and uses
-catalog-backed readiness. Events use school stages and separate venue country
-and region. News discovery is manual via publisher feeds and editorial review.
-Staging deployment and runtime inquiry checks remain to be verified.
+**Local update:** Home and navigation point to the inquiry, challenge, events,
+news, and testimonials; `/tutoring` redirects to `/contact`. Challenge
+browsing restores the selected grade or course and now includes playable
+Grades 6–8 starter topics. Events use school stages and separate venue country
+and region. Math News has audience filters, a 20-story curated catalog, and
+manual publisher-feed discovery with editorial review. The user supplied
+regular tutor rates and trial details; tutor biographies remain withheld until
+each tutor reviews them. Local tests, typecheck, lint, required-field
+validation, mobile keyboard navigation, the tutoring redirect, and production
+build were verified after upgrading Next.js to 16.4.6. These changes are not
+yet deployed to staging, and the current email flow has not been resubmitted.
+An earlier staging email success was owner-confirmed.
 
 ## 1. Purpose and relationship to the project plan
 
@@ -19,20 +25,40 @@ This document supplements `docs/PROJECT_PLAN.md`; it does not replace its origin
 
 AoPS is a reference for academic presentation and learning patterns. Keep The Pi School's branding, wording, imagery, teaching approach, and implementation original.
 
-## 2. Current state — checked November 11, 2026
+## 2. Current state — checked November 16, 2026
 
 The local application has a Next.js App Router, TypeScript, Tailwind styling, a responsive shared site shell, a homepage, an inquiry page, and seven owner-approved testimonials published locally. `/tutoring` redirects to the inquiry page. F05 includes a short inquiry form with server-side validation, a honeypot, a best-effort in-process rate limit, and Resend email delivery code. Local email environment variables are populated. A 2026-11-07 test request was rejected by Resend with HTTP 403; a later local test was accepted as noted below.
 
 A later clearly labeled local test was accepted by Resend, as recorded in
-`docs/PROJECT_PLAN.md`. That confirms provider acceptance for that local test
-only; staging runtime delivery, inbox receipt, and actual Reply-To behavior
-remain unverified.
+`docs/PROJECT_PLAN.md`. The owner also confirmed an earlier staging send was
+delivered and Reply addressed the entered email; no message ID was recorded.
+Those tests predate the current changes. The current staging runtime settings,
+send acceptance, inbox delivery, and Reply-To behavior still require
+verification after deployment.
 
 The public source archive and F01 reconciliation are complete. On 2026-11-07, the owner confirmed reviewing the flagged team/contact/outcome-claim content and confirmed no private records were collected or kept for this website. The review did not record specific corrections or republication approvals, so flagged details remain unverified and must not be presented as current facts. The testimonial portion of F04 is complete locally; current tutor profiles remain unverified and unpublished. Booking, accounts, database-backed storage, and AI are not implemented.
 
-F06 has a working local daily challenge route with a typed question-service and repository boundary, a server-only file bank, and deterministic templates for integer arithmetic, fraction addition/subtraction, linear equations, and 19 elementary topics. The shared catalog defines 14 advanced course IDs and 173 topics: 154 advanced-course topics plus Kindergarten–Grade 5 topics. Each elementary topic has a grade-scoped five-question generated set with selectable answers and optional accessible visuals. Ten Arithmetic and Number Sense topics each have five authored questions (one at every difficulty), as well as a retained complete mixed-review topic. Readiness is derived from complete coverage. Other topics remain “Coming soon” unless an existing complete bank or supported template supplies all five difficulties. The five-question daily set is selected by local date, timezone, grade/course level, topic, and generation version, then cached as a versioned public snapshot separately from attempts in device-local storage. Answer checking, hints, and solutions stay server-side. No account, cross-device sync, database, AI, or production publishing workflow is included. Elementary and authored content have not received separate owner/educator review for production. See `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md` and `docs/CURRICULUM_SCOPE.md`.
+F06 has a working local daily challenge route with a typed question-service
+and repository boundary, a server-only file bank, and deterministic
+templates for integer arithmetic, fraction addition/subtraction, linear
+equations, and 28 grade-specific topics. The shared catalog defines 14
+advanced course IDs and 182 topics: 154 advanced-course topics plus
+Kindergarten–Grade 8 topics. Each grade-specific topic has a five-question
+generated set with selectable answers; answer rules, hints, and worked
+solutions stay server-side. Ten Arithmetic and Number Sense topics each have
+five authored questions (one at every difficulty), as well as a retained
+complete mixed-review topic. Readiness is derived from complete coverage.
+Other topics remain “Coming soon” unless an existing complete bank or
+supported template supplies all five difficulties. The five-question daily
+set is selected by local date, timezone, grade/course level, topic, and
+generation version, then cached as a versioned public snapshot separately
+from attempts in device-local storage. No account, cross-device sync,
+database, AI, or production publishing workflow is included. Grade-specific
+and authored content still needs separate owner/educator review before
+production. See `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md` and
+`docs/CURRICULUM_SCOPE.md`.
 
-The shared curriculum labels Kindergarten, US Grades 1–12, and college/advanced math while keeping grade separate from course and topic. K–5 challenge coverage is a starter set, not a complete grade-by-grade curriculum; topic gaps and further review are tracked in `docs/CURRICULUM_SCOPE.md`.
+The shared curriculum labels Kindergarten, US Grades 1–12, and college/advanced math while keeping grade separate from course and topic. K–8 challenge coverage is a starter set, not a complete grade-by-grade curriculum; topic gaps and further review are tracked in `docs/CURRICULUM_SCOPE.md`.
 
 F07's local directory redesign is complete: 12 published editions across 13
 event families, two archived editions, and one non-public draft. Families and
@@ -68,7 +94,7 @@ Do not mark a feature complete solely because its navigation, mockup, or placeho
 | M4 — Assisted learning | F12–F15 | Evaluated AI feedback, reviewed curriculum expansion, optional accounts and targeted review |
 | M5 — Advanced experiences | F16–F20 | Selected contest, live-learning, and community features justified by demand and staffing |
 
-M0 / F01 is complete. F07 — Worldwide math events and beginner guides has been implemented locally in M2; see the verified-coverage and editorial-gap notes below. The Kindergarten–Grade 5 expansion updates F06 and F07 without completing the broader curriculum. The visual theme may be refined independently without publishing unverified content. No calendar dates or delivery estimates are committed here.
+M0 / F01 is complete. F07 — Worldwide math events and beginner guides has been implemented locally in M2; see the verified-coverage and editorial-gap notes below. The Kindergarten–Grade 8 challenge starter set updates F06 without completing the broader curriculum. The visual theme may be refined independently without publishing unverified content. No calendar dates or delivery estimates are committed here.
 
 ## 5. Feature inventory
 
@@ -282,10 +308,10 @@ deadlines are purpose-labeled and kept separate from student entry. No live
 website/domain changes were made. See `docs/EVENT_DIRECTORY_EDITORIAL.md` for
 checked sources, coverage, and the remaining research backlog.
 
-Elementary support extends the shared US-grade filters and beginner guidance
-through Kindergarten–Grade 5. Math Kangaroo USA's 2027 edition has verified
-US K–12 eligibility. Other elementary filters return a listing only when the
-edition's official rules and a verified mapping support it; host country,
+The shared US-grade event filters cover Kindergarten–Grade 12. Beginner
+guidance and Math Kangaroo USA's verified 2027 K–12 eligibility are recorded.
+Other elementary filters return a listing only when the edition's official
+rules and a verified mapping support it; host country,
 online mode, broad student audience, and age appearance do not imply grade
 eligibility. Preserve original organizer school-year labels; add a US-grade
 mapping only with an official, reviewed equivalency source. Beginner guides
@@ -295,7 +321,16 @@ include parent/guardian guidance for younger participants.
 
 Separate **Research Explained**, **Math News**, and **Interesting Facts**. Include learning-level/topic tags, original summaries, sources, publication date, review date and optional diagrams. Explain research uncertainty and distinguish established facts from new claims. Avoid confusing source publication date with your summary's publication date.
 
-**Progress:** `/math-news` is linked from the main navigation and displays three manually reviewed stories. RSS discovery is run manually outside page requests; editors verify sources and update the static catalog before publication. Research explainers, topic/level filters, and scheduled refresh remain future work.
+**Progress:** `/math-news` is linked from the main navigation and displays 20
+curated stories with audience filters, original four-to-five-sentence
+summaries, publisher, publication-date precision, review metadata, and links
+to original articles. Feed discovery is run manually outside page requests;
+the five registered feeds surface candidates but do not modify published
+content. Editors must verify claims and sources, deduplicate syndicated
+stories, and update the static catalog before publication. Independent
+mathematical review is still needed; the registry does not yet include every
+publisher represented in the story catalog. Research explainers, topic-level
+filters, and scheduled refresh remain future work.
 
 **Done when:** every published item is reviewed and attributed; summaries are original; links work; research claims reflect the source; no unsupported feed content appears.
 

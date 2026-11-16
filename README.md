@@ -3,7 +3,7 @@
 A responsive Next.js tutoring website with a shared site shell, tutoring
 information, approved student testimonials, a server-side tutoring inquiry
 form, a local Daily Math Challenge pilot, a curated math events directory,
-and an initial Math News page.
+and a curated Math News page.
 
 ## Requirements
 
@@ -96,6 +96,14 @@ The form reports success only after Resend accepts the request. Provider
 acceptance does not itself guarantee final inbox delivery, so verify delivery
 and Reply-To behavior in the recipient inbox during the launch test.
 
+### Tutoring offer
+
+The first lesson is a 45-minute, one-on-one trial. Its price and delivery
+format have not been confirmed and are separate from regular lesson rates:
+Abhay is listed at $25 for 50 minutes, and Sneha and Meera are each listed at
+$20 for 45 minutes. Tutor biographies remain unpublished pending each tutor's
+review.
+
 ## Final validation and hardening status
 
 The site has been checked end-to-end on the local build: the main pages respond
@@ -109,15 +117,15 @@ validation), not the app logic itself.
 
 Open `/daily-challenge` and choose a US grade/level followed by a topic.
 The shared curriculum currently defines Kindergarten, Grades 1–12, and
-college/advanced math labels, along with 14 course IDs and 173 topics. The
-Daily Challenge has 19 elementary topics across Kindergarten–Grade 5, with
-five generated, progressively difficult multiple-choice questions for each
-topic. It also retains existing middle-school, high-school, college, and
-advanced math topics. Grade level remains distinct from course and topic.
-Elementary challenge content is a starter set, not complete grade coverage,
-and still needs independent educator review before production use.
+college/advanced math labels, along with 14 course IDs and 182 topics. The
+Daily Challenge has 28 grade-specific topics across Kindergarten–Grade 8,
+with five generated, progressively difficult multiple-choice questions for
+each topic. It also retains high-school, college, and advanced math topics.
+Grade level remains distinct from course and topic. Grade-specific challenge
+content is a starter set, not complete grade coverage, and still needs
+independent educator review before production use.
 
-The 19 currently playable elementary topics are:
+The currently playable grade-specific topics are:
 
 - Kindergarten: counting collections, comparing quantities, patterns, shapes.
 - Grade 1: addition/subtraction within 20, tens and ones, time and shapes.
@@ -126,6 +134,10 @@ The 19 currently playable elementary topics are:
 - Grade 4: multidigit arithmetic, fractions, angles and measurement.
 - Grade 5: decimal/fraction operations, volume, expressions and coordinate
   grids.
+- Grade 6: ratios, rates and percents; equations; data and statistics.
+- Grade 7: rational numbers; proportional reasoning; geometry and measurement.
+- Grade 8: linear equations and functions; exponents and square roots;
+  geometry and data.
 
 More requested strands remain gaps; see
 [docs/CURRICULUM_SCOPE.md](docs/CURRICULUM_SCOPE.md). The shared grade

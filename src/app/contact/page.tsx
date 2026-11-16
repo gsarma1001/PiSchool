@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import { TutorOffer } from "@/components/tutor-offer";
 import { InquiryForm } from "./inquiry-form";
 
 export const metadata: Metadata = {
-  title: "Request tutoring | The Pi School",
+  title: "Request a trial lesson | The Pi School",
   description:
     "Send The Pi School a tutoring inquiry about a student’s US grade, course, and math learning needs, from early foundations through advanced math.",
 };
@@ -24,7 +25,7 @@ export default async function ContactPage() {
         <h1 id="contact-page-title">Request a trial lesson</h1>
         <p className="public-lede">
           Tell us the student’s grade or course and what kind of math support
-          you’re looking for. Ask us about current subjects, formats, and availability.
+          you’re looking for. Sending an inquiry does not book a lesson.
         </p>
       </section>
 
@@ -38,6 +39,12 @@ export default async function ContactPage() {
               grade or course, and a short description of the help needed.
               Please don’t include sensitive student information.
             </p>
+            <p>
+              We’ll use your contact details to respond to this inquiry. The
+              first lesson is a 45-minute, one-on-one trial. The trial price
+              and delivery format are still to be confirmed. Regular lesson
+              rates are listed separately below.
+            </p>
             {!deliveryConfigured && (
               <p className="delivery-notice" role="status">
                 The inquiry form is currently unavailable. Please try again later.
@@ -47,6 +54,11 @@ export default async function ContactPage() {
           <div className="inquiry-panel">
             <InquiryForm />
           </div>
+        </div>
+      </section>
+      <section aria-label="Regular tutor rates" className="public-section">
+        <div className="page-width">
+          <TutorOffer compact />
         </div>
       </section>
     </main>

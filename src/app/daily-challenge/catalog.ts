@@ -1,7 +1,7 @@
 import {
-  elementaryChallengeLevels,
-  type ElementaryLevelId,
-  type ElementaryLevelLabel,
+  challengeGradeLevels,
+  type ChallengeGradeId,
+  type ChallengeGradeLabel,
 } from "../../lib/curriculum";
 
 export const courseCatalog = [
@@ -24,12 +24,14 @@ export const courseCatalog = [
 export type CourseId = (typeof courseCatalog)[number]["id"];
 export type GradeCourse =
   | (typeof courseCatalog)[number]["name"]
-  | ElementaryLevelLabel;
+  | ChallengeGradeLabel;
 
 export type QuestionVisual = {
   kind: "counters" | "array" | "comparison";
   label: string;
   count: number;
+  symbol?: string;
+  itemLabel?: string;
   rows?: number;
   columns?: number;
   groups?: { label: string; count: number }[];
@@ -40,7 +42,7 @@ export type ChallengeTopic = {
   label: string;
   description: string;
   courseIds: CourseId[];
-  levelIds?: ElementaryLevelId[];
+  levelIds?: ChallengeGradeId[];
   courseLabels?: Partial<Record<CourseId, string>>;
   order: number;
 };
@@ -86,6 +88,18 @@ export const challengeTopics: ChallengeTopic[] = [
   { id: "grade-5-volume", label: "Volume", description: "Find the volume of rectangular prisms using unit cubes and dimensions.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-5"], order: 2 },
   { id: "grade-5-expressions-coordinates", label: "Expressions and coordinate grids", description: "Evaluate numerical expressions and read points in the first quadrant.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-5"], order: 3 },
 
+  { id: "grade-6-ratios-percent", label: "Ratios, rates, and percents", description: "Use unit rates, equivalent ratios, and familiar percent relationships.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-6"], order: 1 },
+  { id: "grade-6-expressions-equations", label: "Expressions and equations", description: "Evaluate expressions and solve one- and two-step equations.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-6"], order: 2 },
+  { id: "grade-6-statistics-data", label: "Data and statistical measures", description: "Interpret small data sets using mean, median, and range.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-6"], order: 3 },
+
+  { id: "grade-7-rational-numbers", label: "Rational numbers", description: "Calculate with positive and negative integers and fractions.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-7"], order: 1 },
+  { id: "grade-7-proportional-reasoning", label: "Proportional reasoning", description: "Solve scale, unit-rate, and percent problems using proportional relationships.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-7"], order: 2 },
+  { id: "grade-7-geometry", label: "Geometry and measurement", description: "Reason about angle relationships, area, and right triangles.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-7"], order: 3 },
+
+  { id: "grade-8-linear-functions", label: "Linear equations and functions", description: "Solve linear equations and interpret slope, intercepts, and function values.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-8"], order: 1 },
+  { id: "grade-8-exponents", label: "Exponents and square roots", description: "Use integer exponents and connect perfect squares with square roots.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-8"], order: 2 },
+  { id: "grade-8-geometry-data", label: "Geometry and data", description: "Apply the Pythagorean theorem and interpret simple statistical summaries.", courseIds: ["arithmetic-number-sense"], levelIds: ["grade-8"], order: 3 },
+
   { id: "place-value", label: "Place value", description: "Read, compose, and compare the value of digits in whole numbers.", courseIds: [arithmetic], order: 1 },
   { id: "comparing-ordering-numbers", label: "Comparing and ordering numbers", description: "Use place value and number lines to compare and arrange whole numbers.", courseIds: [arithmetic], order: 2 },
   { id: "addition", label: "Addition", description: "Add whole numbers using place value, regrouping, and estimation.", courseIds: [arithmetic], order: 3 },
@@ -121,7 +135,7 @@ export const challengeTopics: ChallengeTopic[] = [
   { id: "numerical-expressions", label: "Numerical expressions", description: "Evaluate numerical expressions using operation properties and grouping.", courseIds: [preAlgebra], order: 3 },
   { id: "properties-of-operations", label: "Properties of operations", description: "Use operation properties to rewrite and simplify calculations.", courseIds: [preAlgebra], order: 4 },
   { id: "simplifying-expressions", label: "Simplifying expressions", description: "Combine like terms and use the distributive property.", courseIds: [preAlgebra], order: 5 },
-  { id: "linear-equations", label: "One-step and two-step equations", description: "Solve equations by applying inverse operations to both sides.", courseIds: [preAlgebra, algebra1], order: 6 },
+  { id: "linear-equations", label: "Linear equations", description: "Solve one-variable equations, including equations with grouping and variables on both sides.", courseIds: [preAlgebra, algebra1], order: 6 },
   { id: "introductory-inequalities", label: "Introductory inequalities", description: "Represent and solve simple inequalities.", courseIds: [preAlgebra], order: 7 },
   { id: "exponents", label: "Exponents", description: "Interpret powers and evaluate expressions with integer exponents.", courseIds: [preAlgebra], order: 8 },
   { id: "square-roots", label: "Square roots", description: "Relate square roots to perfect squares and estimate roots.", courseIds: [preAlgebra], order: 9 },
@@ -256,7 +270,7 @@ export const challengeTopics: ChallengeTopic[] = [
 ];
 
 export const gradeCourses: GradeCourse[] = [
-  ...elementaryChallengeLevels
+  ...challengeGradeLevels
     .slice()
     .sort((left, right) => left.order - right.order)
     .map((level) => level.label),
@@ -269,22 +283,22 @@ export const gradeCourses: GradeCourse[] = [
 export function getCourseByName(gradeCourse: GradeCourse) {
   const selectedCourse = courseCatalog.find((course) => course.name === gradeCourse);
   if (selectedCourse) return selectedCourse;
-  const level = elementaryChallengeLevels.find((item) => item.label === gradeCourse);
+  const level = challengeGradeLevels.find((item) => item.label === gradeCourse);
   return courseCatalog.find((course) => course.id === level?.courseId);
 }
 
 export function getTopicsForGrade(gradeCourse: GradeCourse): ChallengeTopic[] {
   const course = getCourseByName(gradeCourse);
   if (!course) return [];
-  const elementaryLevel = elementaryChallengeLevels.find(
+  const challengeGrade = challengeGradeLevels.find(
     (item) => item.label === gradeCourse,
   );
   return challengeTopics
     .filter(
       (topic) =>
         topic.courseIds.includes(course.id) &&
-        (elementaryLevel
-          ? topic.levelIds?.includes(elementaryLevel.id)
+        (challengeGrade
+          ? topic.levelIds?.includes(challengeGrade.id)
           : !topic.levelIds),
     )
     .sort((left, right) => left.order - right.order);

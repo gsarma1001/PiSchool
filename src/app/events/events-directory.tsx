@@ -202,6 +202,24 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
   const eligibleRegions = Array.from(new Set(initialEvents.flatMap((event) =>
     event.eligibility.eligibleRegions,
   ))).sort();
+  const availableCategories = useMemo(() => {
+    const matchesWithoutCategory = filterAndSortEvents(
+      initialEvents,
+      { ...filters, category: "" },
+      now,
+    );
+    const categories = new Set([
+      ...matchesWithoutCategory.events,
+      ...matchesWithoutCategory.uncertainEvents,
+    ].map((event) => event.category));
+    const selectedCategory = eventCategories.find(
+      (category) => category === filters.category,
+    );
+    if (selectedCategory) categories.add(selectedCategory);
+    return eventCategories.filter((category) => categories.has(category));
+  }, [filters, initialEvents, now]);
+  const isSeattleWashingtonView =
+    filters.venueCountry === "US" && filters.venueRegion === "Washington";
 
   function updateVenueCountry(value: string) {
     const regionIsCompatible = initialEvents.some((event) =>
@@ -215,6 +233,10 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
       venueCountry: value,
       venueRegion: regionIsCompatible ? filters.venueRegion : "",
     });
+  }
+
+  function setVenuePreset(venueCountry: string, venueRegion: string) {
+    applyFilters({ ...filters, venueCountry, venueRegion });
   }
 
   useEffect(() => {
@@ -271,7 +293,20 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
     const route = relevantRoute(event, filters, deadline);
     const studentRoute = event.registrationRoutes.find((item) => item.deadline?.purpose === "student-registration");
     const deadlineRoute = route?.deadline?.purpose === "student-registration" ? route : studentRoute ?? route;
-    const status = registrationText(event, route, now);
+    const routesByMode = new Map<
+      EventSummary["mode"],
+      NonNullable<typeof route>
+    >();
+    for (const candidate of event.registrationRoutes) {
+      const mode = candidate.mode ?? event.mode;
+      if (!routesByMode.has(mode)) routesByMode.set(mode, candidate);
+    }
+    const statusByMode = routesByMode.size > 1
+      ? [...routesByMode].map(([mode, modeRoute]) => ({
+          label: `${eventModeLabel(mode)}: ${registrationText(event, modeRoute, now)}`,
+          key: mode,
+        }))
+      : [{ label: registrationText(event, route, now), key: "status" }];
     const grades = eligibilityText(event);
     const signupUrl = route?.registrationUrl;
     return (
@@ -286,7 +321,9 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
             <p className="event-result-organizer">{event.organizer}</p>
             <p className="event-result-description">{event.description}</p>
           </div>
-          <span className="event-status-label">{status}</span>
+          <div className="event-status-label">
+            {statusByMode.map((item) => <span key={item.key}>{item.label}</span>)}
+          </div>
         </div>
         <dl className="event-result-facts">
           <div><dt>Grades / ages</dt><dd>{grades}</dd></div>
@@ -322,6 +359,25 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
           </button>
         ))}
       </nav>
+
+      <div className="events-location-quick-filters" aria-label="Quick location filters">
+        <button
+          aria-pressed={isSeattleWashingtonView}
+          className={isSeattleWashingtonView ? "is-selected" : ""}
+          onClick={() => setVenuePreset("US", "Washington")}
+          type="button"
+        >
+          Seattle &amp; Washington
+        </button>
+        <button
+          aria-pressed={!filters.venueCountry && !filters.venueRegion}
+          className={!filters.venueCountry && !filters.venueRegion ? "is-selected" : ""}
+          onClick={() => setVenuePreset("", "")}
+          type="button"
+        >
+          Worldwide directory
+        </button>
+      </div>
 
       <form className="events-filters" onSubmit={submitSearch}>
         <label className="events-filter-search">
@@ -387,7 +443,7 @@ export function EventsDirectory({ initialQuery, initialEvents }: Props) {
               Detailed event type
               <select onChange={(event) => updateFilter("category", event.target.value)} value={filters.category}>
                 <option value="">All event types</option>
-                {eventCategories.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}
+                {availableCategories.map((category) => <option key={category} value={category}>{categoryLabels[category]}</option>)}
               </select>
             </label>
             <label>

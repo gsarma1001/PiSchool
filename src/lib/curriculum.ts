@@ -1,4 +1,4 @@
-export const elementaryChallengeLevels = [
+export const challengeGradeLevels = [
   {
     id: "kindergarten",
     label: "Kindergarten",
@@ -10,12 +10,13 @@ export const elementaryChallengeLevels = [
   { id: "grade-3", label: "Grade 3", courseId: "arithmetic-number-sense", order: 3 },
   { id: "grade-4", label: "Grade 4", courseId: "arithmetic-number-sense", order: 4 },
   { id: "grade-5", label: "Grade 5", courseId: "arithmetic-number-sense", order: 5 },
+  { id: "grade-6", label: "Grade 6", courseId: "arithmetic-number-sense", order: 6 },
+  { id: "grade-7", label: "Grade 7", courseId: "arithmetic-number-sense", order: 7 },
+  { id: "grade-8", label: "Grade 8", courseId: "arithmetic-number-sense", order: 8 },
 ] as const;
 
-export type ElementaryLevelId =
-  (typeof elementaryChallengeLevels)[number]["id"];
-export type ElementaryLevelLabel =
-  (typeof elementaryChallengeLevels)[number]["label"];
+export type ChallengeGradeId = (typeof challengeGradeLevels)[number]["id"];
+export type ChallengeGradeLabel = (typeof challengeGradeLevels)[number]["label"];
 
 export const usGradeFilterOptions = [
   { id: "kindergarten", label: "Kindergarten (US)" },

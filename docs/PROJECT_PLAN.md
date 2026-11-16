@@ -4,22 +4,22 @@ I reviewed your homepage, team page, and FAQ page. Your domain currently display
 
 I’m assuming you mean **Visual Studio Code with an AI coding assistant**, such as GitHub Copilot or Codex. The prompts below can be used sequentially in its coding chat.
 
-## Implementation status — 2026-11-11
+## Current implementation status — local QA complete; staging pending
 
-Prompt 1 is complete: the App Router, TypeScript, and Tailwind CSS foundation; responsive shared site shell and minimal homepage; project brief, implementation plan, curriculum scope, environment example, and local setup instructions are in place. Lint, TypeScript, production build, and local production HTTP checks passed. Phase 0 public-source capture includes the accessible pages and assets, six unique homepage testimonials, and seven expanded FAQs. The owner supplied and approved an additional testimonial; all seven are displayed in the local application. The owner has reviewed the flagged preservation content and confirmed no private records were collected or kept; specific corrections or republication decisions for flagged claims/contact/team content are still unrecorded. The live site/domain were not changed.
+Prompt 1 is complete: the App Router, TypeScript, and Tailwind CSS foundation; responsive shared site shell and minimal homepage; project brief, implementation plan, curriculum scope, environment example, and local setup instructions are in place. Phase 0 public-source capture includes the accessible pages and assets, six unique homepage testimonials, and seven expanded FAQs. The owner supplied and approved an additional testimonial; all seven are displayed in the local application. The owner has reviewed the flagged preservation content and confirmed no private records were collected or kept; specific corrections or republication decisions for flagged claims/contact/team content are still unrecorded. The live site/domain were not changed.
 
-F05 has since added local tutoring/contact routes and a short, server-validated inquiry form with Resend delivery code. A clearly labeled local form test was accepted by Resend; inbox receipt and actual Reply-To behavior remain unverified. See `docs/FEATURE_ROADMAP.md` for the current F05 status.
+F05 has local tutoring/contact routes and a short, server-validated inquiry form with Resend delivery code. The owner confirmed that an earlier staging email test worked as expected, including inbox delivery and reply behavior; no message ID was recorded. The current tutor offer and contact copy were checked locally, and an empty inquiry was blocked by required-field validation without sending mail. These current changes have not been deployed or submitted to Resend. The supplied trial is a 45-minute, one-on-one lesson with price and delivery format unconfirmed. Regular rates are $25/50 minutes for Abhay and $20/45 minutes for Sneha and Meera; their biographies remain unpublished pending each tutor's review. See `docs/FEATURE_ROADMAP.md` for the current F05 status.
 
-Final validation and hardening pass completed locally: the app routes respond successfully, internal links resolve without 404s, the daily challenge and events test suites pass, and the production build completes. The remaining inquiry-email deployment step depends on confirming inbox receipt and actual Reply-To behavior; no production website or live-domain edits were made.
+**Local validation — 2026-11-16:** Next.js and `eslint-config-next` were upgraded from 16.4.3 to 16.4.6 in a separate worktree and integrated as local commit `4f2620a`; `README.md` records the updated package versions and the security reminder policy is enabled. Daily Challenge (22), Events (23), and Math News (3) tests pass; TypeScript passes; lint reports four unused-variable warnings and no errors; the production build passes. The mobile navigation opens and closes with Enter, shows a visible focus outline, and has no horizontal overflow at 390px. The `/tutoring` redirect reaches `/contact`, and an empty inquiry is blocked by required-field validation without sending mail. Staging deployment, final staging regression, runtime-setting checks, and a new inquiry submission remain pending. No production website, original repository remote, or live-domain settings were changed.
 
 | Prompt or phase | Status | Notes |
 |---|---|---|
 | Prompt 1 — Establish the project and working rules | Complete | The local application foundation and minimal homepage are implemented. Lint, TypeScript, production build, and production-server homepage checks pass. |
 | Phase 0 — Preserve | Complete | Public pages, assets, six unique testimonials, and seven expanded FAQs are archived and reconciled. The owner completed the flagged-content review and confirmed there are no private records to export. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
-| Phase 1 — Redesign | Foundation plus partial F05 | Tutoring/contact routes and the validated inquiry form are implemented locally. Resend accepted a clearly labeled local test inquiry; inbox receipt and actual Reply-To verification remain outstanding. Current tutor details also need review. |
-| Phase 2 — Math hub | Partial — F06/F07 elementary support updated locally; F07 directory redesign complete; F08 Math News initial slice available | K–5 challenge topics and source-backed event grade filters are implemented, but broader curriculum coverage and educator/editorial review remain incomplete. The event directory now has 12 published editions, two archived editions, and one draft across verified US, online, and international opportunities; the wider global organizer and edition research backlog remains open. A small, source-linked Math News page is an initial F08 slice; research explainers, facts, and editorial tooling remain future work. Preserve future Phase 2 work and incomplete topic banks; see `docs/FEATURE_ROADMAP.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md`, and `docs/EVENT_DIRECTORY_EDITORIAL.md`. |
+| Phase 1 — Redesign | Foundation plus partial F05 | Tutoring/contact routes and inquiry validation are implemented locally. An earlier staging email test and reply behavior were owner-confirmed; current changes have not been sent or staging-tested. Trial terms and regular rates were supplied; tutor biographies await individual review. |
+| Phase 2 — Math hub | Partial — Grade 6–8 Daily Challenge, Events filters, and curated Math News updates are implemented locally | Grades K–8 have three playable starter topics per grade; broader curriculum coverage and independent educator review remain incomplete. The event directory has 12 published editions, two archived editions, and one draft; wider source and edition research remains open. Math News has a 20-story curated catalog and manual feed discovery, not scheduled publishing. Targeted local tests, typecheck, lint, production build, and browser checks pass on Next.js 16.4.6; staging retest remains pending. See `docs/FEATURE_ROADMAP.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/DAILY_CHALLENGE_QUESTION_SYSTEM.md`, and `docs/EVENT_DIRECTORY_EDITORIAL.md`. |
 | Phase 3 — Daily Quick Mind pilot | Partial — daily challenge browsing experience refreshed locally | The daily challenge offers grade/course browsing, topic status labels, and resume handling while preserving deterministic questions, hints, worked solutions, and stored device-local progress. Broader pilot expansion remains future work. |
-| Phase 4 — Expand learning | Partial — Kindergarten–Grade 5 starter challenge topics are implemented locally | 19 elementary topics now have deterministic five-question challenge sets. Coverage gaps, educator review, remaining K–12 catalog mapping, and advanced curriculum expansion remain open. No AI, accounts, or child information collection was added. |
+| Phase 4 — Expand learning | Partial — Kindergarten–Grade 8 starter challenge topics are implemented locally | 28 grade-specific topics now have deterministic five-question challenge sets. Coverage gaps, educator review, remaining K–12 catalog mapping, and advanced curriculum expansion remain open. No AI, accounts, or child information collection was added. |
 | Phase 5 — Launch and operate | Not started | Future phase; production website and domain have not been changed. |
 
 **Staging validation — 2026-11-13:** The separate staging resource is
@@ -65,14 +65,18 @@ verified. Those checks were local, not staging evidence. Production,
 
 F06 remains a local pilot, not a complete curriculum or a production
 publishing workflow. The shared catalog defines 14 advanced course IDs and
-173 topics (154 advanced-course topics and 19 Kindergarten–Grade 5 topics).
-Each elementary topic has five deterministic questions with multiple-choice
+182 topics (154 advanced-course topics and 28 Kindergarten–Grade 8 topics).
+Each grade-specific topic has five deterministic questions with multiple-choice
 answers; answer rules, hints, and solutions stay server-side. The shared grade
 configuration keeps level separate from course and topic. Arithmetic and
 Number Sense retains five authored questions for each of its ten requested
 topics and the mixed-review topic. Trigonometry and Precalculus share their
-existing bank. Elementary coverage gaps and educator review remain open; see
+existing bank. Grade-level coverage gaps and educator review remain open; see
 `docs/CURRICULUM_SCOPE.md`. Progress remains device-local.
+
+The current local changes add three deterministic template-backed topics for
+each of Grades 6–8, with question, answer-check, hint, and worked-solution
+tests. This is starter coverage, not a complete middle-school curriculum.
 
 F07's directory redesign, purpose views, URL-backed filters, compact result
 cards, confirmed/uncertain eligibility separation, annual-edition family
@@ -89,7 +93,7 @@ festivals, conferences, and international editions remain open research. See
 `docs/EVENT_DIRECTORY_EDITORIAL.md` for checked sources, limitations, and the
 research backlog. No live website/domain changes were made.
 
-The elementary expansion adds shared Kindergarten–Grade 5 event filters and
+The event directory provides shared Kindergarten–Grade 12 filters and
 beginner guidance. Math Kangaroo USA's 2027 edition has a verified US K–12
 grade mapping. Other elementary matches remain unpublished until official
 edition rules and any US-grade mapping are sourced and reviewed.

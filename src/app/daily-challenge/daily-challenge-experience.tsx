@@ -16,9 +16,11 @@ import {
   getQuestionSolution,
 } from "./actions";
 import type { CourseId, GradeCourse } from "./catalog";
-import { elementaryChallengeLevels } from "../../lib/curriculum";
+import { challengeGradeLevels } from "../../lib/curriculum";
 import {
   emptyProgress,
+  getSessionKeys,
+  nextSessionKey,
   parseProgress,
   progressStorageKey,
   sessionKey,
@@ -74,6 +76,7 @@ function blankQuestionProgress(): QuestionProgress {
     feedback: "",
     hintViewed: false,
     solutionViewed: false,
+    helpHistoryKnown: true,
   };
 }
 
@@ -85,6 +88,12 @@ function isGradeCourse(
 }
 
 function getQuestionProgressLabel(progress: QuestionProgress): string {
+  if (
+    (progress.outcome === "correct" || progress.outcome === "helped") &&
+    progress.helpHistoryKnown === false
+  ) {
+    return "Completed; help history not recorded";
+  }
   if (progress.outcome === "correct") return "Solved independently";
   if (progress.outcome === "helped") return "Completed with help";
   if (progress.outcome === "incorrect") return "Try another answer";
@@ -133,6 +142,7 @@ export function DailyChallengeExperience({
   const [isChecking, setIsChecking] = useState(false);
   const [isLoadingChallenge, setIsLoadingChallenge] = useState(false);
   const [focusRequest, setFocusRequest] = useState(0);
+  const [speechMessage, setSpeechMessage] = useState("");
   const challengeHeadingRef = useRef<HTMLHeadingElement>(null);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const restoreStartedRef = useRef(false);
@@ -169,7 +179,7 @@ export function DailyChallengeExperience({
   const gradeOptions = useMemo(
     () =>
       catalog.courses.filter((item) =>
-        elementaryChallengeLevels.some((level) => level.label === item.name),
+        challengeGradeLevels.some((level) => level.label === item.name),
       ),
     [catalog.courses],
   );
@@ -177,7 +187,7 @@ export function DailyChallengeExperience({
     () =>
       catalog.courses.filter(
         (item) =>
-          !elementaryChallengeLevels.some((level) => level.label === item.name),
+          !challengeGradeLevels.some((level) => level.label === item.name),
       ),
     [catalog.courses],
   );
@@ -185,10 +195,26 @@ export function DailyChallengeExperience({
     () => topics.filter((topic) => !topic.ready),
     [topics],
   );
-  const isElementarySelection = elementaryChallengeLevels.some(
+  const isGradeSelection = challengeGradeLevels.some(
     (level) => level.label === selectedGrade,
   );
   const showTopicSearch = readyTopics.length > 6;
+  const selectedSessionKeys =
+    selectedGrade && selectedTopic
+      ? getSessionKeys(
+          progress,
+          localDateKey(new Date()),
+          selectedGrade,
+          selectedTopic,
+        )
+      : [];
+  const resumableSessionKey = [...selectedSessionKeys]
+    .reverse()
+    .find((key) => !progress.results[key]);
+  const latestSessionKey = selectedSessionKeys.at(-1);
+  const selectedTopicCompleted = Boolean(
+    latestSessionKey && progress.results[latestSessionKey],
+  );
   const filteredReadyTopics = useMemo(() => {
     const query = topicSearch.trim().toLocaleLowerCase();
     return readyTopics.filter(
@@ -211,14 +237,8 @@ export function DailyChallengeExperience({
   const selectedTopicIsReady = readyTopicIdSet.has(selectedTopic);
   const availabilityNote =
     readyTopics.length === 0
-      ? upcomingTopics.length > 0
-        ? `No topics available · ${upcomingTopics.length} coming soon`
-        : "No topics available yet"
-      : `${readyTopics.length} topic${readyTopics.length === 1 ? "" : "s"} available${
-          upcomingTopics.length > 0
-            ? ` · ${upcomingTopics.length} coming soon`
-            : ""
-        }`;
+      ? "No playable topics yet"
+      : `${readyTopics.length} playable topic${readyTopics.length === 1 ? "" : "s"}`;
   const streaks = useMemo(
     () => getStreaks(progress.completedDates, localDateKey(new Date())),
     [progress.completedDates],
@@ -230,17 +250,14 @@ export function DailyChallengeExperience({
 
   function getTopicStatus(topicId: string): "Not started" | "Practicing" | "Completed today" {
     if (!selectedGrade) return "Not started";
-    const key = sessionKey(localDateKey(new Date()), selectedGrade, topicId);
-    const savedSession = progress.sessions[key];
-    if (savedSession && progress.results[key]) return "Completed today";
-    if (
-      savedSession &&
-      (savedSession.currentQuestion > 0 ||
-        savedSession.questions.some((item) => item.outcome !== "pending"))
-    ) {
-      return "Practicing";
-    }
-    return "Not started";
+    const keys = getSessionKeys(
+      progress,
+      localDateKey(new Date()),
+      selectedGrade,
+      topicId,
+    );
+    if (keys.some((key) => !progress.results[key])) return "Practicing";
+    return keys.length > 0 ? "Completed today" : "Not started";
   }
 
   const saveProgress = useCallback((next: ChallengeProgress) => {
@@ -259,6 +276,7 @@ export function DailyChallengeExperience({
       gradeCourse: GradeCourse,
       topicId: string,
       startingProgress: ChallengeProgress = progress,
+      mode: "start" | "resume" | "restore" = "start",
     ) => {
       setIsLoadingChallenge(true);
       setStorageMessage("");
@@ -268,7 +286,22 @@ export function DailyChallengeExperience({
       const date = localDateKey(new Date());
       const timeZone =
         Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-      const key = sessionKey(date, gradeCourse, topicId);
+      const matchingKeys = getSessionKeys(
+        startingProgress,
+        date,
+        gradeCourse,
+        topicId,
+      );
+      const unfinishedKey = [...matchingKeys]
+        .reverse()
+        .find((item) => !startingProgress.results[item]);
+      const key =
+        mode === "resume" || mode === "restore"
+          ? unfinishedKey ?? matchingKeys.at(-1) ?? sessionKey(date, gradeCourse, topicId)
+          : unfinishedKey ??
+            (matchingKeys.length && startingProgress.results[matchingKeys.at(-1)!]
+              ? nextSessionKey(startingProgress, date, gradeCourse, topicId)
+              : matchingKeys.at(-1) ?? sessionKey(date, gradeCourse, topicId));
       const existing = startingProgress.sessions[key];
       let challengeSnapshot: DailyChallengeSnapshot | undefined =
         startingProgress.challengeSnapshots[key];
@@ -326,7 +359,7 @@ export function DailyChallengeExperience({
 
       setSelectedGrade(gradeCourse);
       setBrowseMode(
-        elementaryChallengeLevels.some((level) => level.label === gradeCourse)
+        challengeGradeLevels.some((level) => level.label === gradeCourse)
           ? "grade"
           : "course",
       );
@@ -378,17 +411,22 @@ export function DailyChallengeExperience({
             item.courseId === restoredCourse?.id &&
             item.gradeCourse === restored.selectedGradeCourse,
         )?.topics ?? [];
-      const savedChallengeKey = restored.selectedTopicId
-        ? sessionKey(
+      const savedChallengeKeys = restored.selectedTopicId
+        ? getSessionKeys(
+            restored,
             localDateKey(new Date()),
             restored.selectedGradeCourse,
             restored.selectedTopicId,
           )
-        : undefined;
+        : [];
+      const savedChallengeKey = [...savedChallengeKeys]
+        .reverse()
+        .find((key) => !restored.results[key]) ??
+        savedChallengeKeys.at(-1);
       startTransition(() => {
         setSelectedGrade(restored.selectedGradeCourse!);
         setBrowseMode(
-          elementaryChallengeLevels.some(
+          challengeGradeLevels.some(
             (level) => level.label === restored.selectedGradeCourse,
           )
             ? "grade"
@@ -403,8 +441,7 @@ export function DailyChallengeExperience({
           setSelectedTopic(restored.selectedTopicId!);
         });
         if (
-          (savedChallengeKey &&
-            restored.challengeSnapshots[savedChallengeKey]) ||
+          savedChallengeKey ||
           restoredTopics.some(
             (topic) =>
               topic.id === restored.selectedTopicId && topic.ready,
@@ -415,6 +452,7 @@ export function DailyChallengeExperience({
               restored.selectedGradeCourse!,
               restored.selectedTopicId!,
               restored,
+              "restore",
             ),
           );
         }
@@ -425,6 +463,10 @@ export function DailyChallengeExperience({
   useEffect(() => {
     if (focusRequest > 0) {
       challengeHeadingRef.current?.focus();
+      challengeHeadingRef.current?.scrollIntoView({
+        block: "start",
+        behavior: "smooth",
+      });
     }
   }, [focusRequest, questionIndex, savedResult]);
 
@@ -568,11 +610,15 @@ export function DailyChallengeExperience({
 
     if (result.status === "correct") {
       const firstAttempt = currentProgress.attempts === 0;
+      const usedHelp = currentProgress.hintViewed || currentProgress.solutionViewed;
       updateCurrentQuestion((item) => ({
         ...item,
         attempts: item.attempts + 1,
-        outcome: "correct",
-        feedback: firstAttempt
+        outcome: usedHelp ? "helped" : "correct",
+        helpHistoryKnown: true,
+        feedback: usedHelp
+          ? "Correct. You completed this problem with help."
+          : firstAttempt
           ? "Correct on your first attempt! Nice mathematical thinking."
           : "That’s correct. You worked it out—well done!",
       }));
@@ -583,6 +629,7 @@ export function DailyChallengeExperience({
       ...item,
       attempts: item.attempts + 1,
       incorrectAttempts: item.incorrectAttempts + 1,
+      helpHistoryKnown: true,
       outcome: "incorrect",
       feedback: "Not quite. A mistake is part of learning—review your steps and try again.",
     }));
@@ -604,6 +651,7 @@ export function DailyChallengeExperience({
     updateCurrentQuestion((item) => ({
       ...item,
       hintViewed: true,
+      helpHistoryKnown: true,
     }));
   }
 
@@ -624,10 +672,11 @@ export function DailyChallengeExperience({
     setSolutionSteps({ questionId: currentQuestion.id, steps });
     updateCurrentQuestion((item) => ({
       ...item,
+      answer: "",
       solutionViewed: true,
-      outcome: "helped",
-      feedback:
-        "You completed this problem with help. Learning from a worked solution counts toward today’s completion.",
+      helpHistoryKnown: true,
+      outcome: "pending",
+      feedback: "Review the steps, then enter and check your answer to complete this problem.",
     }));
   }
 
@@ -674,13 +723,29 @@ export function DailyChallengeExperience({
       gradeCourse: session.gradeCourse,
       topicId: session.topicId,
       solvedIndependently: session.questions.filter(
-        (item) => item.outcome === "correct",
+        (item) =>
+          item.outcome === "correct" &&
+          item.helpHistoryKnown !== false &&
+          !item.hintViewed &&
+          !item.solutionViewed,
       ).length,
       firstAttemptCorrect: session.questions.filter(
-        (item) => item.outcome === "correct" && item.attempts === 1,
+        (item) =>
+          item.outcome === "correct" &&
+          item.attempts === 1 &&
+          item.helpHistoryKnown !== false &&
+          !item.hintViewed &&
+          !item.solutionViewed,
       ).length,
       completedWithHelp: session.questions.filter(
-        (item) => item.outcome === "helped",
+        (item) =>
+          item.outcome === "helped" &&
+          item.helpHistoryKnown !== false,
+      ).length,
+      unclassifiedCompleted: session.questions.filter(
+        (item) =>
+          (item.outcome === "correct" || item.outcome === "helped") &&
+          item.helpHistoryKnown === false,
       ).length,
       incorrectAttempts: session.questions.reduce(
         (total, item) => total + item.incorrectAttempts,
@@ -717,14 +782,6 @@ export function DailyChallengeExperience({
     });
   }
 
-  const hasResumeProgress = Boolean(
-    selectedGrade &&
-      selectedTopic &&
-      progress.sessions[
-        sessionKey(localDateKey(new Date()), selectedGrade, selectedTopic)
-      ],
-  );
-
   if (!loaded) {
     return (
       <div aria-live="polite" className="challenge-loading">
@@ -757,6 +814,12 @@ export function DailyChallengeExperience({
             <strong>{savedResult.completedWithHelp}</strong>
             <span>Completed with help</span>
           </div>
+          {savedResult.unclassifiedCompleted > 0 && (
+            <div className="result-stat">
+              <strong>{savedResult.unclassifiedCompleted}</strong>
+              <span>Completed; help history not recorded</span>
+            </div>
+          )}
           <div className="result-stat">
             <strong>{savedResult.incorrectAttempts}</strong>
             <span>Incorrect attempts</span>
@@ -831,7 +894,7 @@ export function DailyChallengeExperience({
             role="tab"
             type="button"
           >
-            By Grade (K–5)
+            By Grade (K–8)
           </button>
           <button
             aria-selected={browseMode === "course"}
@@ -884,7 +947,7 @@ export function DailyChallengeExperience({
               No challenges are available for this level yet. Choose another
               level to get started.
             </p>
-          ) : isElementarySelection ? (
+          ) : isGradeSelection ? (
             <>
               {showTopicSearch && (
                 <div className="form-field">
@@ -1027,25 +1090,25 @@ export function DailyChallengeExperience({
                 }
                 onClick={() => {
                   if (selectedGrade && selectedTopicIsReady) {
-                    void openChallenge(selectedGrade, selectedTopic);
+                    void openChallenge(
+                      selectedGrade,
+                      selectedTopic,
+                      progress,
+                      resumableSessionKey ? "resume" : "start",
+                    );
                   }
                 }}
                 type="button"
               >
                 {isLoadingChallenge
                   ? "Preparing challenge…"
-                  : "Start 5-Problem Challenge"}
+                  : resumableSessionKey
+                    ? "Resume 5-Problem Challenge"
+                    : selectedTopicCompleted
+                      ? "Practice Another Set"
+                      : "Start 5-Problem Challenge"}
               </button>
             </div>
-            {hasResumeProgress && selectedGrade && selectedTopic && (
-              <button
-                className="button button-text challenge-resume-button"
-                onClick={() => void openChallenge(selectedGrade, selectedTopic, progress)}
-                type="button"
-              >
-                Resume challenge
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -1100,6 +1163,46 @@ export function DailyChallengeExperience({
             {currentQuestion.subtopic}
           </h2>
           <p className="question-prompt">{currentQuestion.prompt}</p>
+          {currentQuestion.gradeCourse === "Kindergarten" &&
+            currentQuestion.topicId === "kindergarten-counting" && (
+              <div className="read-aloud-control">
+                <button
+                  className="button button-secondary"
+                  onClick={() => {
+                    if (
+                      typeof window === "undefined" ||
+                      !("speechSynthesis" in window) ||
+                      typeof SpeechSynthesisUtterance === "undefined"
+                    ) {
+                      setSpeechMessage(
+                        "Read-aloud is unavailable in this browser. The prompt and answer choices are also available as text.",
+                      );
+                      return;
+                    }
+                    try {
+                      window.speechSynthesis.cancel();
+                      window.speechSynthesis.speak(
+                        new SpeechSynthesisUtterance(currentQuestion.prompt),
+                      );
+                      setSpeechMessage("Reading the question aloud.");
+                    } catch (error) {
+                      console.error("The question could not be read aloud.", error);
+                      setSpeechMessage(
+                        "The question could not be read aloud. You can still read it on screen.",
+                      );
+                    }
+                  }}
+                  type="button"
+                >
+                  Read it to me
+                </button>
+                {speechMessage && (
+                  <p aria-live="polite" className="field-hint" role="status">
+                    {speechMessage}
+                  </p>
+                )}
+              </div>
+            )}
           {currentQuestion.visual && (
             <figure className="challenge-visual">
               <figcaption>{currentQuestion.visual.label}</figcaption>
@@ -1125,8 +1228,9 @@ export function DailyChallengeExperience({
                 </div>
               ) : (
                 <div
-                  aria-label={`${currentQuestion.visual.count} visual counters`}
+                  aria-label={`${currentQuestion.visual.count} ${currentQuestion.visual.itemLabel ?? "visual counters"}`}
                   className={`challenge-visual-items challenge-visual-${currentQuestion.visual.kind}`}
+                  data-symbolic={Boolean(currentQuestion.visual.symbol)}
                   role="img"
                   style={
                     currentQuestion.visual.kind === "array"
@@ -1138,7 +1242,11 @@ export function DailyChallengeExperience({
                 >
                   {Array.from(
                     { length: Math.min(currentQuestion.visual.count, 60) },
-                    (_, index) => <span aria-hidden="true" key={index} />,
+                    (_, index) => (
+                      <span aria-hidden="true" key={index}>
+                        {currentQuestion.visual?.symbol}
+                      </span>
+                    ),
                   )}
                 </div>
               )}
@@ -1151,7 +1259,24 @@ export function DailyChallengeExperience({
           )}
 
           <div className="answer-entry">
-            {currentQuestion.choices?.length ? (
+            {currentQuestion.choices?.length &&
+            currentQuestion.gradeCourse === "Kindergarten" &&
+            currentQuestion.topicId === "kindergarten-counting" ? (
+              <fieldset className="challenge-choice-options challenge-choice-buttons">
+                <legend>Choose an answer</legend>
+                {currentQuestion.choices.map((choice) => (
+                  <button
+                    aria-pressed={currentProgress.answer === choice.id}
+                    className={`challenge-answer-button${currentProgress.answer === choice.id ? " challenge-answer-button-selected" : ""}`}
+                    key={choice.id}
+                    onClick={() => handleAnswerChange(choice.id)}
+                    type="button"
+                  >
+                    {choice.label}
+                  </button>
+                ))}
+              </fieldset>
+            ) : currentQuestion.choices?.length ? (
               <fieldset className="challenge-choice-options">
                 <legend>Your answer</legend>
                 {currentQuestion.choices.map((choice) => {

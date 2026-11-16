@@ -10,6 +10,7 @@ import {
 import { checkAnswer, chooseDailyIds } from "./domain";
 import {
   emptyProgress,
+  nextSessionKey,
   parseProgress,
   progressVersion,
   sessionKey,
@@ -25,14 +26,14 @@ import type {
   QuestionRecord,
   QuestionRepository,
 } from "./question-service/repository";
-import { elementaryChallengeLevels } from "../../lib/curriculum";
+import { challengeGradeLevels } from "../../lib/curriculum";
 
 describe("daily challenge catalog and question bank", () => {
   it("lists all curriculum courses and their requested topics", () => {
-    assert.equal(gradeCourses.length, 20);
+    assert.equal(gradeCourses.length, 23);
     assert.equal(courseCatalog.length, 14);
     assert.equal(courseCatalog[0].id, "arithmetic-number-sense");
-    assert.equal(challengeTopics.length, 173);
+    assert.equal(challengeTopics.length, 182);
     assert.equal(questionBank.length, 180);
 
     const trig = getTopicsForGrade("Trigonometry").find(
@@ -58,8 +59,8 @@ describe("daily challenge catalog and question bank", () => {
   });
 
   it("provides grade-scoped elementary topics and five accessible choice questions", () => {
-    const expectedTopicCounts = [4, 3, 3, 3, 3, 3];
-    for (const [index, level] of elementaryChallengeLevels.entries()) {
+    const expectedTopicCounts = [4, 3, 3, 3, 3, 3, 3, 3, 3];
+    for (const [index, level] of challengeGradeLevels.entries()) {
       assert.equal(gradeCourses.includes(level.label), true);
       const topics = getTopicsForGrade(level.label);
       assert.equal(topics.length, expectedTopicCounts[index]);
@@ -178,14 +179,14 @@ describe("daily challenge catalog and question bank", () => {
   });
 
   it("keeps generated grade-level problems valid across changing daily seeds", () => {
-    const kindergarten = elementaryChallengeLevels[0];
-    const grade1 = elementaryChallengeLevels[1];
-    const grade2 = elementaryChallengeLevels[2];
-    const grade4 = elementaryChallengeLevels[4];
+    const kindergarten = challengeGradeLevels[0];
+    const grade1 = challengeGradeLevels[1];
+    const grade2 = challengeGradeLevels[2];
+    const grade4 = challengeGradeLevels[4];
     for (let day = 1; day <= 28; day += 1) {
       const date = `2026-10-${String(day).padStart(2, "0")}`;
       const context = (
-        level: (typeof elementaryChallengeLevels)[number],
+        level: (typeof challengeGradeLevels)[number],
         topicId: string,
       ) => ({
         date,
@@ -250,6 +251,73 @@ describe("daily challenge catalog and question bank", () => {
       assert.equal(money.answer.type, "choice");
       if (money.answer.type === "choice") {
         assert.match(money.answer.canonical, /^\$\d+\.\d{2}$/);
+      }
+    }
+  });
+
+  it("generates answer-checked questions for every Grade 6–8 topic", () => {
+    const expectedAnswer = (
+      topicId: string,
+      parameters: Record<string, number | string>,
+    ): number => {
+      const value = (name: string) => Number(parameters[name]);
+      switch (topicId) {
+        case "grade-6-ratios-percent":
+          return value("amount") / 4;
+        case "grade-6-expressions-equations":
+          return value("solution");
+        case "grade-6-statistics-data":
+          return value("firstValue") + value("step");
+        case "grade-7-rational-numbers":
+          return value("positiveValue") - value("negativeValue");
+        case "grade-7-proportional-reasoning":
+          return value("totalCost") / value("count");
+        case "grade-7-geometry":
+          return 180 - value("firstAngle") - value("secondAngle");
+        case "grade-8-linear-functions":
+          return value("slope") * value("input") + value("intercept");
+        case "grade-8-exponents":
+          return value("base") ** value("exponent");
+        case "grade-8-geometry-data":
+          return value("scale") * 5;
+        default:
+          throw new Error(`Unexpected middle-school topic: ${topicId}`);
+      }
+    };
+
+    for (const level of challengeGradeLevels.slice(6)) {
+      const topics = getTopicsForGrade(level.label);
+      assert.equal(topics.length, 3, level.label);
+      for (const topic of topics) {
+        for (let day = 1; day <= 5; day += 1) {
+          const questions = getGeneratedTemplateQuestions(question, {
+            date: `2026-11-0${day}`,
+            timeZone: "UTC",
+            courseId: level.courseId,
+            gradeCourse: level.label,
+            topicId: topic.id,
+          });
+          assert.equal(questions.length, 5, `${level.label}: ${topic.id}`);
+          for (const item of questions) {
+            assert.equal(item.answer.type, "choice", item.prompt);
+            if (item.answer.type === "choice") {
+              assert.equal(
+                item.answer.canonical,
+                String(expectedAnswer(topic.id, item.parameters)),
+                item.prompt,
+              );
+              const correctOption = item.answer.options.find(
+                (option) => option.value === item.answer.canonical,
+              );
+              assert.ok(correctOption, item.prompt);
+              assert.deepEqual(checkAnswer(item.answer, correctOption.id), {
+                status: "correct",
+              });
+            }
+            assert.ok(item.hint.trim());
+            assert.ok(item.solutionSteps.length >= 2);
+          }
+        }
       }
     }
   });
@@ -340,6 +408,9 @@ describe("daily challenge catalog and question bank", () => {
         ["Grade 3", 3, 3, 0],
         ["Grade 4", 3, 3, 0],
         ["Grade 5", 3, 3, 0],
+        ["Grade 6", 3, 3, 0],
+        ["Grade 7", 3, 3, 0],
+        ["Grade 8", 3, 3, 0],
         ["Arithmetic and Number Sense", 11, 11, 0],
         ["Fractions, Decimals, and Percentages", 8, 1, 7],
         ["Ratios and Proportional Reasoning", 8, 1, 7],
@@ -396,6 +467,21 @@ describe("daily challenge catalog and question bank", () => {
         "grade-5-decimals-fractions",
         "grade-5-volume",
         "grade-5-expressions-coordinates",
+      ],
+      "Grade 6": [
+        "grade-6-ratios-percent",
+        "grade-6-expressions-equations",
+        "grade-6-statistics-data",
+      ],
+      "Grade 7": [
+        "grade-7-rational-numbers",
+        "grade-7-proportional-reasoning",
+        "grade-7-geometry",
+      ],
+      "Grade 8": [
+        "grade-8-linear-functions",
+        "grade-8-exponents",
+        "grade-8-geometry-data",
       ],
       "Arithmetic and Number Sense": [
         "place-value",
@@ -741,8 +827,16 @@ describe("daily challenge catalog and question bank", () => {
       );
       assert.equal(new Set(questions.map((item) => item.id)).size, 5);
       for (const item of questions) {
-        assert.ok(item.answer.type === "integer" || item.answer.type === "fraction");
-        if (item.answer.type !== "integer" && item.answer.type !== "fraction") {
+        assert.ok(
+          item.answer.type === "integer" ||
+            item.answer.type === "fraction" ||
+            item.answer.type === "variable-integer",
+        );
+        if (
+          item.answer.type !== "integer" &&
+          item.answer.type !== "fraction" &&
+          item.answer.type !== "variable-integer"
+        ) {
           continue;
         }
         assert.ok(item.hint.trim());
@@ -759,8 +853,19 @@ describe("daily challenge catalog and question bank", () => {
       (item) => item.templateId === "linear-equation-one-variable",
     );
     for (const equation of equations) {
-      assert.equal(equation.answer.type, "integer");
-      if (equation.answer.type !== "integer") continue;
+      assert.equal(equation.answer.type, "variable-integer");
+      if (equation.answer.type !== "variable-integer") continue;
+      assert.deepEqual(checkAnswer(equation.answer, equation.answer.canonical), {
+        status: "correct",
+      });
+      assert.deepEqual(checkAnswer(equation.answer, `x = ${equation.answer.canonical}`), {
+        status: "correct",
+      });
+      assert.deepEqual(checkAnswer(equation.answer, `x=${equation.answer.canonical}`), {
+        status: "correct",
+      });
+      assert.equal(checkAnswer(equation.answer, `y=${equation.answer.canonical}`).status, "invalid");
+      assert.equal(checkAnswer(equation.answer, `x=${equation.answer.canonical}+0`).status, "invalid");
       const { parameters } = equation;
       const x = Number(equation.answer.canonical);
       assert.equal(x, parameters.solution);
@@ -965,6 +1070,165 @@ describe("local progress and streaks", () => {
       parseProgress(JSON.stringify(emptyProgress())),
       { progress: emptyProgress(), recovered: false },
     );
-    assert.equal(progressVersion, 3);
+    assert.equal(progressVersion, 4);
+  });
+
+  it("preserves legacy saves without attributing missing help history to independent work", () => {
+    const key = sessionKey("2026-11-14", "Algebra 1", "linear-equations");
+    const legacy = {
+      ...emptyProgress(),
+      version: 3,
+      selectedGradeCourse: "Algebra 1",
+      selectedTopicId: "linear-equations",
+      completedDates: ["2026-11-14"],
+      sessions: {
+        [key]: {
+          date: "2026-11-14",
+          gradeCourse: "Algebra 1",
+          topicId: "linear-equations",
+          questionIds: ["1", "2", "3", "4", "5"],
+          currentQuestion: 5,
+          questions: Array.from({ length: 5 }, (_, index) => ({
+            answer: "3",
+            attempts: 1,
+            incorrectAttempts: 0,
+            outcome: "correct",
+            feedback: "Correct.",
+          })),
+        },
+      },
+      results: {
+        [key]: {
+          date: "2026-11-14",
+          gradeCourse: "Algebra 1",
+          topicId: "linear-equations",
+          solvedIndependently: 5,
+          firstAttemptCorrect: 5,
+          completedWithHelp: 0,
+          incorrectAttempts: 0,
+          currentStreak: 1,
+          bestStreak: 1,
+        },
+      },
+    };
+
+    const migrated = parseProgress(JSON.stringify(legacy));
+    assert.equal(migrated.recovered, false);
+    assert.equal(migrated.progress.results[key].solvedIndependently, 0);
+    assert.equal(migrated.progress.results[key].unclassifiedCompleted, 5);
+  });
+
+  it("does not preserve completion or streak credit for a solution reveal alone", () => {
+    const key = sessionKey("2026-11-14", "Algebra 1", "linear-equations");
+    const legacy = {
+      ...emptyProgress(),
+      version: 3,
+      completedDates: ["2026-11-14"],
+      sessions: {
+        [key]: {
+          date: "2026-11-14",
+          gradeCourse: "Algebra 1",
+          topicId: "linear-equations",
+          questionIds: ["1", "2", "3", "4", "5"],
+          currentQuestion: 5,
+          questions: Array.from({ length: 5 }, () => ({
+            answer: "3",
+            attempts: 0,
+            incorrectAttempts: 0,
+            outcome: "helped",
+            feedback: "Completed with help.",
+            hintViewed: true,
+            solutionViewed: true,
+          })),
+        },
+      },
+      results: {
+        [key]: {
+          date: "2026-11-14",
+          gradeCourse: "Algebra 1",
+          topicId: "linear-equations",
+          solvedIndependently: 0,
+          firstAttemptCorrect: 0,
+          completedWithHelp: 5,
+          incorrectAttempts: 0,
+          currentStreak: 1,
+          bestStreak: 1,
+        },
+      },
+    };
+
+    const migrated = parseProgress(JSON.stringify(legacy));
+    assert.equal(migrated.progress.sessions[key].questions[0].outcome, "pending");
+    assert.equal(migrated.progress.results[key], undefined);
+    assert.deepEqual(migrated.progress.completedDates, []);
+  });
+
+  it("preserves a correctly submitted solution-assisted answer after reload", () => {
+    const key = sessionKey("2026-11-14", "Algebra 1", "linear-equations");
+    const progress = emptyProgress();
+    progress.selectedGradeCourse = "Algebra 1";
+    progress.selectedTopicId = "linear-equations";
+    progress.completedDates = ["2026-11-14"];
+    progress.sessions[key] = {
+      date: "2026-11-14",
+      gradeCourse: "Algebra 1",
+      topicId: "linear-equations",
+      questionIds: ["1", "2", "3", "4", "5"],
+      currentQuestion: 5,
+      questions: Array.from({ length: 5 }, (_, index) => ({
+        answer: "3",
+        attempts: 1,
+        incorrectAttempts: index === 0 ? 1 : 0,
+        outcome: index === 0 ? "helped" as const : "correct" as const,
+        feedback: index === 0 ? "Correct. Completed with help." : "Correct.",
+        hintViewed: index === 0,
+        solutionViewed: index === 0,
+        helpHistoryKnown: true,
+      })),
+    };
+    progress.results[key] = {
+      date: "2026-11-14",
+      gradeCourse: "Algebra 1",
+      topicId: "linear-equations",
+      solvedIndependently: 4,
+      firstAttemptCorrect: 4,
+      completedWithHelp: 1,
+      unclassifiedCompleted: 0,
+      incorrectAttempts: 1,
+      currentStreak: 1,
+      bestStreak: 1,
+    };
+
+    const restored = parseProgress(JSON.stringify(progress));
+    assert.equal(restored.recovered, false);
+    assert.equal(restored.progress.sessions[key].questions[0].outcome, "helped");
+    assert.equal(restored.progress.results[key].completedWithHelp, 1);
+    assert.deepEqual(restored.progress.completedDates, ["2026-11-14"]);
+  });
+
+  it("allocates separate same-day topic practice sessions", () => {
+    const progress = emptyProgress();
+    const baseKey = sessionKey("2026-11-14", "Algebra 1", "linear-equations");
+    progress.sessions[baseKey] = {
+      date: "2026-11-14",
+      gradeCourse: "Algebra 1",
+      topicId: "linear-equations",
+      questionIds: ["1", "2", "3", "4", "5"],
+      currentQuestion: 5,
+      questions: Array.from({ length: 5 }, () => ({
+        answer: "",
+        attempts: 0,
+        incorrectAttempts: 0,
+        outcome: "pending" as const,
+        feedback: "",
+        hintViewed: false,
+        solutionViewed: false,
+        helpHistoryKnown: true,
+      })),
+    };
+    assert.equal(
+      nextSessionKey(progress, "2026-11-14", "Algebra 1", "linear-equations"),
+      `${baseKey}|practice-1`,
+    );
   });
 });

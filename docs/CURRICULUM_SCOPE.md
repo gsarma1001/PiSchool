@@ -24,7 +24,7 @@ with the relevant course sequence. Do not assume a standard topic list.
 
 ## Current status
 
-- The catalog controls the two local browsing choices: grades K–5 and
+- The catalog controls the two local browsing choices: grades K–8 and
   courses. The following table separates playable topics from the number of
   catalog topics still planned. The complete planned-topic names are listed
   under “View upcoming topics” for each selection in the app.
@@ -37,6 +37,9 @@ with the relevant course sequence. Do not assume a standard topic list.
   | Grade 3 | Multiplication and division; Fractions as equal parts; Area and perimeter | 0 |
   | Grade 4 | Multidigit arithmetic; Equivalent fractions and fraction operations; Angles and measurement | 0 |
   | Grade 5 | Decimal and fraction operations; Volume; Expressions and coordinate grids | 0 |
+  | Grade 6 | Ratios, rates, and percents; Expressions and equations; Data and statistical measures | 0 |
+  | Grade 7 | Rational numbers; Proportional reasoning; Geometry and measurement | 0 |
+  | Grade 8 | Linear equations and functions; Exponents and square roots; Geometry and data | 0 |
   | Arithmetic and Number Sense | Place value; Comparing and ordering numbers; Addition; Subtraction; Multiplication; Division; Order of operations; Rounding and estimation; Factors and multiples; Prime numbers; Whole-number operations (mixed review) | 0 |
   | Fractions, Decimals, and Percentages | Adding and subtracting fractions | 7 |
   | Ratios and Proportional Reasoning | Proportions | 7 |
@@ -59,30 +62,35 @@ with the relevant course sequence. Do not assume a standard topic list.
   grade-scoped topics. No lost playable bank was identified in that comparison.
 - The shared curriculum definitions in `src/lib/curriculum.ts` provide
   US Kindergarten and Grades 1–12 filter options, broader school-level labels,
-  and the six elementary Daily Challenge levels. Grade level is separate from
-  math course/topic; elementary challenges map internally to the existing
+  and nine Daily Challenge grade levels from Kindergarten through Grade 8.
+  Grade level is separate from
+  math course/topic; grade-specific challenges map internally to the existing
   Arithmetic and Number Sense course without changing its stable course ID.
 - Daily Challenge currently has five generated questions at each difficulty
-  for all 19 elementary topics: Kindergarten counting, comparing quantities,
+  for all 28 grade-specific topics. Kindergarten–Grade 5 includes counting,
+  comparing quantities,
   patterns, and shapes/sorting; Grade 1 addition/subtraction within 20,
   place value, and time/shapes; Grade 2 place value, equal groups, and
   money/data; Grade 3 multiplication/division, fractions, and area/perimeter;
   Grade 4 multidigit arithmetic, fractions, and angles/measurement; and
   Grade 5 decimal/fraction operations, volume, and expressions/coordinates.
-  Selection is grade-scoped. Elementary answer choices, answer rules, hints,
-  and worked solutions are generated on the server; progress follows the
-  existing device-local persistence model.
-- Elementary challenge coverage is not comprehensive. Kindergarten positional
+  Grade 6–8 topics cover percentages/equations/statistics, rational numbers/
+  proportional reasoning/geometry, and linear functions/exponents/geometry.
+  Selection is grade-scoped. Grade-specific answer choices, answer rules,
+  hints, and worked solutions are generated on the server; progress follows
+  the existing device-local persistence model.
+- Grade-specific challenge coverage is not comprehensive. Kindergarten positional
   language and adding/subtracting with objects, Grade 1 measurement and
   broader word problems, Grade 2 time/measurement, Grade 3 time/graphs and
   multistep problems, Grade 4 factors/multiples and broader conversions, and
-  Grade 5 several requested strands need further content. Existing generated
-  templates also need independent educator review before production use.
+  Grade 5 several requested strands need further content. Grades 6–8 also need
+  broader strands beyond their current three starter topics per grade.
+  Generated templates need independent educator review before production use.
 - F07 uses school-stage filters and source-backed grade mappings. Original
   organizer age and school-year labels remain unchanged; an unverified
   equivalence must not become a confirmed grade match.
 - The typed curriculum catalog now defines 14 stable course IDs and 154
-  distinct advanced-course topic IDs plus 19 elementary topic IDs (173
+  distinct advanced-course topic IDs plus 28 grade-specific topic IDs (182
   distinct topic IDs total), including every topic in the requested advanced
   course list.
   Course and topic display names, descriptions, and display order are stored

@@ -8,7 +8,7 @@ import {
   type CourseId,
   type GradeCourse,
 } from "../catalog";
-import { elementaryChallengeLevels } from "../../../lib/curriculum";
+import { challengeGradeLevels } from "../../../lib/curriculum";
 import { checkAnswer, chooseDailyIds, type AnswerCheck } from "../domain";
 import { question } from "../question-bank";
 import { FileQuestionRepository } from "./file-question-repository";
@@ -60,10 +60,10 @@ function validCourseTopic(
     (item) => item.id === topicId && item.courseIds.includes(courseId),
   );
   if (!course || !topic) return undefined;
-  const elementaryLevel = elementaryChallengeLevels.find((level) =>
+  const challengeGrade = challengeGradeLevels.find((level) =>
     topic.levelIds?.includes(level.id),
   );
-  return { gradeCourse: elementaryLevel?.label ?? course.name, topic };
+  return { gradeCourse: challengeGrade?.label ?? course.name, topic };
 }
 
 function isQuestionLocator(value: QuestionLocator): boolean {
@@ -91,7 +91,10 @@ function isQuestionLocator(value: QuestionLocator): boolean {
       Number.isInteger(question.templateVersion) &&
       (question.templateVersion ?? 0) > 0;
     if (!validIdentity) return false;
-    if (question.templateId === "elementary-math-foundations") {
+    if (
+      question.templateId === "elementary-math-foundations" ||
+      question.templateId === "middle-school-math-foundations"
+    ) {
       return question.parameters === undefined;
     }
     return (
@@ -150,7 +153,12 @@ function publicTemplateParameters(
   parameters: GeneratedQuestion["parameters"],
   templateId: string,
 ): GeneratedQuestion["parameters"] | undefined {
-  if (templateId === "elementary-math-foundations") return undefined;
+  if (
+    templateId === "elementary-math-foundations" ||
+    templateId === "middle-school-math-foundations"
+  ) {
+    return undefined;
+  }
   return Object.fromEntries(
     Object.entries(parameters).filter(
       ([key]) => key !== "solution" && key !== "quotient",
@@ -294,7 +302,7 @@ function getCoverage(repository: QuestionRepository): CourseCoverage[] {
         remainingTopics: topics.length - readyTopics,
       };
     });
-  const elementaryCoverage = elementaryChallengeLevels.map((level) => {
+  const gradeCoverage = challengeGradeLevels.map((level) => {
     const course = courseCatalog.find((item) => item.id === level.courseId);
     if (!course) throw new Error(`Unknown course for ${level.label}.`);
     const topics = getTopicsForGrade(level.label);
@@ -311,11 +319,11 @@ function getCoverage(repository: QuestionRepository): CourseCoverage[] {
       remainingTopics: topics.length - readyTopics,
     };
   });
-  return [...elementaryCoverage, ...advancedCoverage];
+  return [...gradeCoverage, ...advancedCoverage];
 }
 
 function listCourses(): PublicCourse[] {
-  const elementaryCourses: PublicCourse[] = elementaryChallengeLevels.map(
+  const gradeCourses: PublicCourse[] = challengeGradeLevels.map(
     (level) => {
       const course = courseCatalog.find((item) => item.id === level.courseId);
       if (!course) throw new Error(`Unknown course for ${level.label}.`);
@@ -331,7 +339,7 @@ function listCourses(): PublicCourse[] {
     .slice()
     .sort((left, right) => left.order - right.order)
     .map((item) => ({ ...item }));
-  return [...elementaryCourses, ...advancedCourses];
+  return [...gradeCourses, ...advancedCourses];
 }
 
 function listTopics(

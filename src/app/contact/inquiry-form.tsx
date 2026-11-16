@@ -34,8 +34,9 @@ export function InquiryForm() {
       )}
 
       <div className="form-grid">
+        <p className="form-required-note">Fields marked (required) must be completed.</p>
         <div className="form-field">
-          <label htmlFor="inquiry-name">Parent or guardian name</label>
+          <label htmlFor="inquiry-name">Parent or guardian name (required)</label>
           <input
             autoComplete="name"
             aria-describedby={fieldError(state, "name") ? "inquiry-name-error" : undefined}
@@ -55,7 +56,7 @@ export function InquiryForm() {
         </div>
 
         <div className="form-field">
-          <label htmlFor="inquiry-email">Email address</label>
+          <label htmlFor="inquiry-email">Email address (required)</label>
           <input
             autoComplete="email"
             aria-describedby={fieldError(state, "email") ? "inquiry-email-error" : undefined}
@@ -76,7 +77,7 @@ export function InquiryForm() {
 
         <div className="form-field form-field-wide">
           <label htmlFor="inquiry-grade-course">
-            Student grade, level, or course
+            Student grade, level, or course (required)
           </label>
           <input
             aria-describedby={
@@ -113,7 +114,7 @@ export function InquiryForm() {
         </div>
 
         <div className="form-field form-field-wide">
-          <label htmlFor="inquiry-help">What would you like help with?</label>
+          <label htmlFor="inquiry-help">What would you like help with? (required)</label>
           <textarea
             aria-describedby={
               fieldError(state, "helpWith")
@@ -152,7 +153,7 @@ export function InquiryForm() {
       </div>
 
       <button className="button button-primary inquiry-submit" disabled={pending} type="submit">
-        {pending ? "Sending…" : "Send inquiry"}
+        {pending ? "Sending…" : "Request a trial lesson"}
       </button>
     </form>
   );

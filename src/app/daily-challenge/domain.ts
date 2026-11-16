@@ -2,6 +2,7 @@ import "server-only";
 
 export type AnswerRule =
   | { type: "integer"; canonical: string }
+  | { type: "variable-integer"; canonical: string; variable: string }
   | { type: "fraction"; canonical: string; acceptDecimal?: boolean }
   | {
       type: "choice";
@@ -144,6 +145,26 @@ export function checkAnswer(rule: AnswerRule, value: string): AnswerCheck {
       return {
         status: "invalid",
         message: "Enter a whole number, including a minus sign if needed.",
+      };
+    }
+    return String(submitted) === rule.canonical
+      ? { status: "correct" }
+      : { status: "incorrect" };
+  }
+
+  if (rule.type === "variable-integer") {
+    const variableAnswer = answer.match(/^([A-Za-z])\s*=\s*([+-]?\d+)$/);
+    if (variableAnswer && variableAnswer[1] !== rule.variable) {
+      return {
+        status: "invalid",
+        message: `Use ${rule.variable} as the variable in your answer.`,
+      };
+    }
+    const submitted = parseInteger(variableAnswer ? variableAnswer[2] : answer);
+    if (submitted === undefined) {
+      return {
+        status: "invalid",
+        message: `Enter a whole number or an equation such as ${rule.variable} = 3.`,
       };
     }
     return String(submitted) === rule.canonical
