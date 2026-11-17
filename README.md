@@ -104,14 +104,19 @@ Abhay is listed at $25 for 50 minutes, and Sneha and Meera are each listed at
 $20 for 45 minutes. Tutor biographies remain unpublished pending each tutor's
 review.
 
-## Final validation and hardening status
+## Validation status
 
-The site has been checked end-to-end on the local build: the main pages respond
-successfully, the app's internal links resolve without broken routes, and the
-daily-challenge and event validation suites pass. The production build also
-completes successfully. The remaining live-delivery dependency is the email
-provider configuration (Resend sender verification and recipient inbox
-validation), not the app logic itself.
+The staging app code at
+`b1261b9366d83a6b417e5cc3173a96835431c71d` deployed successfully to
+`https://agreeable-water-00b9db610.5.azurestaticapps.net`; see
+`docs/PROJECT_PLAN.md` for the staging QA record. Local
+Daily Challenge, Events, and Math News tests, TypeScript checking, and the
+production build pass. Lint reports four existing unused-variable warnings.
+
+On staging, one clearly labeled inquiry was submitted and Resend accepted it;
+the browser showed the success message. The owner still needs to confirm
+delivery in Gmail and that Reply addresses the email entered on the form.
+Provider acceptance does not itself guarantee final inbox delivery.
 
 ## Daily Math Challenge
 
