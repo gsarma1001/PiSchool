@@ -1588,7 +1588,20 @@ const eventEditions: EventEdition[] = [
         lastChecked: "2026-11-10",
       },
     ],
-    resources: [],
+    resources: [
+      {
+        type: "sample-questions",
+        title: "Official sample contest — Division E (Grades 4–6)",
+        url: "https://drive.google.com/file/d/1w8AkMWqMAHPidIEfAs9044xp-bjRSTHT/view",
+        sourceId: "moems-2026-27-resources",
+      },
+      {
+        type: "sample-questions",
+        title: "Official sample contest — Division M (Grades 6–8)",
+        url: "https://drive.google.com/file/d/1ODkoRxVl1YZl9dFQ8zALe92uR-KLs8a4/view",
+        sourceId: "moems-2026-27-resources",
+      },
+    ],
     sources: [
       {
         id: "moems-2026-27",
@@ -1607,8 +1620,16 @@ const eventEditions: EventEdition[] = [
           "preparation",
         ],
       },
+      {
+        id: "moems-2026-27-resources",
+        url: "https://www.moems.org/pages/resources",
+        title: "MOEMS official sample contests and preparation resources",
+        authority: "organizer",
+        verifiedAt: "2026-11-16",
+        claims: ["preparation"],
+      },
     ],
-    lastVerified: "2026-11-10",
+    lastVerified: "2026-11-16",
     nextReview: "2026-12-01",
     editorialStatus: "published",
     reviewFlags: [],

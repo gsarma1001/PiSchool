@@ -384,6 +384,38 @@ describe("event directory filters and source boundaries", () => {
     );
   });
 
+  it("publishes MOEMS sample contests with organizer source provenance", () => {
+    const moems = eventRecords.find((event) => event.id === "moems-2026-27");
+    assert.ok(moems);
+    assert.deepEqual(
+      moems.resources.map(({ title, url, sourceId }) => ({
+        title,
+        url,
+        sourceId,
+      })),
+      [
+        {
+          title: "Official sample contest — Division E (Grades 4–6)",
+          url: "https://drive.google.com/file/d/1w8AkMWqMAHPidIEfAs9044xp-bjRSTHT/view",
+          sourceId: "moems-2026-27-resources",
+        },
+        {
+          title: "Official sample contest — Division M (Grades 6–8)",
+          url: "https://drive.google.com/file/d/1ODkoRxVl1YZl9dFQ8zALe92uR-KLs8a4/view",
+          sourceId: "moems-2026-27-resources",
+        },
+      ],
+    );
+    assert.ok(
+      moems.sources.some(
+        (source) =>
+          source.id === "moems-2026-27-resources" &&
+          source.url === "https://www.moems.org/pages/resources" &&
+          source.verifiedAt === "2026-11-16",
+      ),
+    );
+  });
+
   it("reports missing editorial information and overdue verification", () => {
     const report = getEventEditorialReport(
       [
