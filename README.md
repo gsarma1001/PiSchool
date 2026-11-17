@@ -100,9 +100,9 @@ and Reply-To behavior in the recipient inbox during the launch test.
 
 The first lesson is a 45-minute, one-on-one trial. Its price and delivery
 format have not been confirmed and are separate from regular lesson rates:
-Abhay is listed at $25 for 50 minutes, and Sneha and Meera are each listed at
-$20 for 45 minutes. Tutor biographies remain unpublished pending each tutor's
-review.
+Abhay is listed at $25 for 45 minutes, and Sneha and Meera are each listed at
+$20 for 45 minutes. Public biographies remain withheld until each tutor has
+reviewed and approved their bio.
 
 ## Validation status
 

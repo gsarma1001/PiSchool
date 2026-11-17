@@ -9,13 +9,15 @@ news, and testimonials; `/tutoring` redirects to `/contact`. Challenge
 browsing restores the selected grade or course and now includes playable
 Grades 6–8 starter topics. Events use school stages and separate venue country
 and region. Math News has audience filters, a 20-story curated catalog, and
-manual publisher-feed discovery with editorial review. The user supplied
-regular tutor rates and trial details; tutor biographies remain withheld until
-each tutor reviews them. Local tests, typecheck, lint, required-field
-validation, mobile keyboard navigation, the tutoring redirect, and production
-build were verified after upgrading Next.js to 16.4.6. These changes are not
-yet deployed to staging, and the current email flow has not been resubmitted.
-An earlier staging email success was owner-confirmed.
+manual publisher-feed discovery with editorial review. The first lesson is a
+45-minute one-on-one trial with price and delivery format unconfirmed. Regular
+rates are $25/45 minutes for Abhay and $20/45 minutes for Sneha and Meera.
+Tutor biographies remain withheld until each tutor reviews and approves their
+bio. Local tests, typecheck, lint, required-field validation, mobile keyboard
+navigation, the tutoring redirect, and production build were verified after
+upgrading Next.js to 16.4.6. An earlier staging email success was
+owner-confirmed; the latest staging inquiry was also accepted by Resend, with
+Gmail delivery and Reply-To confirmation pending.
 
 ## 1. Purpose and relationship to the project plan
 

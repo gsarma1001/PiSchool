@@ -20,7 +20,7 @@ export const tutors: TutorProfile[] = [
     bio: "Founded The Pi School and is a first-year student in UC Berkeley’s Management, Entrepreneurship, & Technology (M.E.T.) program.",
     subjects: "Advanced math from Precalculus onward",
     rate: "$25",
-    lessonLength: "50 minutes",
+    lessonLength: "45 minutes",
     reviewStatus: "pending",
   },
   {
