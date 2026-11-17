@@ -9,9 +9,9 @@ Abhay is $25/45 minutes; Sneha and Meera are each $20/45 minutes. Trial price
 and delivery format are unconfirmed, and public biographies remain withheld
 pending each tutor's review. The targeted test suites, typecheck, lint, browser
 checks, and production build pass locally after upgrading Next.js and
-`eslint-config-next` to 16.4.6. The tutoring rate revision still needs staging
-deployment and verification. Unverified availability, event editions, and
-news claims remain open for review.
+`eslint-config-next` to 16.4.6. Tutor offer revision `c7fc341` is deployed to
+staging and verified on both Home and Request a trial lesson. Unverified
+availability, event editions, and news claims remain open for review.
 
 This plan tracks work against `PROJECT_PLAN.md`. Implement each phase only
 when requested, preserving the existing source material and avoiding
@@ -23,8 +23,8 @@ production changes.
 |---|---|---|
 | Prompt 1 — Foundation and homepage | Complete | App Router, TypeScript, Tailwind, responsive shared shell and homepage; required docs and setup instructions; ESLint, TypeScript, production build, and HTTP 200 homepage content checks passed. |
 | Phase 0 — Preserve | Complete | Accessible public pages, assets, six unique source testimonials, seven expanded FAQs, and one owner-provided testimonial are archived. The owner completed the flagged-content review and confirmed no private records were collected or kept. Specific publication decisions for flagged tutor/contact/claims content remain subject to verification; see `docs/CONTENT_MIGRATION.md`. |
-| Phase 1 — Redesign | Partial | Responsive homepage, shared header/footer, testimonials, tutoring offer, and contact inquiry are implemented. Abhay's regular rate is $25/45 minutes; Sneha and Meera are $20/45 minutes. Trial price and delivery are unconfirmed; public tutor biographies await individual review. The latest rate change needs staging deployment and verification. |
-| Phase 2 — Math hub | Partial — Grade 6–8 challenge starter content, Events filters, and Math News catalog are implemented locally; broader content coverage remains | Grades K–8 have three playable topics per grade and server-side answer/help generation. F07 has 12 published editions across 13 families, two archived editions, and one non-public draft. Math News has 20 curated stories and manual feed discovery; source coverage and independent mathematical review remain incomplete. The directory lacks a verified upcoming conference, workshop, or university tournament. Targeted suites, typecheck, lint, and production build pass on Next.js 16.4.6; staging has not yet been updated. |
+| Phase 1 — Redesign | Partial; deployed to staging | Responsive homepage, shared header/footer, testimonials, tutoring offer, and contact inquiry are implemented. Abhay's regular rate is $25/45 minutes; Sneha and Meera are $20/45 minutes. Trial price and delivery are unconfirmed; public tutor biographies await individual review. The staging rate revision was browser-verified on Home and Request a trial lesson. |
+| Phase 2 — Math hub | Partial — deployed to staging; broader content coverage remains | Grades K–8 have three playable topics per grade and server-side answer/help generation. F07 has 12 published editions across 13 families, two archived editions, and one non-public draft. Math News has 20 curated stories and manual feed discovery; source coverage and independent mathematical review remain incomplete. The directory lacks a verified upcoming conference, workshop, or university tournament. Targeted suites, typecheck, lint, and production build pass on Next.js 16.4.6; staging QA evidence is in `docs/PROJECT_PLAN.md`. |
 | Phase 3 — Daily Quick Mind pilot | Not started | Reviewed topics and validated server-side grading for a small pilot. |
 | Phase 4 — Expand learning | Partial — K–8 challenge starter set added | 28 grade-specific topics have deterministic five-question challenge sets. Broader topic coverage, educator review, remaining grade/course mappings, and advanced curriculum expansion remain open. |
 | Phase 5 — Launch and operate | Not started | Content, critical flows, backups, monitoring, and rollback verified; domain switch remains a separately approved action. |

@@ -107,7 +107,7 @@ reviewed and approved their bio.
 ## Validation status
 
 The staging app code at
-`b1261b9366d83a6b417e5cc3173a96835431c71d` deployed successfully to
+`c7fc341fa2f966966e1971a6cd94fc2dec7bb5cf` deployed successfully to
 `https://agreeable-water-00b9db610.5.azurestaticapps.net`; see
 `docs/PROJECT_PLAN.md` for the staging QA record. Local
 Daily Challenge, Events, and Math News tests, TypeScript checking, and the
