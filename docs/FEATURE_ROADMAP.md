@@ -1,6 +1,6 @@
 # The Pi School — Feature Roadmap and Requirements
 
-Updated: November 16, 2026
+Updated: November 18, 2026
 Suggested repository location: `docs/FEATURE_ROADMAP.md`
 Status: Planning baseline. Proposed features are not authorization to implement every phase at once.
 
@@ -23,7 +23,7 @@ Gmail delivery and Reply-To confirmation pending.
 
 Build a welcoming mathematics learning hub that connects personalized tutoring, independent practice, homework help, mathematical exploration, and competition opportunities.
 
-This document supplements `docs/PROJECT_PLAN.md`; it does not replace its original eight prompts. Use stable feature IDs below to link implementation work to the plan. Where priorities differ from earlier suggestions, the sequence in Section 4 is the current recommendation. Implement one selected milestone at a time.
+This document supplements `docs/PROJECT_PLAN.md`; it does not replace its original eight prompts. Use stable feature IDs below to link implementation work to the plan. The release priorities in Section 4A take precedence where earlier sequencing differs. Implement only the selected, authorized work at a time.
 
 AoPS is a reference for academic presentation and learning patterns. Keep The Pi School's branding, wording, imagery, teaching approach, and implementation original.
 
@@ -34,11 +34,11 @@ The local application has a Next.js App Router, TypeScript, Tailwind styling, a 
 A later clearly labeled local test was accepted by Resend, as recorded in
 `docs/PROJECT_PLAN.md`. The owner also confirmed an earlier staging send was
 delivered and Reply addressed the entered email; no message ID was recorded.
-Those tests predate the current changes. The current staging runtime settings,
-send acceptance, inbox delivery, and Reply-To behavior still require
-verification after deployment.
+The latest staging inquiry was accepted by Resend after deployment; Gmail
+delivery and Reply-To confirmation for that specific message remain pending.
+Provider acceptance is not proof of inbox delivery.
 
-The public source archive and F01 reconciliation are complete. On 2026-11-07, the owner confirmed reviewing the flagged team/contact/outcome-claim content and confirmed no private records were collected or kept for this website. The review did not record specific corrections or republication approvals, so flagged details remain unverified and must not be presented as current facts. The testimonial portion of F04 is complete locally; current tutor profiles remain unverified and unpublished. Booking, accounts, database-backed storage, and AI are not implemented.
+The public source archive and F01 reconciliation are complete. On 2026-11-07, the owner confirmed reviewing the flagged team/contact/outcome-claim content and confirmed no private records were collected or kept for this website. The review did not record specific corrections or republication approvals, so flagged details remain unverified and must not be presented as current facts. The testimonial portion of F04 is complete locally; tutor cards show owner-supplied coverage and rates, while biographies await each tutor's review. Booking, accounts, database-backed storage, and AI are not implemented.
 
 F06 has a working local daily challenge route with a typed question-service
 and repository boundary, a server-only file bank, and deterministic
@@ -98,30 +98,60 @@ Do not mark a feature complete solely because its navigation, mockup, or placeho
 
 M0 / F01 is complete. F07 — Worldwide math events and beginner guides has been implemented locally in M2; see the verified-coverage and editorial-gap notes below. The Kindergarten–Grade 8 challenge starter set updates F06 without completing the broader curriculum. The visual theme may be refined independently without publishing unverified content. No calendar dates or delivery estimates are committed here.
 
+## 4A. Launch roadmap update — release priorities
+
+Phase 1 and Phase 2 below are release groupings for this review, not
+replacements for milestones M0–M5 or the phases in `docs/PROJECT_PLAN.md`.
+Only the specified slices of a feature are prioritized here; other requirements
+in its existing entry remain in scope for their own later work.
+
+The public staging review found the six distinct production homepage
+testimonials on staging alongside an additional Algebra 1 testimonial.
+Daily Challenge, Events, and Math News are visible in staging navigation.
+The latest staging inquiry was accepted by Resend; its Gmail delivery and
+Reply-To confirmation remain pending.
+
+| Phase | Feature IDs and item | Origin | Scope and acceptance |
+| --- | --- | --- | --- |
+| 1 | F04/F05 Parent FAQ | Production FAQ | Explain lesson format and frequency, homework help, what happens during a lesson, trial and regular pricing, inquiry follow-up, and cancellation. Cancellations made less than 24 hours before the scheduled session are ineligible for refunds or make-up classes. Link the FAQ from the footer and Get Started; identify unconfirmed details rather than inventing them. |
+| 1 | F04 Tutor cards and About | Production Team page | Publish reviewed current bios, course coverage, regular rates, and a sentence about each tutor's approach. Add an About page with Abhay's founder story and experience as a math tutor and swim instructor, subject to verification and tutor review. Preserve testimonial wording and attribution. |
+| 1 | F05 Direct support and trial inquiry | Production support links and staging review | Use `thepischooltutoring@gmail.com` in the FAQ, contact page, and footer. The first lesson is a 45-minute one-on-one trial; trial price and delivery format are separate owner inputs. Explain inquiry follow-up and verify deployed delivery and confirmation. |
+| 1 | F01 Legacy routes | Production navigation | Keep `/faq` and `/contact` usable; route `/team` to the current tutor section or page. Verify on the deployment that will serve the production domain. |
+| 1 | F03/F11 Practice entry and next step | Khan Academy mastery paths | Use existing grade/course and topic options. After a completed set, link to one reviewed follow-up topic, using a prerequisite for a known gap where available. Keep practice available to guests. |
+| 2 | F18 Semi-private and group lessons | Production tutoring formats | If demand and staffing support it, pilot one course-level group. Publish format, eligibility, group size, price, and schedule when confirmed. |
+| 2 | F11/F15 Readiness check | IXL Diagnostic and Khan Academy Readiness Check | Pilot a brief Algebra 1 readiness check showing observed strengths and one or two recommended practice topics linked to existing sets. |
+| 2 | F14 Parent progress updates | Khan Academy parent reports | Pilot tutor-written updates covering practice, independent skills, and next steps; use parent feedback to scope any future dashboard. |
+| 2 | F07 Competition starter guides | Existing Events directory and roadmap | Pilot guides across elementary, middle, and high school, with verified eligibility, registration deadlines, official sample problems, and a suggested first week of practice. |
+| 2 | F09 Weekly homework-help hour | Production FAQ and existing roadmap | Pilot one staffed slot with a published time zone, grade coverage, and signup instructions. Evaluate expansion using attendance and repeat demand. |
+
+Keep Phase 1 tutoring copy aligned with services actually on offer. Do not
+publish legacy aggregate outcome claims, the placeholder phone number, 24/7
+support claims, or non-math services unless their current status is verified.
+
 ## 5. Feature inventory
 
 The inventory defines scope and dependencies. Current verified completion is recorded in Section 2 and each feature specification below.
 
 | ID | Feature | Priority | Dependencies |
 | --- | --- | --- | --- |
-| F01 | Original-content and testimonial preservation | Complete | Archive and owner reconciliation complete; no private records were collected or kept |
+| F01 | Original-content and testimonial preservation | Complete; legacy routes Phase 1 | Archive and owner reconciliation complete; legacy routes verified on the deployment serving the production domain |
 | F02 | Aqua/navy visual theme | Near term | Existing app foundation |
-| F03 | Learning-pathway cards | Near term | Reviewed service scope |
-| F04 | Testimonials and current tutor profiles | Near term | F01; owner content review |
-| F05 | Tutoring pages and contact flow | Near term | Verified services; delivery configuration |
+| F03 | Learning-pathway cards | Phase 1 practice entry; other pathways near term | Existing grade/course and topic options; reviewed service scope |
+| F04 | Testimonials and current tutor profiles | Phase 1 FAQ, tutor cards and About | F01; owner and individual tutor review |
+| F05 | Tutoring pages and contact flow | Phase 1 FAQ, direct support and inquiry | Verified services; delivery configuration and inbox confirmation |
 | F06 | Daily Math Challenge | Near term | Reviewed original questions |
-| F07 | Worldwide math events and beginner guides | Near term | Official-source verification |
+| F07 | Worldwide math events and beginner guides | Phase 2 competition starter guides; directory near term | Official-source verification |
 | F08 | Math Discoveries: research, news, facts | Near term | Editorial review |
-| F09 | Weekly homework-help calendar | Near term | Confirmed schedule and registration method |
+| F09 | Weekly homework-help calendar | Phase 2 staffed-hour pilot; full calendar later | Confirmed staffing, schedule and registration method |
 | F10 | Editorial/admin dashboard | Near term | Database, admin authentication and authorization |
-| F11 | Daily Quick Mind pilot | Pilot | Reviewed question bank and mathematical grader |
+| F11 | Daily Quick Mind pilot | Phase 1 next topic; Phase 2 readiness check; broader pilot later | Reviewed question bank, links and mathematical grader |
 | F12 | AI explanations and reasoning review | Later | F11; evaluation, usage and privacy controls |
 | F13 | Full curriculum expansion through Calculus IV | Later | F11; curriculum definition and review |
-| F14 | Parent-managed accounts and progress dashboard | Later | Account/access design and retention decisions |
-| F15 | Adaptive difficulty and targeted review | Later | F11, F14; validated learning-history interpretation |
+| F14 | Parent progress updates, accounts and dashboard | Phase 2 tutor-written pilot; accounts and dashboard later | Tutor capacity and parent feedback; account/access design and retention decisions for accounts |
+| F15 | Adaptive difficulty and targeted review | Phase 2 readiness pilot; broader adaptation later | F11; reviewed recommendations; F14 history for account-based adaptation |
 | F16 | Timed practice contests | Future | Sufficient reviewed/licensed content |
 | F17 | Tutor videos and searchable concept library | Future | Content production capacity |
-| F18 | Live math circles and collaborative sessions | Future | Facilitators, schedule, suitable participation controls |
+| F18 | Semi-private/group lessons and live math circles | Phase 2 group pilot if justified; broader sessions future | Demand, staffing, schedule, suitable participation controls |
 | F19 | Multiplayer challenges and leaderboards | Future | Reliable scoring and active user demand |
 | F20 | Moderated forums and mentored research | Future | Sustained moderation/mentor capacity |
 
@@ -138,6 +168,11 @@ Private inquiries, unpublished feedback, scheduling records, and client contact 
 **Done when:** every discovered source item is accounted for; exact testimonial comparison passes; missing/private records are listed or confirmed not applicable; outdated tutor information and outcome claims are flagged and reviewed by the owner. Specific corrections and publication approval remain prerequisites before reuse of flagged content.
 
 **Status:** Complete for archive and reconciliation. The owner completed the flagged-content review and confirmed that no private records were collected or kept (2026-11-07). Tutor, contact, and outcome-claim details remain flagged because the review did not record specific corrections or approval to republish them.
+
+**Phase 1 legacy routes:** Keep `/faq` and `/contact` usable and route `/team`
+to the current tutor section or page. Verify all three against the deployment
+that will serve the production domain; do not assume local redirects prove
+production behavior.
 
 ### F02 — Visual theme
 
@@ -162,21 +197,43 @@ Define semantic theme tokens. Favor aqua backgrounds, light cards, navy headings
 
 Add three clear entry cards: **Build Foundations**, **Get Homework Help**, and **Explore Challenges**. Each explains its intended learner and links to a real destination. Preserve non-math services if still offered. Keep Kindergarten–Calculus IV as a long-term curriculum scope, not a current availability claim.
 
+**Phase 1 practice entry:** Make the existing grade/course and topic options
+easy to find and use. Coordinate the reviewed post-set next step with F11;
+do not imply that planned topics are playable.
+
 **Done when:** every card has an honest description and working destination; unavailable experiences are clearly labeled; navigation remains manageable on mobile.
 
 ### F04 — Testimonials and tutor profiles
 
-Seven owner-approved testimonials are published in readable cards on the local homepage, with original wording and attributions. Avoid requiring motion to read quotes. Current tutor participation, biographies, photographs, subjects and availability still need review; no tutor profiles are being represented as current.
+Seven owner-approved testimonials are published in readable cards on the local homepage, with original wording and attributions. Avoid requiring motion to read quotes. Tutor cards show owner-supplied course coverage and regular rates; biographies remain withheld until each tutor reviews and approves their bio. Photographs and availability still need verification.
 
 **Status:** testimonial publication is complete locally; tutor-profile review and publication remain incomplete.
+
+**Phase 1:** Add a parent FAQ with F05, linked from the footer and Get Started.
+Publish reviewed current biographies, course coverage, regular rates and
+lesson lengths, and a sentence describing each tutor's approach. Add an About
+page with Abhay's founder story and teaching experience as a math tutor and
+swim instructor, subject to verification and tutor review. Preserve original
+testimonial wording and attributions.
 
 **Done when:** published quotes match their archive; no invented stars or outcomes appear; tutor information is reviewed; original attributions remain intact.
 
 ### F05 — Tutoring and contact
 
-Explain the source-confirmed broad math scope and tutoring formats, and provide a request path without implying current availability. The contact form collects only parent/guardian name, reply email, student grade or course, and requested help. It validates on the server, includes a hidden honeypot and best-effort in-process rate limit, and sends through Resend using server-only `RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`, and `INQUIRY_TO_EMAIL`. The intended recipient is `thepischooltutoring@gmail.com`; the sender must be an address on a domain verified with Resend. The owner still needs to configure these values and production edge rate limiting.
+Explain the source-confirmed broad math scope and tutoring formats, and provide a request path without implying current availability. The contact form collects only parent/guardian name, reply email, student grade or course, and requested help. It validates on the server, includes a hidden honeypot and best-effort in-process rate limit, and sends through Resend using server-only `RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`, and `INQUIRY_TO_EMAIL`. The intended recipient is `thepischooltutoring@gmail.com`; the sender must be an address on a domain verified with Resend. Staging delivery settings were functionally present; production configuration and edge rate limiting remain to be verified.
 
-**Status:** routes, form, validation, spam controls, and delivery code are implemented locally. A clearly labeled local form test was accepted by Resend (message ID `01a1c94c-4c4c-76a6-aae3-0e6f2d566492`). Inbox receipt and actual Reply-To behavior have not been independently verified.
+**Status:** routes, form, validation, spam controls, and delivery code are implemented. The owner confirmed an earlier staging send and Reply-To; the latest staging inquiry was accepted by Resend, but its inbox receipt and Reply-To await owner confirmation.
+
+**Phase 1:** Publish `thepischooltutoring@gmail.com` as direct support in the
+FAQ, contact page and footer. The first lesson is a 45-minute one-on-one
+trial; its price and delivery format are separate, unconfirmed owner inputs,
+not the regular rates. Explain what happens during a lesson, lesson format
+and frequency, homework help, regular pricing, and inquiry follow-up without
+inventing missing details or promising a response time. Include the supplied
+cancellation policy: “Cancellations made less than 24 hours before the
+scheduled session are ineligible for refunds or make-up classes.” Verify
+deployed confirmation and actual delivery, distinguishing provider acceptance
+from inbox receipt.
 
 **Done when:** a real inquiry reaches its intended destination; failure and validation states work; private inquiries are protected; expected response arrangements are accurately described. A provider acceptance is not proof of final inbox receipt.
 
@@ -198,7 +255,13 @@ Focused checks cover question-bank completeness and canonical answers, stable da
 
 Cover math conferences, competitions, Olympiads, tournaments, and workshops worldwide. Include local through international events and clearly distinguish the venue's location from where entrants are eligible to participate.
 
-**Timing.** Add the requirements now. Build the directory in M2 after the content preservation and site foundation milestones. Launch with a small set of verified events across several regions and online formats, then expand country by country and through verified organizer submissions. Treat worldwide coverage as the long-term scope and track which regions and organizers are covered.
+**Timing.** The directory is implemented in M2 as a curated first release; expand it country by country and through verified organizer submissions. Treat worldwide coverage as the long-term scope and track which regions and organizers are covered.
+
+**Phase 2 competition starter-guide pilot:** Cover elementary, middle, and
+high school. For each guide, include organizer-verified eligibility and
+registration deadlines, official sample problems, and a suggested first week
+of practice. Clearly label unannounced or unverified details rather than
+inferring them.
 
 | Listing field | What to capture |
 | --- | --- |
@@ -221,7 +284,7 @@ Start with manual verification and publish only reviewed entries. Recheck active
 #### F07 implementation contract and M2 status
 
 The site foundation and content-preservation dependencies are complete, so
-implementation proceeds in M2. The directory is a curated first release, not
+the directory was implemented in M2. It is a curated first release, not
 comprehensive worldwide coverage. Preserve the existing site shell, palette,
 typography, and navigation across `/events`, `/events/[slug]`, and
 `/events/guides`. The implemented directory groups events by purpose, uses
@@ -338,6 +401,10 @@ filters, and scheduled refresh remain future work.
 
 ### F09 — Homework-help calendar
 
+**Phase 2 pilot:** If staffed, publish one weekly homework-help slot with its
+time zone, grade coverage and signup instructions. Use attendance and repeat
+demand to evaluate expansion; do not invent a schedule or availability.
+
 Desktop week view and mobile agenda. Display subject/level, tutor, start/end time, timezone, online/in-person format, availability and registration action. Default timezone: America/Los_Angeles; label conversions clearly. Support recurrence and exceptions, daylight-saving changes, cancellations and calendar downloads.
 
 First release may use configured external registration or a clearly labeled inquiry action. Inquiry is not reservation. Native booking later needs transactional capacity enforcement, duplicate prevention, cancellations and confirmations. Never expose private meeting links or student rosters publicly.
@@ -353,6 +420,15 @@ Admin-only draft, preview, publish, edit, archive and export for opportunities, 
 ## 7. Daily Quick Mind and later learning features
 
 ### F11 — Practice pilot
+
+**Phase 1 next step:** After a completed guest set, link to one reviewed
+follow-up topic using existing playable grade/course and topic options. Use a
+reviewed prerequisite for a known gap where available, or a related reviewed
+topic otherwise; do not offer dead links or claim diagnostic precision.
+
+**Phase 2 readiness pilot:** With F15, offer a brief Algebra 1 readiness check
+that reports observed strengths and links one or two recommended practice
+topics to existing sets. Keep this distinct from the broader practice pilot.
 
 Flow: level → topic → subtopic → 5 or 10 questions → answer submission → score and explanations → suggested review or relevant help session.
 
@@ -384,11 +460,19 @@ Publish in reviewed batches. Advanced grading must address extraneous roots, mul
 
 ### F14 — Accounts and progress
 
+**Phase 2 pilot:** Provide tutor-written parent updates covering practice,
+independent skills and next steps. Use parent feedback to scope a possible
+future dashboard; this pilot does not require accounts or a dashboard.
+
 Optional parent-managed access, session history and understandable topic summaries. Define parent/student/tutor/admin permissions; retention; export; deletion; and account recovery. Tutors see only assigned students. Separate guest access from account-linked storage.
 
 **Release gate:** allow/deny access checks pass; history reflects actual work; no fabricated progress; data lifecycle is documented and usable.
 
 ### F15 — Adaptive learning and targeted review
+
+**Phase 2 readiness pilot:** Collaborate with F11 on the brief Algebra 1
+check and its one or two reviewed, actionable practice recommendations.
+Report observed strengths without overstating mastery.
 
 Use validated question tags and history to recommend review, adjust difficulty and revisit weak concepts. Explain recommendations and let learners choose topics. Distinguish practice performance from demonstrated mastery; one short quiz is insufficient evidence of broad mastery.
 
@@ -400,7 +484,7 @@ Use validated question tags and history to recommend review, adjust difficulty a
 | --- | --- | --- |
 | F16 | Timed original practice sets with solutions | Enough reviewed content; clear timing/accommodations and scoring rules; no implied official affiliation |
 | F17 | Short tutor-created explanations linked to topics | Production/review capacity; captions/transcripts; search by level/topic |
-| F18 | Facilitated small-group math circles | Confirmed hosts, participation expectations, registration and privacy arrangements |
+| F18 | Phase 2: one course-level semi-private or group lesson pilot; later, facilitated math circles | Demand and staffing support; confirmed format, eligibility, group size, price, schedule, participation expectations, registration and privacy arrangements |
 | F19 | Opt-in friendly challenges | Reliable scoring, sufficient usage, age-appropriate identities, anti-abuse design; avoid public student data |
 | F20a | Moderated topic discussions | Named moderation owners, reporting/escalation workflow and sustainable participation |
 | F20b | Small mentored exploration projects | Qualified mentors, original project scope, suitable supervision and clear expectations |
@@ -465,6 +549,8 @@ Do not enable new AI processing or publish unreviewed content.
 - Which non-math tutoring services remain active?
 - Which tutors and availability are current?
 - What are the actual homework-help hours and registration method?
+- What are the trial price, delivery format, lesson frequency, and inquiry follow-up commitments?
+- Have each tutor's biography, approach, and founder-story details been reviewed and approved for publication?
 - Is help free, paid, or included with tutoring?
 - Which countries, organizers, and grade bands should the first worldwide directory listings prioritize?
 - Who reviews math questions and publishes weekly content?
@@ -476,12 +562,15 @@ These do not block preserving content or applying the visual theme.
 
 ## 12. Completion checklist
 
-- [ ] F01 archived and reconciled
+- [x] F01 archived and reconciled
+- [ ] F01 Phase 1 legacy routes verified on the deployment serving the production domain
 - [ ] F02 theme reviewed on desktop/mobile
 - [ ] F03 pathways link to honest destinations
 - [x] F04 owner-approved testimonials published in the local rebuild
 - [ ] F04 current tutor profiles reviewed and published
+- [ ] F04/F05 Phase 1 parent FAQ and F04 About page published with verified details
 - [ ] F05 real contact delivery verified
+- [ ] F03/F11 Phase 1 guest practice entry and reviewed next-topic link verified
 - [ ] F06 first original daily challenge reviewed and daily publishing process confirmed
 - [ ] F07 worldwide math events directory launched with verified listings and preparation links where available
 - [ ] F08 discovery content reviewed and attributed
@@ -492,6 +581,11 @@ These do not block preserving content or applying the visual theme.
 - [ ] F13 curriculum batches individually reviewed
 - [ ] F14 optional account access/data lifecycle verified
 - [ ] F15 adaptation evaluated before mastery claims
+- [ ] Phase 2 F18 group lesson pilot scoped if demand and staffing support it
+- [ ] Phase 2 F11/F15 Algebra 1 readiness pilot verified
+- [ ] Phase 2 F14 tutor-written parent updates piloted
+- [ ] Phase 2 F07 competition starter guides piloted across elementary, middle and high school
+- [ ] Phase 2 F09 staffed weekly homework-help hour piloted
 - [ ] Future features selected individually based on demand
 
 ## 13. Reference inspiration
@@ -509,4 +603,5 @@ references document inspiration, not a commitment to reproduce their system.
 
 | Date | Change |
 | --- | --- |
+| 2026-11-18 | Merged launch-review Phase 1 and Phase 2 priorities into existing feature IDs while retaining milestones and outstanding verification gates. |
 | 2026-10-30 | Consolidated original requested additions, AoPS-inspired ideas, proposed palette, staged requirements, dependencies, acceptance criteria and implementation prompts. |
